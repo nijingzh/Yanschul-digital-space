@@ -3,6 +3,8 @@
 # ════════════════════════════════════════════════════
 node_modules/
 dist/
+#网易云API
+api-enhanced/ 
 .astro/
 coverage/
 .cache/

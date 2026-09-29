@@ -110,7 +110,7 @@ body {
   /* L1 环境光场（雾瓷 v17.2）：主光右上 900px 冷紫 0.55 + 暖息左下 700px 0.45 + 基底；
      滚动跟随 = fixed attachment（性能稳，登记值）；token 未动 */
   background:
-    linear-gradient(rgba(167, 152, 218, 0.045), rgba(167, 152, 218, 0.045)),
+    linear-gradient(rgba(167, 152, 218, 0.09), rgba(167, 152, 218, 0.09)),
     radial-gradient(1250px 1250px at 88% -8%, rgba(214, 208, 242, 0.95) 0%, transparent 66%),
     radial-gradient(1050px 1050px at 2% 102%, rgba(252, 238, 242, 0.95) 0%, transparent 80%),
     radial-gradient(1500px 700px at 50% 118%, rgba(232, 230, 246, 0.5) 0%, transparent 70%),

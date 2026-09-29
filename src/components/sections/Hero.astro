@@ -97,12 +97,6 @@ const motes = [
         }
       </nav>
 
-      <!-- v23 语录浮条（第一幕海报化） -->
-      <aside class="quote-chip" data-reveal>
-        <span class="quote-mark" aria-hidden="true">✦</span>
-        <p class="serif">人在决定幸福的时候开始幸福。</p>
-      </aside>
-
       <!-- 最近在写（首屏内容密度；真实 feed 数据） -->
       <section class="hero-recent" data-reveal aria-label="最近在写">
         <p class="mono recent-head">最近在写 / RECENT</p>
@@ -218,8 +212,7 @@ const motes = [
     display: grid;
     gap: 3rem;
     align-items: end;
-    /* v23.8 #12：压缩 hero 让「最近在写」进首屏 */
-    min-height: calc(76vh - 5rem);
+    /* v1 收尾：去掉 min-height 留白，内容自然撑高 */
     padding-top: 8.5rem;
   }
 
@@ -525,6 +518,8 @@ const motes = [
     .hero-grid {
       display: grid;
       gap: 2.3rem;
+      /* v1 收尾：恢复双栏（1.27:1 ≈ 591/464），单列堆叠会让舞台掉行、左下留白 */
+      grid-template-columns: minmax(0, 1.27fr) minmax(0, 1fr);
     }
 
     .hero-stage {

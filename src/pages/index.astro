@@ -43,6 +43,51 @@ import StatsPanel from '../components/StatsPanel.astro';
 </Base>
 
 <style>
+  /* v1 收尾：主页翻页式滚动（方案 A · CSS 吸附 proximity）
+     只主页生效：本样式随 index 页打包，其他页面不加载（无吸附点，滚动如常） */
+  :global(html) {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 60px;
+  }
+
+  :global(.section),
+  :global(.content-square) {
+    /* v1 收尾：压缩区块间隙（原 clamp(5rem,13vh,9.5rem) 上下各 80-152px、01→02 间隙 296px 过大）；
+       覆盖主页所有 .section（.now / .latest / .world），区块整体 ≤ 一页 */
+    padding-block: clamp(2rem, 4vh, 3rem);
+  }
+
+  :global(.content-square),
+  :global(.latest) {
+    /* 01↔02 间隙加回一点（152 → ~216px，江衍 2026-09-29） */
+    padding-top: 5rem;
+  }
+
+  :global(.latest) {
+    /* 01 屏内见不到 02（江衍裁决 2026-09-29）：02 眉标恰好推出 100vh 之外，
+       随窗口高度自适应；矮窗口保底 5rem */
+    padding-top: max(5rem, calc(100vh - 932px));
+  }
+
+  :global(.hero) {
+    /* 顶部合法停位（否则 mandatory 会把首屏强制拉到 01）；
+       scroll-margin-top 负值抵消 scroll-padding，让停位精确 = 0（刷新回顶才能停住） */
+    scroll-snap-align: start;
+    scroll-margin-top: -60px;
+  }
+
+  :global(.marquee),
+  :global(.content-square .section-eyebrow),
+  :global(.world .section-eyebrow) {
+    /* v1 收尾：分割点 = 01 屏顶在跑马灯条上沿、02/03 眉标贴 nav 下沿
+       （江衍裁决 2026-09-29：01 定在状态栏上面）；主页首屏与页脚不作翻页目标 */
+    scroll-snap-align: start;
+  }
+
+  :global(.site-footer) {
+    /* 底部合法停位（否则 mandatory 会把页脚强制拉回 03）；停位 = 页脚落底 */
+    scroll-snap-align: end;
+  }
   /* v25.1 观测台 sticky：从「现在·进行时」起跟随滚动 */
   .stats-sticky {
     /* v25.10：浮动跟随，但浮动上限=红框（「网络安全」行）——不浮到红框之上 */

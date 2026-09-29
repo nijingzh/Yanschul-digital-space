@@ -31,6 +31,12 @@ const {
     <ClientRouter />
     <script is:inline>
       if (location.protocol !== 'file:') document.documentElement.classList.add('js');
+      // 刷新/完整加载回顶：关掉浏览器的滚动位置恢复（江衍 2026-09-29）；
+      // SPA 导航不受影响（本 inline script 不随 ClientRouter 导航重跑）
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      window.scrollTo(0, 0);
+      // 浏览器的滚动恢复发生在本脚本之前，load 完成后再归零一次兜底
+      window.addEventListener('load', function () { window.scrollTo(0, 0); }, { once: true });
     </script>
   </head>
 
