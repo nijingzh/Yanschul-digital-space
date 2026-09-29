@@ -1,0 +1,50 @@
+---
+/**
+ * SectionHead —— 统一的区块节奏：幽灵数字 + 极小英文眉题 + 中文大标题
+ */
+interface Props {
+  num: string;
+  en: string;
+  title: string;
+  desc?: string;
+}
+
+const { num, en, title, desc } = Astro.props;
+---
+
+<header class="section-head" data-reveal>
+  <p class="mono section-eyebrow">{num} / {en}</p>
+  <h2 class="display section-title">{title}</h2>
+  {desc && <p class="lead section-desc">{desc}</p>}
+</header>
+
+<style>
+  .section-head {
+    position: relative;
+    margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  .section-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-eyebrow::after {
+    content: "";
+    flex: 0 0 3.5rem;
+    height: 1px;
+    background: var(--color-hair);
+  }
+
+
+  .section-title {
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    margin-top: 0.9rem;
+  }
+
+  .section-desc {
+    margin-top: 1rem;
+    max-width: 44ch;
+  }
+</style>

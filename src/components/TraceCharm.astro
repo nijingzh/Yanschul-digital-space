@@ -1,0 +1,66 @@
+---
+/**
+ * 痕迹挂件（任务单 v17 · F.3）：右下角孤件。
+ * 极淡光晕（rgba(232,230,246,0.16) 上限）+ 灰态小字一行；30s 轮播预留（当前单条不轮播）；
+ * 换字动效预留（y 6→0 / opacity 0.35→1 / 380ms）；移动端隐藏；不打扰阅读（pointer-events none）。
+ */
+const trace = '人在决定幸福的时候开始幸福。';
+---
+
+<div class="trace-charm" aria-hidden="true">
+  <p class="charm-glow"></p>
+  <p class="charm-line mono" data-charm-line>{trace}</p>
+</div>
+
+<style>
+  .trace-charm {
+    position: fixed;
+    right: 1.6rem;
+    bottom: 1.6rem;
+    z-index: 30;
+    pointer-events: none;
+  }
+
+  .charm-glow {
+    position: absolute;
+    inset: -0.9rem;
+    background: radial-gradient(rgba(232, 230, 246, 0.16), transparent 72%);
+    border-radius: 50%;
+  }
+
+  .charm-line {
+    position: relative;
+    font-size: 0.56rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-2);
+    opacity: 0.72;
+  }
+
+  /* 换字动效预留（30s 轮播启用时使用）：y 6→0 / opacity 0.35→1 / 380ms */
+  .charm-line.is-swap {
+    animation: charmSwap 380ms var(--ease-out) both;
+  }
+
+  @keyframes charmSwap {
+    from {
+      opacity: 0.35;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 0.72;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .trace-charm {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .charm-line.is-swap {
+      animation: none;
+    }
+  }
+</style>

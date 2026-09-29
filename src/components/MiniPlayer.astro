@@ -1,0 +1,30 @@
+---
+/**
+ * MiniPlayer —— 全站极简播放态（裁决 §12.2）
+ *
+ * 一行小字「♪ 歌名 – 歌手」+ 播放/暂停；等宽字、无进度条、无封面墙。
+ * 常驻控件不参与入场编排。当前曲目与 mediaNotes「在听」同源（假数据联调），
+ * 歌单由江衍维护、站点侧不写死曲目；Folia 接入后改取播放器状态。
+ */
+import { getMediaNotes } from '../data/content';
+
+const mediaNotes = await getMediaNotes();
+
+const nowPlaying = mediaNotes.find((note) => note.kind === '在听');
+const track = nowPlaying ? `${nowPlaying.title} · ${nowPlaying.meta}` : '未在播放';
+---
+
+<div class="mini-player" data-mini-player>
+  <span class="mini-track" data-mini-track>♪ {track}</span>
+  <button class="mini-toggle mono" type="button" data-mini-toggle aria-pressed="false">播放</button>
+</div>
+
+<script>
+  // 占位态：切换按钮状态文案（不写死地址、不加载真实音源；dev 下占位不报错）
+  const toggle = document.querySelector<HTMLButtonElement>('[data-mini-toggle]');
+  toggle?.addEventListener('click', () => {
+    const playing = toggle.getAttribute('aria-pressed') === 'true';
+    toggle.setAttribute('aria-pressed', String(!playing));
+    toggle.textContent = playing ? '播放' : '暂停';
+  });
+</script>

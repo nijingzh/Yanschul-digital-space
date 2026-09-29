@@ -1,0 +1,278 @@
+---
+/**
+ * 文章页 = 书房（技术区，光温用冷纱）
+ *
+ * 数据与首页「最近更新」同源（feedItems，schema 契约字段，不另发明字段名）。
+ * 列表语法：发丝线延续 Hero —— 条目间只有发丝线，无卡片、无容器。
+ */
+import Base from '../layouts/Base.astro';
+import Sidenote from '../components/Sidenote.astro';
+import { getFeedItems } from '../data/content';
+
+const feedItems = await getFeedItems();
+import SparkIcon from '../components/SparkIcon.astro';
+---
+
+<Base title="文章" description="书房 —— 技术、笔记，以及正在琢磨的东西。">
+  <div class="notes-room">
+    <div class="room-cool" aria-hidden="true"></div>
+
+    <header class="notes-head">
+      <p class="mono notes-eyebrow" data-enter>SPACE 01 / NOTES</p>
+      <h1 class="page-title notes-title icon-hover" data-enter><SparkIcon name="articles" />文章</h1>
+      <p class="lead notes-lead" data-enter>书房不大，摊开的都是正在<Sidenote note="就是现在" tether>琢磨</Sidenote>的东西。</p>
+    </header>
+
+    {/* 分类筛选 chip（v23.8 · 方案 #2）：纯前端过滤，aria-pressed 可达 */}
+    <nav class="filter-chips mono" aria-label="按分类筛选" data-enter>
+      <button class="chip is-on" type="button" data-cat="*" aria-pressed="true">全部</button>
+      {[...new Set(feedItems.map((f) => f.category))].map((c) => (
+        <button class="chip" type="button" data-cat={c} aria-pressed="false">{c}</button>
+      ))}
+    </nav>
+
+    <section class="notes-list" data-reveal-group aria-label="文章列表" id="notes-list">
+      {
+        feedItems.map((item, i) => (
+          <a class="note magnetic pressable" data-reveal-item href={item.href} data-cat={item.category}>
+            <span class="mono note-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h2 class="note-title">{item.title}</h2>
+            <p class="note-desc">{item.desc}</p>
+            <p class="note-meta mono">
+              <span class="note-kind">{item.kind}</span>
+              <span class="note-date">{item.date.replace(/-/g, '.')}</span>
+              {item.kind === '文章' && <span class="note-mins">约 {item.minutes} 分钟</span>}
+              {item.kind === '文章' && item.tags.map((t) => (
+                <span class="note-tag">#{t}</span>
+              ))}
+            </p>
+          </a>
+        ))
+      }
+      {/* 分页编号（v17 · D）：终端拟态，英文小标签位、真实计数 */}
+      <p class="mono list-range">[1–{feedItems.length}/{feedItems.length}]</p>
+    </section>
+  </div>
+</Base>
+
+<script>
+  // 分类筛选（v23.8 · 方案 #2）：aria-pressed + 显示过滤，reduced 不动效
+  const chips = document.querySelectorAll<HTMLButtonElement>('.filter-chips .chip');
+  const rows = document.querySelectorAll<HTMLElement>('#notes-list .note');
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const cat = chip.dataset.cat;
+      chips.forEach((c) => {
+        c.classList.toggle('is-on', c === chip);
+        c.setAttribute('aria-pressed', String(c === chip));
+      });
+      rows.forEach((row) => {
+        row.style.display = cat === '*' || row.dataset.cat === cat ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  /* 分类 chip（v23.8） */
+  .filter-chips {
+    display: flex;
+    gap: 8px;
+    margin: 28px 0 8px;
+  }
+
+  .chip {
+    padding: 5px 13px;
+    border: 1px solid rgba(29, 29, 34, 0.12);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .chip:hover {
+    color: var(--color-ink);
+    border-color: var(--hair-frame);
+  }
+
+  .chip.is-on {
+    background: rgba(155, 138, 168, 0.12);
+    border-color: var(--hair-frame);
+    color: var(--color-ink);
+  }
+
+  .note-mins,
+  .note-tag {
+    color: var(--color-ink-faint);
+  }
+
+  .note-tag {
+    letter-spacing: 0.02em;
+  }
+
+  .notes-room {
+    position: relative;
+    padding-block: clamp(2.2rem, 5vh, 3.6rem);
+  }
+
+  /* 页面级冷纱：技术区光温「整片」，上下缘羽化融入底色 */
+  .room-cool {
+    position: absolute;
+    inset: 0;
+    background: var(--color-panel-2);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    pointer-events: none;
+  }
+
+  .notes-head,
+  .notes-list {
+    position: relative;
+    width: min(56rem, 100% - 3rem);
+    margin-inline: auto;
+  }
+
+  .notes-head {
+    margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  /* 眉标语法：编号 / 英文标签 + 发丝线（与 Hero 01/02/03 一致） */
+  .notes-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-ink-2);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .notes-eyebrow::after {
+    content: '';
+    flex: 0 0 3.5rem;
+    height: 1px;
+    background: var(--color-hair);
+  }
+
+  .notes-title {
+    margin-top: 0.9rem;
+    font-size: clamp(2.15rem, 5vw, 3.15rem);
+    letter-spacing: 0.04em;
+  }
+
+  .notes-lead {
+    margin-top: 1.1rem;
+    max-width: 42ch;
+    color: var(--color-ink-2);
+  }
+
+  /* ── 列表：条目间只有发丝线，无卡片、无容器 ── */
+  .notes-list {
+    border-top: 1px solid var(--color-hair);
+  }
+
+  /* v23 编辑部式：大编号列 + hover 摘要提亮 */
+  .note {
+    grid-template-columns: 4.6em 1fr;
+    align-items: baseline;
+  }
+
+  .note-no {
+    grid-row: 1 / span 3;
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-soft);
+    opacity: 0.55;
+    transition: opacity 0.32s var(--ease-out-quart);
+  }
+
+  .note:hover .note-no {
+    opacity: 1;
+  }
+
+  .note-title,
+  .note-desc,
+  .note-meta {
+    grid-column: 2;
+  }
+
+  .note-desc {
+    opacity: 0.62;
+    transition:
+      opacity 0.32s var(--ease-out-quart),
+      transform 0.32s var(--ease-out-quart);
+  }
+
+  .note:hover .note-desc {
+    opacity: 1;
+    transform: translateX(5px);
+  }
+
+  .note {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1.7rem 0 1.6rem;
+    border-bottom: 1px solid var(--color-hair);
+    color: inherit;
+    text-decoration: none;
+    /* 接触阴影：光轴统一，落向左下 */
+    box-shadow: var(--shadow-contact);
+    transition:
+      transform 700ms var(--ease-space),
+      opacity 700ms var(--ease-space),
+      box-shadow 700ms var(--ease-space);
+  }
+
+  /* 错落：条目交替缩进 24px（移动 10px），像摊开叠放的稿纸 */
+  .note:nth-child(even) {
+    margin-left: 24px;
+  }
+
+  .note:hover {
+    --lift: 3px;
+    box-shadow: var(--shadow-contact-deep);
+  }
+
+  .notes-list:hover .note:not(:hover) {
+    opacity: 0.75;
+  }
+
+  .note-title {
+    font-weight: 500;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: clamp(1.15rem, 2.1vw, 1.42rem);
+    letter-spacing: 0.03em;
+    line-height: 1.35;
+  }
+
+  .note-desc {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--color-ink-2);
+    max-width: 52ch;
+  }
+
+  .note-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    margin-top: 0.25rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+  }
+
+  .note-date {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 859px) {
+    .note:nth-child(even) {
+      margin-left: 10px;
+    }
+  }
+</style>

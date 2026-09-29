@@ -1,0 +1,296 @@
+---
+/**
+ * 学习页 = 在读/在学的桌面（技术区，页面级冷纱沿用登记值）
+ *
+ * 内容身份：与首页「最近记录」侧栏 MediaNote 同源（在读项 → 摊开的书物件）；
+ * 学习领域条目走 FeedItem 同源（网安 / 外语 / 业余开发，对应 worldItems「学习」方向）。
+ * 形态 = 书房语法（发丝线列表 + 交替缩进），禁止卡片网格、禁止进度条/百分比。
+ */
+import Base from '../layouts/Base.astro';
+import { getFeedItems, getMediaNotes } from '../data/content';
+
+const feedItems = await getFeedItems();
+const mediaNotes = await getMediaNotes();
+
+const reading = mediaNotes.find((note) => note.kind === '在读');
+import SparkIcon from '../components/SparkIcon.astro';
+const directions = [
+  { name: '网安', item: feedItems.find((i) => i.title.startsWith('Web 安全')) },
+  { name: '外语', item: feedItems.find((i) => i.href === '/learning') },
+  { name: '业余开发', item: feedItems.find((i) => i.title.startsWith('Arch')) },
+].filter((d) => d.item !== undefined);
+
+// v23.1 进度可视化（禁令已解 · 真实口径）：各方向已持续天数占比
+const dayMs = 86400000;
+const today = Date.now();
+const days = directions.map((d) => Math.max(1, Math.round((today - new Date(d.item!.date).getTime()) / dayMs)));
+const maxDays = Math.max(1, ...days);
+---
+
+<Base title="学习" description="在读/在学的桌面。">
+  <div class="study-room">
+    <div class="room-cool" aria-hidden="true"></div>
+
+    <header class="study-head">
+      <p class="mono study-eyebrow" data-enter>SPACE 04 / STUDY</p>
+      <h1 class="page-title study-title icon-hover" data-enter><SparkIcon name="learning" />学习</h1>
+      <p class="lead study-lead" data-enter>网安、外语、业余开发。都在慢慢跑，没停。</p>
+    </header>
+
+    <!-- 在读：摊开的书（物件可有容器） -->
+    {
+      reading && (
+        <section class="reading" data-reveal-group aria-label="在读">
+          <p class="mono reading-kind" data-enter-char>
+            在读
+            <span class="ticks" aria-hidden="true"><i></i><i></i><i></i></span>
+          </p>
+          <article class="book" data-reveal-item>
+            <h2 class="book-title">{reading.title}</h2>
+            <p class="book-meta">{reading.meta}</p>
+          </article>
+        </section>
+      )
+    }
+
+    <!-- 在学：发丝线列表（书房语法 + 交替缩进） -->
+    <section class="study-list" data-reveal-group aria-label="在学">
+      <p class="mono study-kind" data-enter-char>
+        在学
+        <span class="ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      </p>
+      {
+        directions.map(({ name, item }, i) => (
+          <a class="study-entry link-grow pressable" data-reveal-item href={item!.href}>
+            <p class="mono entry-dir">{name}</p>
+            <h2 class="entry-title">{item!.title}</h2>
+            <p class="entry-desc">{item!.desc}</p>
+            <div class="entry-progress" aria-hidden="true">
+              <span class="progress-track"><span class="progress-fill" style={'width: ' + Math.round((days[i] / maxDays) * 100) + '%'}></span></span>
+              <span class="mono progress-days">同行 {days[i]} 天</span>
+            </div>
+            <p class="entry-date mono">{item!.date}</p>
+          </a>
+        ))
+      }
+    </section>
+  </div>
+</Base>
+
+<style>
+  /* v23.1 学习进度条（禁令已解）：发丝线槽 + 灰紫填充（真实持续天数） */
+  .entry-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.45rem;
+  }
+
+  .progress-track {
+    flex: 0 0 12rem;
+    height: 3px;
+    background: var(--color-hair);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(155, 138, 168, 0.75), rgba(201, 168, 184, 0.75));
+    border-radius: 2px;
+  }
+
+  .progress-days {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-soft);
+  }
+
+  .study-room {
+    position: relative;
+    padding-block: clamp(2.2rem, 5vh, 3.6rem);
+  }
+
+  /* 页面级冷纱（登记值：rgba(232,230,246,0.4)，羽化 12%/88%） */
+  .room-cool {
+    position: absolute;
+    inset: 0;
+    background: var(--color-panel-2);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    pointer-events: none;
+  }
+
+  .study-head,
+  .reading,
+  .study-list {
+    position: relative;
+    width: min(56rem, 100% - 3rem);
+    margin-inline: auto;
+  }
+
+  .study-head {
+    margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  /* 眉标语法：编号 / 英文标签 + 发丝线 */
+  .study-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-ink-2);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .study-eyebrow::after {
+    content: '';
+    flex: 0 0 3.5rem;
+    height: 1px;
+    background: var(--color-hair);
+  }
+
+  .study-title {
+    margin-top: 0.9rem;
+    font-size: clamp(2.15rem, 5vw, 3.15rem);
+    letter-spacing: 0.04em;
+  }
+
+  .study-lead {
+    margin-top: 1.1rem;
+    max-width: 42ch;
+    color: var(--color-ink-2);
+  }
+
+  /* ── 在读：摊开的书 = 物件（容器 + 接触阴影） ── */
+  .reading {
+    margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+    display: grid;
+    gap: 0.7rem;
+    justify-items: start;
+  }
+
+  .reading-kind {
+    font-size: 0.56rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-2);
+  }
+
+  .book {
+    width: min(26rem, 100%);
+    display: grid;
+    gap: 0.45rem;
+    padding: 1.35rem 1.55rem 1.25rem;
+    background: var(--color-panel);
+    border: 1px solid var(--hair-frame);
+    border-radius: var(--radius-md, 14px);
+    box-shadow: var(--shadow-contact);
+    transition:
+      transform 700ms var(--ease-space),
+      box-shadow 700ms var(--ease-space);
+  }
+
+  .book:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-contact-deep);
+  }
+
+  .book-title {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.18rem;
+    letter-spacing: 0.03em;
+  }
+
+  .book-meta {
+    font-size: 0.72rem;
+    color: var(--color-ink-2);
+  }
+
+  /* ── 在学：发丝线列表（书房语法 + 交替缩进 24px/10px） ── */
+  .study-list {
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .study-entry {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 2rem;
+    padding: 1.55rem 0 1.45rem;
+    border-bottom: 1px solid var(--color-hair);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      transform 700ms var(--ease-space),
+      opacity 700ms var(--ease-space);
+  }
+
+  .study-entry:nth-child(even) {
+    margin-left: 24px;
+  }
+
+  .study-entry:hover {
+    transform: translateY(-3px);
+  }
+
+  .study-list:hover .study-entry:not(:hover) {
+    opacity: 0.75;
+  }
+
+  .entry-dir {
+    font-size: 0.56rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-2);
+  }
+
+  .entry-title {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.18rem;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+  }
+
+  .entry-desc {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--color-ink-2);
+    max-width: 48ch;
+  }
+
+  .entry-date {
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+    opacity: 0.8;
+  }
+
+  @media (max-width: 859px) {
+    .study-entry:nth-child(even) {
+      margin-left: 10px;
+    }
+  }
+
+  /* 自习室气质：在读/在学的发丝线刻度（禁进度条组件） */
+  .study-kind {
+    padding-top: 1.6rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-2);
+  }
+
+  .ticks {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 0.85rem;
+    vertical-align: middle;
+  }
+
+  .ticks i {
+    display: block;
+    width: 8px;
+    height: 1px;
+    background: var(--color-hair);
+  }
+</style>

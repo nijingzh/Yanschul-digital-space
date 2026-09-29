@@ -1,0 +1,193 @@
+---
+// 项目详情页 —— v23.8（方案 #9）：项目正文渲染 + 仓库/演示外链 + 技术栈 + 详情元行
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import SparkIcon from '../../components/SparkIcon.astro';
+import PlaceholderCard from '../../components/PlaceholderCard.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('project');
+  return entries.map((entry) => ({
+    params: { slug: entry.id.replace(/^\d+-/, '') },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const data = entry.data;
+const minutes = Math.max(1, Math.round(((entry.body || '').replace(/\s/g, '').length) / 400));
+const all = (await getCollection('project')).sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const idx = all.findIndex((e) => e.id === entry.id);
+const older = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+---
+
+<Base title={`${data.title} — 江衍 · Digital Space`} desc={data.desc}>
+  <div class="work-page">
+    <header class="work-head">
+      <p class="mono work-eyebrow" data-enter>SPACE 02 / WORK DETAIL</p>
+      <h1 class="page-title work-title icon-hover" data-enter><SparkIcon name="projects" />{data.title}</h1>
+      <p class="lead work-lead" data-enter>{data.desc}</p>
+    </header>
+
+    <div class="work-body" data-reveal-group>
+      <article class="prose work-main" data-reveal-item>
+        {(entry.body || '').replace(/\s/g, '').length < 40 ? (
+          <PlaceholderCard
+            label="BUILDING"
+            title="项目过程还在整理"
+            note="背景、过程和踩过的坑都记在这里——内容整理好就上线。技术栈与链接见右侧。"
+          />
+        ) : (
+          <Content />
+        )}
+      </article>
+
+      <aside class="work-side" data-reveal-item aria-label="项目信息">
+        {data.links.length > 0 && (
+          <section class="side-block">
+            <h2 class="side-label mono">链接 / LINKS</h2>
+            <ul class="side-links">
+              {data.links.map((l) => (
+                <li>
+                  <a class="side-link mono" href={l.href} target="_blank" rel="noopener">
+                    {l.label} <span class="arrow" aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        <section class="side-block">
+          <h2 class="side-label mono">技术栈 / STACK</h2>
+          <p class="side-stack mono">{data.stack.join(' · ')}</p>
+        </section>
+        <section class="side-block">
+          <h2 class="side-label mono">信息 / META</h2>
+          <p class="side-meta mono">日期 · {data.date.replace(/-/g, '.')}</p>
+          <p class="side-meta mono">分类 · {data.category}</p>
+          <p class="side-meta mono">全文 · {entry.body?.replace(/\s/g, '').length || 0} 字 · 约 {minutes} 分钟</p>
+        </section>
+        {older && (
+          <a class="side-next mono" href={`/projects/${older.id.replace(/^\d+-/, '')}`}>
+            下一个项目 · {older.data.title}
+          </a>
+        )}
+      </aside>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .work-page {
+    padding-block: clamp(2.2rem, 5vh, 3.6rem);
+  }
+
+  .work-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    color: var(--color-ink-faint);
+    margin-bottom: 14px;
+  }
+
+  .work-lead {
+    margin-top: 18px;
+    max-width: 56ch;
+  }
+
+  .work-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 72px;
+    align-items: start;
+    margin-top: clamp(32px, 5vw, 56px);
+  }
+
+  .work-main {
+    max-width: 68ch;
+    justify-self: center;
+  }
+
+  .work-side {
+    position: sticky;
+    top: 120px;
+  }
+
+  .side-block {
+    margin-bottom: 28px;
+  }
+
+  .side-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .side-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .side-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-hair);
+    padding-bottom: 2px;
+    transition: color 180ms ease, border-color 180ms ease;
+    width: fit-content;
+  }
+
+  .side-link:hover {
+    color: var(--color-ink-strong);
+    border-color: var(--hair-frame);
+  }
+
+  .side-link .arrow {
+    color: var(--color-ink-2);
+  }
+
+  .side-stack,
+  .side-meta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    line-height: 1.9;
+  }
+
+  .side-next {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-ink-faint);
+    text-decoration: none;
+    border-top: 1px solid var(--color-hair);
+    padding-top: 12px;
+    transition: color 180ms ease;
+  }
+
+  .side-next:hover {
+    color: var(--color-ink);
+  }
+
+  @media (max-width: 880px) {
+    .work-body {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .work-side {
+      position: static;
+    }
+  }
+</style>

@@ -1,0 +1,373 @@
+---
+import { siteNav } from '../data/content';
+
+
+const current = Astro.url.pathname;
+// A2.5 意境代号（任务单修订 · 文案白名单追加六枚）
+const codeFor: Record<string, string> = {
+  首页: '数字大厅',
+  文章: '书房',
+  项目: '工坊',
+  学习: '自习室',
+  生活: '客厅',
+  关于: '玄关',
+};
+
+const isActive = (href: string): boolean =>
+  href === '/' ? current === '/' : current.startsWith(href);
+
+
+---
+
+<header class="site-header">
+  <div class="shell header-inner">
+    <a href="/" class="brand" aria-label="江衍 Digital Space 首页">
+      <span class="brand-name">江衍</span>
+      <span class="brand-tag mono">YANSCHUL · Digital Space</span>
+    </a>
+
+    <nav class="main-nav" aria-label="主导航">
+      {
+        siteNav.map((item) => (
+          <a href={item.href} class:list={['nav-link', 'star-morph', { 'is-active': isActive(item.href) }]}>
+            <span class="morph-label">{item.label}</span>
+            <span class="nav-code" aria-hidden="true">{codeFor[item.label] ?? ''}</span>
+            <span class="morph-star" aria-hidden="true">
+              <svg viewBox="0 0 18 18" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round">
+                <path d="M9 2.5 L10.1 7.9 15.5 9 10.1 10.1 9 15.5 7.9 10.1 2.5 9 7.9 7.9 Z" />
+              </svg>
+            </span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="header-side">
+      <span class="status mono"><i class="status-dot"></i>空间在线</span>
+<button class="theme-toggle mono" data-theme-toggle aria-label="切换夜航模式" title="夜航模式">☾</button>
+<button class="search-btn mono" data-search-open aria-label="搜索" title="搜索（⌘K）">搜索 ⌘K</button>
+      <button class="menu-btn mono" type="button" aria-expanded="false" aria-controls="mobile-menu">
+        菜单
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="mobile-menu" hidden>
+    <nav class="mobile-nav" aria-label="移动端导航">
+      {
+        siteNav.map((item) => (
+          <a href={item.href} class:list={['mobile-link', { 'is-active': isActive(item.href) }]}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* 页眉区顶部 140px 冷纱渐变（v17 · C）：顶缘 rgba(232,230,246,0.4) → 140px 处透明 */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 140px;
+    background: linear-gradient(to bottom, rgba(232, 230, 246, 0.4), rgba(232, 230, 246, 0));
+    pointer-events: none;
+  }
+
+  .site-header {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 50;
+    padding-block: 0.9rem;
+    transition: background 0.5s var(--ease-space), box-shadow 0.5s var(--ease-space),
+      border-color 0.5s var(--ease-space);
+    border-bottom: 1px solid transparent;
+  }
+
+  .site-header.is-scrolled {
+    /* v20.3：实底遮挡（55% 半透明曾让下层内容透字叠导航）；冷纱 ::before 光温保留 */
+    background: var(--color-space-0);
+    border-bottom-color: var(--color-hair);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .brand-name {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: 0.06em;
+  }
+
+  .brand-tag {
+    font-size: 0.58rem;
+  }
+
+  .main-nav {
+    display: none;
+    gap: 2rem;
+  }
+
+  .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    font-size: 0.86rem;
+    color: var(--color-ink-2);
+    padding-block: 0.2rem;
+    transition: color 0.3s;
+  }
+
+  /* A2.5 意境代号浮字（任务单修订）：hover 浮出 240ms，移出即消；
+     绝对定位不占布局（nav 高度前后差 0）；reduce 与移动端不显示 */
+  .nav-code {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    left: 50%;
+    transform: translate(-50%, 6px);
+    opacity: 0;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-2);
+    white-space: nowrap;
+    pointer-events: none;
+    transition:
+      transform 240ms ease-out,
+      opacity 240ms ease-out;
+  }
+
+  .nav-link:hover .nav-code,
+  .nav-link:focus-visible .nav-code {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-code {
+      display: none;
+    }
+  }
+
+  @media (max-width: 959px) {
+    .nav-code {
+      display: none;
+    }
+  }
+
+  .nav-link:hover {
+    color: var(--color-ink);
+  }
+
+  .nav-link.is-active {
+    color: var(--color-ink);
+  }
+
+  .nav-link.is-active::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -0.45rem;
+    width: 8px;
+    height: 1px;
+    background: var(--color-ink);
+    opacity: 0.55;
+    transform: translateX(-50%);
+  }
+
+  .header-side {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .status {
+    display: none;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.6rem;
+  }
+
+  .search-btn {
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.24rem 0.62rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    color: var(--color-ink-soft);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      color 0.32s var(--ease-out-quart),
+      border-color 0.32s var(--ease-out-quart);
+  }
+
+  .search-btn:hover {
+    color: var(--color-ink);
+    border-color: var(--color-edge);
+  }
+
+  .theme-toggle {
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.24rem 0.62rem;
+    font-size: 0.82rem;
+    line-height: 1;
+    color: var(--color-ink-soft);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      color 0.32s var(--ease-out-quart),
+      border-color 0.32s var(--ease-out-quart);
+  }
+
+  .theme-toggle:hover {
+    color: var(--color-ink);
+    border-color: var(--color-edge);
+  }
+
+  .status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #b7c7e8;
+    animation: pulse 3.2s var(--ease-space) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.45;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.25);
+    }
+  }
+
+  .menu-btn {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.24em;
+    color: var(--color-ink-2);
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    background: var(--color-panel);
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.3s, background 0.3s;
+  }
+
+  .menu-btn:hover {
+    color: var(--color-ink);
+    border-color: var(--hair-frame);
+    background: var(--color-panel);
+  }
+
+  .mobile-menu {
+    width: min(1120px, calc(100% - 3rem));
+    margin: 0.8rem auto 0;
+    border-radius: var(--radius-glass);
+  }
+
+  .mobile-nav {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1rem 1.2rem;
+  }
+
+  .mobile-link {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.7rem 0.4rem;
+    font-size: 0.95rem;
+    color: var(--color-ink-2);
+    border-bottom: 1px solid var(--color-hair);
+    transition: color 0.3s, padding-left 0.4s var(--ease-space);
+  }
+
+  .mobile-link:last-child {
+    border-bottom: 0;
+  }
+
+  .mobile-link:hover,
+  .mobile-link.is-active {
+    color: var(--color-ink);
+    padding-left: 0.8rem;
+  }
+
+  @media (min-width: 860px) {
+    .main-nav {
+      display: flex;
+    }
+
+    .status {
+      display: inline-flex;
+    }
+
+    .menu-btn,
+    .mobile-menu {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { animate, stagger } from 'animejs';
+
+  const header = document.querySelector('.site-header');
+  const menuBtn = document.querySelector<HTMLButtonElement>('.menu-btn');
+  const menu = document.querySelector<HTMLElement>('#mobile-menu');
+
+  // 滚动后切换为玻璃导航
+  const onScroll = (): void => {
+    header?.classList.toggle('is-scrolled', window.scrollY > 12);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // 移动端菜单：分层进入
+  if (menuBtn && menu) {
+    menuBtn.addEventListener('click', () => {
+      const open = menuBtn.getAttribute('aria-expanded') === 'true';
+      menuBtn.setAttribute('aria-expanded', String(!open));
+      if (open) {
+        menu.hidden = true;
+        menu.classList.remove('glass');
+      } else {
+        menu.hidden = false;
+        menu.classList.add('glass');
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          animate('.mobile-link', {
+            opacity: [0, 1],
+            y: [10, 0],
+            duration: 420,
+            delay: stagger(50),
+            ease: 'out(3)',
+          });
+        }
+      }
+    });
+  }
+</script>

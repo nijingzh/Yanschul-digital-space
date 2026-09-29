@@ -1,0 +1,292 @@
+---
+/**
+ * 项目页 = 做过的东西摊在桌面（技术区，页面级冷纱沿用第一批登记值）
+ *
+ * 物件才有容器：每个项目是桌面上的一件「物件」（容器 + 接触阴影），
+ * 错落节奏摊开，禁止等高卡片网格、禁止 chip。
+ * 数据 projectItems 与 feedItems 的 kind='项目' 条目同源同值。
+ */
+import Base from '../layouts/Base.astro';
+import { getProjectItems } from '../data/content';
+import SparkIcon from '../components/SparkIcon.astro';
+
+const projectItems = await getProjectItems();
+---
+
+<Base title="项目" description="桌面 —— 做过的东西，都摊在这儿。">
+  <div class="works-room">
+    <div class="room-cool" aria-hidden="true"></div>
+
+    <header class="works-head">
+      <p class="mono works-eyebrow" data-enter>SPACE 02 / WORKS</p>
+      <h1 class="page-title works-title icon-hover" data-enter><SparkIcon name="projects" />项目</h1>
+      <p class="lead works-lead" data-enter>做过的东西，都摊在这张桌面上。踩过的坑也算。</p>
+    </header>
+
+    <section class="works-grid" data-reveal-group aria-label="项目物件">
+      {
+        projectItems.map((item) => (
+          <article class="work magnetic pressable" data-reveal-item>
+            <h2 class="work-title">
+              <a class="work-title-link" href={`/projects/${item.slug}`}>{item.title}</a>
+            </h2>
+            <p class="work-desc">{item.desc}</p>
+            <p class="work-stack mono">
+              <span class="stack-line">{item.stack.join(' · ')}</span>
+              <span class="stack-detail">
+                {item.stack.map((s) => (
+                  <em class="stack-item">{s}</em>
+                ))}
+              </span>
+            </p>
+            <div class="work-foot">
+              <span class="work-date mono">{item.date.replace(/-/g, '.')}</span>
+              <span class="work-links">
+                {item.links.map((link) => (
+                  <a class="work-link mono magnetic" href={link.href} target="_blank" rel="noopener">
+                    {link.label} <span class="link-arrow" aria-hidden="true">↗</span>
+                  </a>
+                ))}
+              </span>
+            </div>
+          </article>
+        ))
+      }
+      {/* 分页编号（v17 · D）：终端拟态，英文小标签位、真实计数 */}
+      <p class="mono list-range">[1–{projectItems.length}/{projectItems.length}]</p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .works-room {
+    position: relative;
+    padding-block: clamp(2.2rem, 5vh, 3.6rem);
+  }
+
+  /* 页面级冷纱（工坊气质：冷纱偏紫 rgba(230,227,249,0.45)，羽化 12%/88% 不变） */
+  .room-cool {
+    position: absolute;
+    inset: 0;
+    background: var(--color-panel-2);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    pointer-events: none;
+  }
+
+  .works-head,
+  .works-grid {
+    position: relative;
+    width: min(56rem, 100% - 3rem);
+    margin-inline: auto;
+  }
+
+  .works-head {
+    margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  /* 眉标语法：编号 / 英文标签 + 发丝线 */
+  .works-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-ink-2);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .works-eyebrow::after {
+    content: '';
+    flex: 0 0 3.5rem;
+    height: 1px;
+    background: var(--color-hair);
+  }
+
+  .works-title {
+    margin-top: 0.9rem;
+    font-size: clamp(2.15rem, 5vw, 3.15rem);
+    letter-spacing: 0.04em;
+  }
+
+  .works-lead {
+    margin-top: 1.1rem;
+    max-width: 42ch;
+    color: var(--color-ink-2);
+  }
+
+  /* ── 物件区：错落摊开，禁止等高卡片网格 ── */
+  .works-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: clamp(1.5rem, 3vw, 2.8rem);
+  }
+
+  /* 物件 = 桌面上的实体（容器 + 接触阴影，非玻璃；工坊气质：微倾斜 ≤1.5deg） */
+  .work {
+    flex: 0 0 auto;
+    width: 44%;
+    display: grid;
+    gap: 0.55rem;
+    padding: 1.55rem 1.7rem 1.45rem;
+    background: var(--color-panel);
+    border: 1px solid var(--hair-frame);
+    border-radius: var(--radius-md, 14px);
+    /* 接触阴影：光轴统一，落向左下 */
+    box-shadow: var(--shadow-contact);
+    transition:
+      opacity 700ms var(--ease-space),
+      box-shadow 700ms var(--ease-space);
+    --tilt: 0.8deg;
+  }
+
+  /* 错落：交替缩进 24px（登记基准），宽度差 10% */
+  .work:nth-child(even) {
+    width: 40%;
+    margin-left: 24px;
+    --tilt: -0.6deg;
+  }
+
+  .work:hover {
+    --lift: 3px;
+    box-shadow: var(--shadow-contact-deep);
+  }
+
+  .works-grid:hover .work:not(:hover) {
+    opacity: 0.75;
+  }
+
+  .work-title {
+    font-weight: 500;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: clamp(1.12rem, 2vw, 1.38rem);
+    letter-spacing: 0.03em;
+    line-height: 1.35;
+  }
+
+  .work-desc {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--color-ink-2);
+    max-width: 34ch;
+  }
+
+  /* 技术栈：小号文字 + 发丝线分隔（禁 chip）；hover 展开细项 */
+  .work-title-link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 180ms ease;
+  }
+
+  .work:hover .work-title-link {
+    border-color: var(--hair-frame);
+  }
+
+  .link-arrow {
+    color: var(--color-ink-2);
+    font-size: 0.85em;
+  }
+
+  .work-stack {
+    margin-top: 0.35rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--color-hair);
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+  }
+
+  .stack-detail {
+    display: grid;
+    gap: 0.32rem;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      max-height 700ms var(--ease-space),
+      opacity 700ms var(--ease-space),
+      margin-top 700ms var(--ease-space);
+  }
+
+  .work:hover .stack-detail {
+    max-height: 7rem;
+    opacity: 1;
+    margin-top: 0.55rem;
+  }
+
+  .stack-item {
+    position: relative;
+    padding-left: 0.95rem;
+    font-style: normal;
+    font-size: 0.52rem;
+    letter-spacing: 0.14em;
+  }
+
+  .stack-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0.52rem;
+    height: 1px;
+    background: var(--color-hair);
+  }
+
+  .work-foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.9rem;
+  }
+
+  .work-date {
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+    opacity: 0.8;
+  }
+
+  .work-links {
+    display: flex;
+    gap: 1.1rem;
+  }
+
+  /* 链接 = 发丝线入口（细线生长） */
+  .work-link {
+    position: relative;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+    text-decoration: none;
+  }
+
+  .work-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 40%;
+    background: var(--color-ink-2);
+    opacity: 0.5;
+    transition: width 500ms var(--ease-space);
+  }
+
+  .work-link:hover::after {
+    width: 100%;
+  }
+
+  @media (max-width: 859px) {
+    .work,
+    .work:nth-child(even) {
+      width: 100%;
+    }
+
+    .work:nth-child(even) {
+      margin-left: 10px;
+    }
+  }
+</style>

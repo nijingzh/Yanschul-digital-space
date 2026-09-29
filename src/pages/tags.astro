@@ -1,0 +1,193 @@
+---
+// 标签页 —— v23 P3：标签云（字号随篇数变化）+ 每标签条目
+import Base from '../layouts/Base.astro';
+import { getFeedItems } from '../data/content';
+import SparkIcon from '../components/SparkIcon.astro';
+
+const items = await getFeedItems();
+const tagMap = new Map<string, typeof items>();
+for (const it of items) {
+  for (const t of it.tags ?? []) {
+    if (!tagMap.has(t)) tagMap.set(t, []);
+    tagMap.get(t)!.push(it);
+  }
+}
+const tags = [...tagMap.entries()].sort((a, b) => b[1].length - a[1].length);
+const maxCount = Math.max(1, ...tags.map(([, list]) => list.length));
+---
+
+<Base title="标签" description="按标签归拢的记录。">
+  <div class="tags-room">
+    <div class="room-cool" aria-hidden="true"></div>
+
+    <header class="tags-head">
+      <p class="mono tags-eyebrow" data-enter>SPACE 07 / TAGS</p>
+      <h1 class="page-title tags-title icon-hover" data-enter><SparkIcon name="articles" />标签</h1>
+      <p class="lead tags-lead" data-enter>每条记录自己挑的队。</p>
+    </header>
+
+    <section class="tag-cloud" data-reveal aria-label="标签云">
+      {
+        tags.map(([tag, list]) => (
+          <a
+            class="tag-pill magnetic pressable"
+            href={'/tags#' + encodeURIComponent(tag)}
+            style={'font-size: ' + (0.82 + (list.length / maxCount) * 0.55).toFixed(2) + 'rem'}
+          >
+            <span class="serif">{tag}</span>
+            <span class="mono">{list.length}</span>
+          </a>
+        ))
+      }
+    </section>
+
+    {
+      tags.map(([tag, list]) => (
+        <section class="tag-group" id={tag} data-reveal-group aria-label={tag}>
+          <h2 class="mono tag-label" data-enter-char>{tag} —— {list.length} 篇</h2>
+          <ol class="tag-list">
+            {list.map((it) => (
+              <li data-reveal-item>
+                <a class="tag-item magnetic pressable" href={it.href}>
+                  <time class="mono">{it.date.replaceAll('-', '.')}</time>
+                  <span class="serif">{it.title}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .tags-room {
+    position: relative;
+    padding-block: clamp(2.2rem, 5vh, 3.6rem);
+  }
+
+  .room-cool {
+    position: absolute;
+    inset: 0;
+    background: var(--color-panel-2);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    pointer-events: none;
+  }
+
+  .tags-head,
+  .tag-cloud,
+  .tag-group {
+    position: relative;
+    width: min(56rem, 100% - 3rem);
+    margin-inline: auto;
+  }
+
+  .tags-head {
+    margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  .tags-eyebrow {
+    color: var(--color-ink-2);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .tags-title {
+    margin-top: 0.9rem;
+    font-size: clamp(2.15rem, 5vw, 3.15rem);
+    letter-spacing: 0.04em;
+  }
+
+  .tags-lead {
+    margin-top: 1.1rem;
+    max-width: 42ch;
+    color: var(--color-ink-2);
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-bottom: 4.2rem;
+  }
+
+  .tag-pill {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    padding: 0.52rem 1.15rem;
+    border: 1px solid var(--hair-frame);
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--color-ink-soft);
+    transition:
+      color 0.32s var(--ease-out-quart),
+      border-color 0.32s var(--ease-out-quart),
+      box-shadow 0.32s var(--ease-out-quart);
+  }
+
+  .tag-pill:hover {
+    color: var(--color-ink);
+    border-color: var(--color-edge);
+    box-shadow: 0 0 0 4px rgba(214, 208, 242, 0.22);
+  }
+
+  .tag-pill .mono {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    opacity: 0.75;
+  }
+
+  .tag-group {
+    margin-bottom: 3.2rem;
+  }
+
+  .tag-label {
+    font-size: var(--text-mono);
+    letter-spacing: 0.16em;
+    color: var(--color-ink-soft);
+  }
+
+  .tag-list {
+    margin: 0.95rem 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .tag-item {
+    display: grid;
+    grid-template-columns: 6.2em 1fr;
+    gap: 1.15rem;
+    align-items: baseline;
+    padding: 0.95rem 0;
+    border-bottom: 1px solid var(--color-hair);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.32s var(--ease-out-quart);
+  }
+
+  .tag-item:hover {
+    background: var(--color-panel-2);
+  }
+
+  .tag-item time {
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-soft);
+  }
+
+  .tag-item .serif {
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    letter-spacing: 0.025em;
+    color: var(--color-ink-soft);
+    transition: color 0.32s var(--ease-out-quart);
+  }
+
+  .tag-item:hover .serif {
+    color: var(--color-ink);
+  }
+</style>

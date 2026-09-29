@@ -1,0 +1,12 @@
+# Folia 配置模板（§12B.3 主题白名单）。
+# TODO: 键名与结构待按 Folia 官方文档校准（部署形态由江衍提供后确认）；此处只固定口径。
+theme:
+  whitelist:
+    - cool-white        # 低饱和冷白（同站点 --color-*）
+    - pink-violet       # 粉紫同调（仅环境光层色，低饱和）
+  animation_style: typographic   # 文字排版系歌词动画
+  visitor_theme_switch: false    # 关闭访客换主题入口
+  ai_theme: admin_only           # AI 生成主题仅站长侧使用
+
+# 舞台（Stage）：发光仅限舞台内/全屏演出内；框外晕染 ≤0.16 环境光（站点侧保证）
+# reduced-motion：站点壳子静止歌词帧（演出引擎懒加载，reduced-motion 不自动播）

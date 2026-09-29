@@ -1,0 +1,156 @@
+---
+import { siteNav, SITE_BIRTH, SLOGAN } from '../data/content';
+import MiniPlayer from './MiniPlayer.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <!-- v21 波浪发丝线（流动收尾） -->
+  <div class="wave-hair shell" aria-hidden="true"></div>
+  <div class="shell">
+    <div class="hairline footer-top">
+      <div class="footer-brand">
+        <p class="display footer-name">江衍 YANSCHUL · Digital Space</p>
+        <p class="lead">一个持续生长的个人数字空间，技术、生活与正在发生的一切都住在这里。</p>
+        <p class="slogan footer-slogan">{SLOGAN}</p>
+      </div>
+
+      <nav class="footer-nav" aria-label="页脚导航">
+        {
+          siteNav
+            .filter((item) => item.href !== '/')
+            .map((item) => (
+              <a href={item.href} class="u-link footer-link">
+                {item.label}
+              </a>
+            ))
+        }
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <a href="/archive" class="u-link footer-link">归档</a>
+        <a href="/tags" class="u-link footer-link">标签</a>
+        <a href="/rss.xml" class="u-link footer-link">RSS</a>
+      </nav>
+    </div>
+
+    <!-- 页脚上方：建站计时（数字 tick）+ 迷你播放态（常驻控件，不参与入场编排） -->
+    <div class="footer-live">
+      <span class="mono site-clock" data-site-clock data-birth={SITE_BIRTH}>这间屋子住了 — 天 — 时</span>
+      <MiniPlayer />
+    </div>
+
+    <div class="footer-bottom mono">
+      <span>© {year} 江衍 YANSCHUL · 保留所有心情</span>
+      <span>由 Astro 驱动 · 动效来自 Anime.js</span>
+      <span>空间仍在生长中</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  import { tickText } from '../lib/motion';
+
+  // 建站计时（裁决 §11）：X 天为自然日差，X 时按本地时区滚动
+  const clock = document.querySelector<HTMLElement>('[data-site-clock]');
+  const render = (): void => {
+    if (!clock) return;
+    const birth = new Date(`${clock.dataset.birth ?? '2026-09-23'}T00:00:00`);
+    const now = new Date();
+    const dayMs = 86400000;
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const start = new Date(birth.getFullYear(), birth.getMonth(), birth.getDate());
+    const days = Math.max(0, Math.round((today.getTime() - start.getTime()) / dayMs));
+    const text = `这间屋子住了 ${days} 天 ${now.getHours()} 时`;
+    if (clock.textContent !== text) tickText(clock, text);
+  };
+  render();
+  setInterval(render, 60000);
+</script>
+
+<style>
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    padding-block: 4rem 2.2rem;
+  }
+
+  .footer-top {
+    display: grid;
+    gap: 2.5rem;
+    padding-top: 2.5rem;
+  }
+
+  .footer-name {
+    font-size: 1.05rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .footer-brand .lead {
+    max-width: 34ch;
+    font-size: 0.88rem;
+    line-height: 1.9;
+  }
+
+  .footer-slogan {
+    margin-top: 0.9rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-2);
+  }
+
+  .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.4rem;
+    align-content: start;
+  }
+
+  .footer-link {
+    font-size: 0.85rem;
+    color: var(--color-ink-2);
+  }
+
+  .footer-link:hover {
+    color: var(--color-ink);
+  }
+
+  .footer-live {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.2rem 2.6rem;
+    margin-top: 2.4rem;
+  }
+
+  .site-clock {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-2);
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem 2.6rem;
+    line-height: 2;
+    justify-content: space-between;
+    margin-top: 2.4rem;
+    font-size: 0.58rem;
+  }
+
+  @media (min-width: 860px) {
+    .footer-top {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+  }
+
+  /* v26.3 · 移动端小字放大（0.58/0.62rem 偏小，读不清） */
+  @media (max-width: 599px) {
+    .site-clock {
+      font-size: 0.78rem;
+    }
+    .footer-bottom {
+      font-size: 0.72rem;
+    }
+  }
+</style>

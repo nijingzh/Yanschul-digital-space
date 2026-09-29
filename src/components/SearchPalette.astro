@@ -1,0 +1,197 @@
+---
+// SearchPalette —— ⌘K / Ctrl+K 搜索面板（v23 · clay 搜索学法）
+// 全站模糊搜索（标题/摘要/标签），键盘导航，玻璃面板；数据构建时注入
+import { getFeedItems } from '../data/content';
+
+const items = await getFeedItems();
+const index = items.map((it) => ({
+  title: it.title,
+  desc: it.desc,
+  href: it.href,
+  date: it.date.replaceAll('-', '.'),
+  kind: it.kind,
+  hay: [it.title, it.desc, it.kind, ...(it.tags ?? [])].join(' ').toLowerCase(),
+}));
+---
+
+<div class="search-palette" data-search-palette hidden>
+  <div class="palette-backdrop" data-search-close></div>
+  <div class="palette-panel" role="dialog" aria-label="搜索">
+    <div class="palette-input-row">
+      <span class="mono palette-hint">搜索</span>
+      <input class="palette-input" type="search" placeholder="标题、摘要、标签……" data-search-input autocomplete="off" />
+      <span class="mono palette-key">ESC</span>
+    </div>
+    <ol class="palette-results" data-search-results></ol>
+    <p class="mono palette-empty" data-search-empty hidden>没有命中。</p>
+    <p class="mono palette-foot">↑↓ 选择 · Enter 打开 · Esc 关闭</p>
+  </div>
+</div>
+
+<script is:inline define:vars={{ index }}>
+  (() => {
+    const root = document.querySelector('[data-search-palette]');
+    if (!root) return;
+    const input = root.querySelector('[data-search-input]');
+    const list = root.querySelector('[data-search-results]');
+    const empty = root.querySelector('[data-search-empty]');
+    let cursor = -1;
+    let hits = [];
+
+    const render = (q) => {
+      const query = q.trim().toLowerCase();
+      hits = query ? index.filter((it) => it.hay.includes(query)).slice(0, 8) : index.slice(0, 8);
+      list.innerHTML = hits
+        .map(
+          (it, i) =>
+            '<li class="palette-item' + (i === cursor ? ' is-cursor' : '') + '">' +
+            '<a href="' + it.href + '"><time class="mono">' + it.date + '</time>' +
+            '<span class="palette-title">' + it.title + '</span>' +
+            '<span class="mono palette-kind">' + it.kind + '</span></a></li>'
+        )
+        .join('');
+      empty.hidden = hits.length > 0;
+    };
+
+    const open = () => {
+      root.hidden = false;
+      cursor = 0;
+      render(input.value);
+      input.focus();
+    };
+    const close = () => {
+      root.hidden = true;
+      input.value = '';
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        root.hidden ? open() : close();
+        return;
+      }
+      if (root.hidden) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        cursor = Math.min(cursor + 1, hits.length - 1);
+        render(input.value);
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        cursor = Math.max(cursor - 1, 0);
+        render(input.value);
+      }
+      if (e.key === 'Enter' && hits[cursor]) {
+        window.location.href = hits[cursor].href;
+      }
+    });
+
+    input.addEventListener('input', () => {
+      cursor = 0;
+      render(input.value);
+    });
+    root.querySelector('[data-search-close]')?.addEventListener('click', close);
+    document.querySelector('[data-search-open]')?.addEventListener('click', open);
+  })();
+</script>
+
+<style>
+  .search-palette {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+  }
+
+  .palette-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(29, 29, 34, 0.18);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .palette-panel {
+    position: relative;
+    width: min(34rem, calc(100vw - 2.5rem));
+    margin: 14vh auto 0;
+    padding: 1.15rem 1.35rem 1rem;
+    border: 1px solid var(--hair-frame);
+    border-radius: 14px;
+    background: var(--color-panel);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-contact);
+  }
+
+  .palette-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding-bottom: 0.95rem;
+    border-bottom: 1px solid var(--color-hair);
+  }
+
+  .palette-hint,
+  .palette-key {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-soft);
+  }
+
+  .palette-input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    color: var(--color-ink);
+    outline: none;
+  }
+
+  .palette-results {
+    margin: 0.65rem 0 0;
+    padding: 0;
+    list-style: none;
+    max-height: 46vh;
+    overflow-y: auto;
+  }
+
+  .palette-item a {
+    display: grid;
+    grid-template-columns: 5.2em 1fr auto;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.72rem 0.55rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .palette-item.is-cursor a,
+  .palette-item a:hover {
+    background: var(--color-panel-2);
+  }
+
+  .palette-item time,
+  .palette-kind {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-soft);
+  }
+
+  .palette-title {
+    font-family: var(--font-serif);
+    font-size: 0.98rem;
+    color: var(--color-ink);
+  }
+
+  .palette-empty,
+  .palette-foot {
+    margin: 0.85rem 0 0;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-soft);
+  }
+</style>

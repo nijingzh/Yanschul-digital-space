@@ -1,0 +1,163 @@
+---
+/**
+ * SPACE STATUS · 星图观测台（v25 · 方向 A，2026-09-28 裁决）
+ * 去白盒 → 发丝线观测台读数：数字衬线活字 + 标签云分档 + ✦ 头缀 + 牵线语法。
+ * 数据全真实（文章/分类/标签/总字数 = content 实算；已住 = SITE_BIRTH tick）。
+ */
+import { SITE_BIRTH, getFeedItems } from '../data/content';
+import { getCollection } from 'astro:content';
+
+const feed = await getFeedItems();
+const entries = await getCollection('feed');
+
+// 真实数据（v25：占位「——」退役）
+const articles = feed.filter((f) => f.kind === '文章').length;
+const categories = new Set(feed.map((f) => f.category)).size;
+const tagSet = new Set(feed.flatMap((f) => f.tags));
+const totalChars = entries.reduce((sum, e) => sum + ((e.body || '').replace(/\s/g, '').length), 0);
+const words = totalChars >= 1000 ? `${(totalChars / 1000).toFixed(1)}k` : `${totalChars}`;
+
+const dayMs = 86400000;
+const days = Math.max(0, Math.round((Date.now() - new Date(`${SITE_BIRTH}T00:00:00`).getTime()) / dayMs));
+
+const rows = [
+  { label: '文章', value: String(articles) },
+  { label: '分类', value: String(categories) },
+  { label: '标签', value: String(tagSet.size) },
+  { label: '总字数', value: words },
+];
+
+// 标签云：动态分位 3 档（前 25% 大 / 中段 中 / 其余 小）——数据分布变化也恒有 3 档
+const tagCounts = [...tagSet].map((t) => ({
+  tag: t,
+  n: feed.filter((f) => f.tags.includes(t)).length,
+})).sort((a, b) => b.n - a.n);
+const top = Math.max(1, Math.ceil(tagCounts.length * 0.25));
+const mid = Math.max(top + 1, Math.ceil(tagCounts.length * 0.6));
+const tier = (i: number) => (i < top ? 't3' : i < mid ? 't2' : 't1');
+---
+
+<div class="stats-panel" data-reveal>
+  <p class="mono stats-caption"><span class="cap-star" aria-hidden="true">✦</span> SPACE STATUS</p>
+
+  <div class="stats-readings">
+    {rows.map((row) => (
+      <div class="reading">
+        <span class="reading-value serif">{row.value}</span>
+        <span class="mono reading-label">{row.label}</span>
+      </div>
+    ))}
+    <div class="reading reading-live">
+      <span class="reading-value serif" data-tick-days data-value={`${days}`}>{days}</span>
+      <span class="mono reading-label">已住 · 天</span>
+    </div>
+  </div>
+
+  <p class="stats-rule" aria-hidden="true"></p>
+
+  <div class="stats-tags" aria-label="标签云">
+    {tagCounts.map(({ tag, n }, i) => (
+      <a class={`tag-orbit ${tier(i)}`} href={`/tags`} title={`${tag} · ${n} 篇`}>
+        #{tag}
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* v25.1 透明玻璃卡片（站内玻璃语法：0.72 白 + 1px 发丝 + radius 14 + blur） */
+  .stats-panel {
+    width: 100%;
+    padding: 1.5rem 1.65rem 1.4rem;
+    background: var(--color-panel);
+    border: 1px solid var(--color-hair);
+    border-radius: 14px;
+    box-shadow: -2px 5px 14px rgba(29, 29, 34, 0.06);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: border-color 300ms ease, box-shadow 300ms ease;
+  }
+
+  .stats-panel:hover {
+    border-color: var(--hair-frame);
+    box-shadow: -2px 8px 22px rgba(155, 138, 168, 0.22);
+  }
+
+  .stats-caption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    color: var(--color-ink-faint);
+  }
+
+  .cap-star {
+    color: var(--color-ink-2);
+  }
+
+  /* 读数区：衬线大字活字 */
+  .stats-readings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 26px;
+    margin-top: 20px;
+  }
+
+  .reading {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 62px;
+  }
+
+  .reading-value {
+    font-family: var(--font-serif);
+    font-size: 1.95rem;
+    line-height: 1;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .reading-live .reading-value {
+    color: var(--color-ink-2);
+  }
+
+  .reading-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-faint);
+  }
+
+  .stats-rule {
+    margin: 22px 0 16px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--color-hair), transparent 85%);
+  }
+
+  /* 标签云：3 档字号、hover 亮灰紫 */
+  .stats-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+
+  .tag-orbit {
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    transition: color 160ms ease, transform 200ms var(--ease-space);
+  }
+
+  .tag-orbit.t1 { font-size: 0.66rem; }
+  .tag-orbit.t2 { font-size: 0.78rem; }
+  .tag-orbit.t3 { font-size: 0.92rem; color: var(--color-ink); }
+
+  .tag-orbit:hover {
+    color: var(--color-ink-2);
+    transform: translateY(-2px);
+  }
+</style>

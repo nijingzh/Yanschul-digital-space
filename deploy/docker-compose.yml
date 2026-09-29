@@ -1,0 +1,43 @@
+# Folia 生产编排（§12A/§12B · 任务单 v7 任务 B）：站点 + Folia + 反代，同一 VPS、同一编排。
+# 此目录不进 src；dev 预览仍是 astro dev --port 4321（Folia 不参与 dev，M5 占位态不报错）。
+#
+# 部署前置（等江衍）：VPS 访问方式（SSH/面板）、Folia 部署形态（镜像名/端口/是否 docker）、
+# 歌单/音源归属。拿到前本文件为配置就绪态，M4/M8 生产验收挂起。
+#
+# 合规提醒（§12A.5）：若 VPS 在境内，反代端口与备案/合规风险由江衍确认（不阻塞）。
+
+services:
+  site:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro          # HTTPS 证书（certbot 签发后放入；见 nginx.conf 注释）
+      - ../logs:/var/log/nginx           # 日志（宿主机轮转：见 logrotate.d/folia-site）
+    depends_on:
+      - folia
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+  folia:
+    image: ${FOLIA_IMAGE:-folia:latest}  # TODO: Folia 官方镜像名/标签（等江衍确认部署形态）
+    restart: unless-stopped
+    env_file:
+      - .env                             # 音源密钥等私密配置：只走服务端，不进仓库、不进前端
+    volumes:
+      - folia-data:/data
+      # TODO: Folia 实际配置路径按官方文档校准（主题白名单等，见 folia-config.example.yml）
+      - ./folia-config.example.yml:/app/config.yml:ro
+    expose:
+      - "8080"                           # 管理端不对公网裸露（仅反代可达；nginx 层再限来源/口令）
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+
+volumes:
+  folia-data:

@@ -1,0 +1,64 @@
+---
+// MarqueeStrip —— 跑马灯文章带（clay-blog 招牌动效 · v22 大改批）
+// 真实 feed 标题循环流动；hover 暂停；reduce 静止（全局规则停 animation）
+import { getFeedItems } from '../data/content';
+
+const items = (await getFeedItems()).slice(0, 8);
+const track = items.map((it) => `${it.date.replaceAll('-', '.')} · ${it.title}`).join('　✦　');
+// 双份内容保证无缝循环
+const doubled = `${track}　✦　${track}`;
+---
+
+<div class="marquee" aria-label="文章速览">
+  <div class="marquee-track">
+    <span class="mono">{doubled}</span>
+    <span class="mono" aria-hidden="true">{doubled}</span>
+  </div>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    border-top: 1px solid var(--color-hair);
+    border-bottom: 1px solid var(--color-hair);
+    padding: 0.95rem 0;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-slide 36s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-track .mono {
+    flex-shrink: 0;
+    padding-right: 3rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-soft);
+    white-space: nowrap;
+    transition: color 0.32s var(--ease-out-quart);
+  }
+
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee-slide {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,155 @@
+---
+/**
+ * SiteLoader · 星芒「点亮星图」全站加载动画（v26 · 方向 A）
+ * 进站首屏前覆盖层：中央星芒 ✦ 汇聚 + 发丝线弧轻旋 + 墨字「江衍」。
+ * 只用 transform/opacity；window.load + 最小时长 600ms 防闪烁后淡出。
+ * respect prefers-reduced-motion（去旋转/呼吸，纯 opacity 渐隐）。
+ */
+---
+
+<div class="site-loader" data-site-loader aria-hidden="true">
+  <div class="loader-inner">
+    <svg class="loader-stars" viewBox="0 0 200 200" aria-hidden="true">
+      <!-- 发丝线弧（轻旋） -->
+      <circle class="loader-arc" cx="100" cy="100" r="84" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 10" />
+      <!-- 中央大星芒 + 环绕小星芒 -->
+      <path class="star star-main" d="M100 16 C105 76 124 95 184 100 C124 105 105 124 100 184 C95 124 76 105 16 100 C76 95 95 76 100 16 Z" />
+      <path class="star star-a" d="M56 56 C57 68 62 73 74 74 C62 75 57 80 56 92 C55 80 50 75 38 74 C50 73 55 68 56 56 Z" />
+      <path class="star star-b" d="M144 116 C145 124 149 128 159 129 C149 130 145 134 144 142 C143 134 139 130 129 129 C139 128 143 124 144 116 Z" />
+    </svg>
+    <p class="loader-name">江衍</p>
+    <p class="loader-note mono">正在点亮星图</p>
+  </div>
+</div>
+
+<style>
+  .site-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    background: var(--color-space-1);
+    color: var(--color-ink-2);
+    transition: opacity 0.5s var(--ease-out-quart, ease), visibility 0.5s;
+  }
+
+  .site-loader.done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .loader-inner {
+    display: grid;
+    justify-items: center;
+    gap: 1.1rem;
+  }
+
+  .loader-stars {
+    width: 220px;
+    height: 220px;
+    color: rgba(186, 176, 230, 0.55);
+  }
+
+  /* 发丝线弧：极缓自转（transform） */
+  .loader-arc {
+    transform-origin: 100px 100px;
+    animation: arc-spin 6s linear infinite;
+    opacity: 0.72;
+  }
+
+  /* 星芒呼吸（opacity + scale），中央快、两翼错拍 */
+  .star {
+    fill: rgb(186, 176, 230);
+    transform-origin: center;
+    animation: star-breathe 1.6s var(--ease-out-quart, ease) infinite;
+  }
+  .star-main {
+    fill: var(--color-ink-2);
+  }
+  .star-a {
+    animation-delay: 0.35s;
+    opacity: 0.7;
+  }
+  .star-b {
+    animation-delay: 0.7s;
+    opacity: 0.55;
+  }
+
+  .loader-name {
+    font-family: var(--font-serif, serif);
+    font-size: 2.1rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink);
+    opacity: 0;
+    animation: name-in 0.9s var(--ease-out-quart, ease) 0.15s forwards;
+  }
+
+  .loader-note {
+    font-size: 0.62rem;
+    letter-spacing: 0.34em;
+    color: #5c5c66;
+    opacity: 0;
+    animation: name-in 0.9s var(--ease-out-quart, ease) 0.35s forwards;
+  }
+
+  @keyframes arc-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes star-breathe {
+    0%, 100% {
+      opacity: 0.32;
+      transform: scale(0.86);
+    }
+    50% {
+      opacity: 0.92;
+      transform: scale(1.08);
+    }
+  }
+  @keyframes name-in {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader-arc,
+    .star,
+    .loader-name,
+    .loader-note {
+      animation: none;
+    }
+    .loader-name,
+    .loader-note {
+      opacity: 1;
+    }
+    .site-loader {
+      transition: opacity 0.3s ease;
+    }
+  }
+</style>
+
+<script>
+  // 完整加载（module script 仅在此执行）：显示加载层满 2 秒；SPA 导航不弹
+  (function () {
+    (window as any).__ldr_ran = true;
+    const first = document.querySelector<HTMLElement>('[data-site-loader]');
+    if (first) {
+      first.dataset.active = '1';
+      setTimeout(() => {
+        first.classList.add('done');
+        setTimeout(() => first.remove(), 520);
+      }, 2000);
+    }
+    // SPA 导航（点导航栏）：移除新加载层；首次完整加载不移除
+    let pageLoads = 0;
+    document.addEventListener('astro:page-load', () => {
+      pageLoads++;
+      if (pageLoads === 1) return;
+      document.querySelectorAll<HTMLElement>('[data-site-loader]').forEach((n) => n.remove());
+    });
+  })();
+</script>

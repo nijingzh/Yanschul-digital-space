@@ -1,0 +1,127 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/sections/Hero.astro';
+import MarqueeStrip from '../components/MarqueeStrip.astro';
+import NowSection from '../components/sections/NowSection.astro';
+import WorldSection from '../components/sections/WorldSection.astro';
+import GlowTransition from '../components/GlowTransition.astro';
+import LatestSection from '../components/sections/LatestSection.astro';
+import StatsPanel from '../components/StatsPanel.astro';
+---
+
+<Base
+  title="首页"
+  description="江衍的个人数字空间：技术、学习、生活，以及一切正在发生的事。"
+>
+  <!-- 第一幕 · 玄关照壁 -->
+  <Hero />
+
+  <!-- 第二幕 · 内容广场（跑马灯 + 不对称双栏） -->
+  <MarqueeStrip />
+  {/* v25.6：起点与「现在 · 进行时」标题齐平，贴视口最右跟随 */}
+  <aside class="stats-sticky" aria-label="空间状态">
+    <StatsPanel />
+  </aside>
+  <NowSection />
+  {/* v26 A+C：痕迹右栏已删 → 单栏舒展；右侧极轻星线点缀 */}
+  <section class="content-square shell" data-reveal>
+    <div class="square-main">
+      <LatestSection />
+    </div>
+    <div class="star-trail" aria-hidden="true">
+      <span class="trail-line"></span>
+      <span class="twinkle t1">✦</span>
+      <span class="twinkle t2">✦</span>
+      <span class="twinkle t3">✦</span>
+      <span class="twinkle t4">✦</span>
+    </div>
+  </section>
+
+  <!-- 第三幕 · 世界之窗 -->
+  <WorldSection />
+  <GlowTransition />
+</Base>
+
+<style>
+  /* v25.1 观测台 sticky：从「现在·进行时」起跟随滚动 */
+  .stats-sticky {
+    /* v25.10：浮动跟随，但浮动上限=红框（「网络安全」行）——不浮到红框之上 */
+    position: sticky;
+    top: 250px;
+    z-index: 3;
+    /* 起点对齐「现在 · 进行时」标题（实测 marquee 底 1716→标题 1827 = 111px）；负底距抵消自身 111+341=452，净占位 0 */
+    margin-top: 111px;
+    margin-bottom: -452px;
+    width: min(19.5rem, 88vw);
+    /* v25.5：贴视口最右（红框位）——右边距 30px，正文在左，零重叠 */
+    margin-left: auto;
+    margin-right: 30px;
+    pointer-events: none;
+  }
+
+  .stats-sticky :global(.stats-panel) {
+    pointer-events: auto;
+  }
+
+  /* v26 内容广场：单栏舒展（痕迹右栏已删）+ 右侧极轻星线点缀 */
+  .content-square {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 96px;
+    gap: 3.5rem;
+    padding-top: 6.5rem;
+    padding-bottom: 7rem;
+    align-items: start;
+  }
+
+  .square-main {
+    min-width: 0;
+  }
+
+  /* C · 足迹星线：竖发丝线 + 4 颗星芒（大小/透明渐变 + 慢闪），极轻不抢戏 */
+  .star-trail {
+    position: sticky;
+    top: 220px;
+    height: 20rem;
+    align-self: start;
+    pointer-events: none;
+  }
+
+  .trail-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--color-hair) 12%, var(--color-hair) 88%, transparent);
+  }
+
+  .twinkle {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgb(186, 176, 230);
+    line-height: 1;
+    animation: star-breathe 3.6s var(--ease-out-quart) infinite;
+  }
+
+  .twinkle.t1 { top: 6%;  font-size: 0.5rem;   opacity: 0.5; animation-delay: 0s; }
+  .twinkle.t2 { top: 30%; font-size: 0.85rem;  opacity: 0.75; animation-delay: 0.7s; }
+  .twinkle.t3 { top: 58%; font-size: 0.62rem;  opacity: 0.6; animation-delay: 1.4s; }
+  .twinkle.t4 { top: 82%; font-size: 0.42rem;  opacity: 0.42; animation-delay: 2.1s; }
+
+  @keyframes star-breathe {
+    0%, 100% { opacity: 0.32; transform: translateX(-50%) scale(0.9); }
+    50% { opacity: 0.85; transform: translateX(-50%) scale(1.08); }
+  }
+
+  @media (max-width: 959px) {
+    .content-square {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding-top: 4.5rem;
+      padding-bottom: 5rem;
+    }
+    .star-trail { display: none; }
+  }
+</style>

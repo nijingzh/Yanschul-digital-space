@@ -1,0 +1,654 @@
+---
+import { statusChips, SLOGAN, SLOGAN_NOTE, getFeedItems } from '../../data/content';
+import SparkIcon from '../SparkIcon.astro';
+
+// 充盈化（clay-blog 手法学习批）：hero「最近在写」预览行——首屏内容密度（真实数据）
+const recent = (await getFeedItems()).slice(0, 3);
+
+const entries = [
+  { href: '/articles', label: '进入文章', desc: '记录与思考', num: '01', icon: 'articles' as const },
+  { href: '/projects', label: '查看项目', desc: '做过的东西', num: '02', icon: 'projects' as const },
+  { href: '/about', label: '认识我', desc: '关于江衍', num: '03', icon: 'about' as const },
+];
+
+/* Hero 光尘：唯一允许的「粒子」形态（≤20 颗、≤2px、≤0.12；固定排布，无随机抖动） */
+const motes = [
+  { x: 8, y: 22, dur: 11 }, { x: 18, y: 64, dur: 13 }, { x: 27, y: 35, dur: 10.5 },
+  { x: 33, y: 78, dur: 12 }, { x: 41, y: 16, dur: 14 }, { x: 48, y: 52, dur: 11.5 },
+  { x: 55, y: 84, dur: 12.5 }, { x: 61, y: 28, dur: 10 }, { x: 68, y: 61, dur: 13.5 },
+  { x: 74, y: 12, dur: 11 }, { x: 79, y: 72, dur: 12 }, { x: 85, y: 44, dur: 14.5 },
+  { x: 90, y: 20, dur: 10.5 }, { x: 14, y: 47, dur: 12.5 }, { x: 45, y: 33, dur: 13 },
+  { x: 63, y: 76, dur: 11 }, { x: 82, y: 58, dur: 12 }, { x: 94, y: 66, dur: 13.5 },
+];
+---
+
+<section class="hero">
+  <!-- Hero 远景线稿层（任务单 v8 · 冻结实数）：「住在这的人的影子」，三层景深远层位
+       （环境光之下、内容之下）；人物压右侧 40%、左侧渐隐到 0；透明度 0.13；
+       图内花瓣为冻结飘瓣（静止），不作动态飘落 -->
+  <div class="hero-shadow" data-hero-shadow aria-hidden="true">
+    <img src="/assets/hero-shadow.webp" alt="" class="shadow-drift" width="1024" height="561" />
+  </div>
+  <div class="shell hero-grid">
+    <div class="hero-copy" data-settle>
+      <p class="mono hero-eyebrow" data-enter>个人数字空间 · 持续建设中</p>
+
+      <h1 class="hero-title" data-enter>
+        <!-- v23.7 SVG 渐变字（根治版）：fill 渐变直涂字形——不走 background-clip、
+             不受伪粗体/字体字重影响，任何环境下字形完整、渐变无缝流动 -->
+        <svg class="hero-name-svg" viewBox="0 0 470 168" role="img" aria-label="江衍">
+          <defs>
+            <linearGradient id="hero-grad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="470" y2="0" spreadMethod="repeat">
+              <stop offset="0%" stop-color="var(--color-ink-2)" />
+              <stop offset="22%" stop-color="#c9a8b8" />
+              <stop offset="44%" stop-color="var(--color-ink-2)" />
+              <stop offset="56%" stop-color="#4a4258" />
+              <stop offset="78%" stop-color="var(--color-ink-2)" />
+              <stop offset="100%" stop-color="var(--color-ink-2)" />
+              {/* 流动 = SMIL 动 gradientTransform（CSS transform 动 gradient 会让渐变失效回退黑） */}
+              <animateTransform
+                attributeName="gradientTransform"
+                type="translate"
+                from="0 0"
+                to="-470 0"
+                dur="8s"
+                repeatCount="indefinite"
+              />
+            </linearGradient>
+          </defs>
+          <text x="0" y="132" class="hero-name-text" fill="url(#hero-grad)">江衍</text>
+        </svg>
+        <span class="hero-en">Digital Space</span>
+      </h1>
+
+      <p class="lead hero-lead" data-enter>
+        一个持续生长的数字空间——技术、学习、生活，以及一切正在发生的事，都会留在这里。
+      </p>
+
+      <!-- 口号（0/1 是排版语言不是装饰母题） -->
+      <div class="hero-slogan" data-enter>
+        <p class="slogan">0 为<span class="accent">过去</span>，1 即<span class="accent">未来</span>。</p>
+        <p class="hero-slogan-note">{SLOGAN_NOTE}</p>
+        <p class="slogan-note">0 · PAST — 1 · FUTURE</p>
+      </div>
+
+      <!-- 灰态小字（纪念日显示；非当日零影响） -->
+      <p class="memorial-line">今天，把光收起来。安静一天。</p>
+      <!-- 深夜留灯（Phase 5 特殊状态，23:00–05:00 显示；非时段零影响） -->
+      <p class="night-line" data-night-note></p>
+
+      <ul class="hero-status" data-enter>
+        {statusChips.map((chip) => <li class="chip">{chip}</li>)}
+      </ul>
+
+      <nav class="hero-entries" aria-label="主要入口">
+        {
+          entries.map((entry) => (
+            <a href={entry.href} class="hero-entry sweep magnetic pressable" data-enter>
+              <span class="mono entry-num">{entry.num}</span>
+              <SparkIcon name={entry.icon} />
+              <span class="entry-main"><span class="entry-label">{entry.label}</span>
+                <span class="entry-desc">{entry.desc}</span></span>
+              <span class="entry-arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          ))
+        }
+      </nav>
+
+      <!-- v23 语录浮条（第一幕海报化） -->
+      <aside class="quote-chip" data-reveal>
+        <span class="quote-mark" aria-hidden="true">✦</span>
+        <p class="serif">人在决定幸福的时候开始幸福。</p>
+      </aside>
+
+      <!-- 最近在写（首屏内容密度；真实 feed 数据） -->
+      <section class="hero-recent" data-reveal aria-label="最近在写">
+        <p class="mono recent-head">最近在写 / RECENT</p>
+        <ul class="recent-list">
+          {
+            recent.map((item) => (
+              <li>
+                <a class="recent-row link-grow" href="/articles">
+                  <time class="mono recent-date">{item.date.replace(/-/g, '.')}</time>
+                  <span class="recent-title">{item.title}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+
+    <div class="hero-stage" data-enter-char>
+      <div class="stage-glow" aria-hidden="true"></div>
+      <div class="hero-dust" aria-hidden="true">
+        {motes.map((m) => (
+          <span class="mote" style={`left:${m.x}%;top:${m.y}%;animation-duration:${m.dur}s`}></span>
+        ))}
+      </div>
+      <span class="hero-coord mono" data-readout aria-hidden="true">Space · 00</span>
+      <!-- 星芒彩蛋浮字（连点星芒 3 次触发；纯文字语气） -->
+      <p class="spark-whisper mono" data-spark-whisper aria-live="polite"></p>
+      <svg class="stage-spark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="stageSpark" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--color-glow-pink)"></stop>
+            <stop offset="100%" stop-color="var(--color-glow-violet)"></stop>
+          </linearGradient>
+        </defs>
+        <path d="M92 100 L108 100 M100 92 L100 108" stroke="#1D1D22" stroke-opacity="0.12" stroke-width="0.8"></path>
+        <g class="spark-main">
+          <circle cx="100" cy="100" r="46" fill="url(#stageSpark)" opacity="0.22"></circle>
+          <path d="M100 58 Q104 94 142 100 Q104 106 100 142 Q96 106 58 100 Q96 94 100 58 Z" fill="url(#stageSpark)" stroke="#1D1D22" stroke-opacity="0.32" stroke-width="1.1" stroke-linejoin="round"></path>
+          <circle cx="96" cy="95" r="2" fill="#FFFFFF" opacity="0.9"></circle>
+        </g>
+        <path d="M158 52 Q159.4 57 164 58 Q159.4 59 158 64 Q156.6 59 152 58 Q156.6 57 158 52 Z" fill="url(#stageSpark)" opacity="0.8"></path>
+        <path d="M46 138 Q47 141.5 50.5 142.5 Q47 143.5 46 147 Q45 143.5 41.5 142.5 Q45 141.5 46 138 Z" fill="url(#stageSpark)" opacity="0.6"></path>
+        <path d="M154 150 Q154.7 152.2 157 153 Q154.7 153.8 154 156 Q153.3 153.8 151 153 Q153.3 152.2 154 150 Z" fill="url(#stageSpark)" opacity="0.5"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="floor">
+    <div class="shell floor-inner">
+      <span class="mono scroll-hint">向下，进入空间</span>
+      <span class="scroll-line" aria-hidden="true"></span>
+    </div>
+  </div>
+  <!-- v21 波浪发丝线（流动转场，发丝线语法延伸） -->
+  <div class="wave-hair shell" aria-hidden="true"></div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+  }
+
+  /* 远景线稿层（v8）：只用 transform/opacity；入场第 1 拍仅透明度渐入（motion.ts） */
+  .hero-shadow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.19;
+  }
+
+  .hero-shadow img {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 58%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 72% 20%;
+    filter: saturate(0);
+    /* 左缘 + 下缘双向羽化进冷白底（v26.4：下缘渐隐消除硬切衔接） */
+    mask-image: linear-gradient(to right, transparent 0%, black 55%), linear-gradient(to bottom, black 62%, transparent 98%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 55%), linear-gradient(to bottom, black 62%, transparent 98%);
+    mask-composite: intersect;
+    -webkit-mask-composite: source-in;
+  }
+
+  /* 极缓漂移：≤1.03 缩放、20s 级周期、仅 transform */
+  .shadow-drift {
+    animation: shadowDrift 20s var(--ease-space) infinite alternate;
+  }
+
+  @keyframes shadowDrift {
+    from {
+      transform: scale(1);
+    }
+
+    to {
+      transform: scale(1.03);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shadow-drift {
+      animation: none;
+      transform: none;
+    }
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: 3rem;
+    align-items: end;
+    /* v23.8 #12：压缩 hero 让「最近在写」进首屏 */
+    min-height: calc(76vh - 5rem);
+    padding-top: 8.5rem;
+  }
+
+  .hero-copy {
+    padding-bottom: 2.5rem;
+    /* v23.8 #4：元素节奏统一 20px（eyebrow→大字→英文→lead→slogan） */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 0;
+  }
+
+  .hero-name-svg {
+    display: block;
+    width: min(100%, 24em);
+    height: auto;
+    overflow: visible;
+  }
+
+  .hero-name-text {
+    font-family: var(--font-serif);
+    font-size: 150px;
+    font-weight: 700;
+    letter-spacing: -4px;
+  }
+
+  .hero-en {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-top: 0.45rem;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    letter-spacing: 0.22em;
+    color: var(--color-ink-2);
+  }
+
+  .hero-en::before {
+    content: "";
+    width: 2.2rem;
+    height: 1px;
+    background: rgba(29, 29, 34, 0.18);
+  }
+
+  .hero-lead {
+    margin-top: 1.6rem;
+    max-width: 40ch;
+  }
+
+  .hero-slogan {
+    margin-top: 1.9rem;
+    padding-top: 1.35rem;
+    border-top: 1px solid var(--color-hair);
+    max-width: 24rem;
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .hero-slogan .slogan {
+    font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+  }
+
+  .hero-slogan-note {
+    font-family: var(--font-serif);
+    font-size: 0.82rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-2);
+  }
+
+  .hero-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.8rem;
+  }
+
+  .chip {
+    font-size: 0.72rem;
+    color: var(--color-ink-2);
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.36rem 0.85rem;
+    background: var(--color-panel);
+  }
+
+  .hero-entries {
+    display: grid;
+    gap: 0;
+    margin-top: 2.2rem;
+    max-width: 30rem;
+  }
+
+  .hero-entry {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.95rem 0.75rem;
+    border-top: 1px solid var(--color-hair);
+    border-radius: var(--radius-hair);
+    transition: background 0.4s var(--ease-space);
+  }
+
+  .hero-entry:last-child {
+    border-bottom: 1px solid var(--color-hair);
+  }
+
+  /* v23 语录浮条（玻璃 + 发丝线，屏幕 3 处玻璃配额之一） */
+  .quote-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 1.7rem 0 0 2.2rem;
+    max-width: calc(100vw - 3rem);
+    padding: 0.72rem 1.25rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 14px;
+    background: var(--color-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .quote-chip .quote-mark {
+    font-size: 0.85rem;
+    color: #c9a8b8;
+  }
+
+  .quote-chip p {
+    font-family: var(--font-serif);
+    font-size: 0.98rem;
+    letter-spacing: 0.06em;
+    color: var(--color-ink-soft);
+  }
+
+  /* 最近在写（充盈化批）：mono 标题 + 发丝线行、hover 微亮 */
+  .hero-recent {
+    margin-top: 2.2rem;
+    max-width: 30rem;
+    opacity: 1;
+  }
+
+  .recent-head {
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-3);
+    margin-bottom: 0.75rem;
+  }
+
+  .recent-list {
+    display: grid;
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .recent-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1.15rem;
+    padding-block: 0.62rem;
+    border-bottom: 1px solid var(--color-hair);
+    transition: opacity 300ms;
+  }
+
+  .recent-date {
+    flex: 0 0 auto;
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-3);
+  }
+
+  .recent-title {
+    font-family: var(--font-serif);
+    font-size: 0.88rem;
+    color: var(--color-ink-2);
+  }
+
+  .recent-row:hover .recent-title {
+    color: var(--color-ink);
+  }
+
+  .hero-entry:hover {
+    background: var(--color-panel);
+  }
+
+  .entry-main {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+
+  .entry-num {
+    font-size: 0.58rem;
+  }
+
+  .entry-label {
+    font-weight: 500;
+    font-size: 0.98rem;
+  }
+
+  .entry-desc {
+    font-size: 0.74rem;
+    color: var(--color-ink-3);
+  }
+
+  .entry-arrow {
+    color: var(--color-ink-3);
+    transition: transform 0.5s var(--ease-space), color 0.4s;
+  }
+
+  .hero-entry:hover .entry-arrow {
+    transform: translateX(5px);
+    color: var(--color-ink);
+  }
+
+  /* 角色的舞台：坐在空间的地板线上 */
+  .hero-stage {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    align-self: end;
+  }
+
+  .stage-spark {
+    position: relative;
+    width: clamp(170px, 22vw, 250px);
+    height: auto;
+  }
+
+  .spark-main {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: breathe 7s var(--ease-space) infinite alternate;
+  }
+
+  @keyframes breathe {
+    from {
+      transform: scale(0.97);
+      opacity: 0.85;
+    }
+    to {
+      transform: scale(1.03);
+      opacity: 1;
+    }
+  }
+
+  .stage-glow {
+    position: absolute;
+    width: 34vw;
+    max-width: 420px;
+    aspect-ratio: 1;
+    bottom: -8%;
+    background: radial-gradient(closest-side, var(--color-glow-pink), transparent 70%);
+    opacity: 0.7;
+  }
+
+  .hero-coord {
+    position: absolute;
+    right: 0;
+    top: 2rem;
+    writing-mode: vertical-rl;
+    font-size: 0.58rem;
+  }
+
+  .floor {
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .floor-inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 1.4rem;
+  }
+
+  .scroll-hint {
+    font-size: 0.58rem;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 2.2rem;
+    background: linear-gradient(180deg, rgba(29, 29, 34, 0.25), transparent);
+    animation: drift 3.2s var(--ease-space) infinite;
+  }
+
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translateY(6px);
+      opacity: 1;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .hero-grid {
+      display: grid;
+      gap: 2.3rem;
+    }
+
+    .hero-stage {
+      justify-content: flex-end;
+      padding-right: 1.5rem;
+    }
+  }
+
+  /* 矮视口（笔记本常态）：收紧首屏，让角色与地板线留在第一屏 */
+  @media (min-width: 960px) and (max-height: 780px) {
+    .hero-grid {
+      padding-top: 5.5rem;
+    }
+
+    .hero-copy {
+      padding-bottom: 1.2rem;
+    }
+
+    .hero-eyebrow {
+      margin-bottom: 0.8rem;
+    }
+
+    .hero-name {
+      font-size: clamp(3.6rem, 12vw, 5.4rem);
+    }
+
+    .hero-en {
+      margin-top: 0.3rem;
+      font-size: 1rem;
+    }
+
+    .hero-lead {
+      margin-top: 1rem;
+    }
+
+    .hero-status {
+      margin-top: 1.1rem;
+    }
+
+    .hero-entries {
+      margin-top: 1.4rem;
+    }
+
+    .hero-entry {
+      padding: 0.7rem 0.75rem;
+    }
+
+    .hero-stage :global(.resident) {
+      width: clamp(170px, 18vw, 230px);
+    }
+  }
+
+  @media (max-width: 959px) {
+    .hero-grid {
+      align-items: center;
+    }
+
+    .hero-stage {
+      order: -1;
+      justify-content: flex-start;
+    }
+
+    .hero-coord {
+      top: 0;
+      right: 1rem;
+    }
+
+    .entry-desc {
+      display: none;
+    }
+  }
+  /* Phase 5：深夜留灯 / 星芒彩蛋浮字 / 星芒 hover 微亮（非触发零影响；只 transform/opacity） */
+  .night-line {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-2);
+  }
+
+  .night-line.is-visible {
+    display: block;
+  }
+
+  .spark-whisper {
+    position: absolute;
+    right: 0;
+    bottom: -2.2rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-2);
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      opacity 700ms var(--ease-space),
+      transform 700ms var(--ease-space);
+    pointer-events: none;
+  }
+
+  .spark-whisper.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stage-spark {
+    opacity: 0.92;
+    transition: opacity 700ms var(--ease-space);
+  }
+
+  .stage-spark:hover {
+    opacity: 1;
+  }
+  .hero-title {
+    /* v23.5 修正：父层不再做渐变字（与 .hero-name 流动渐变双层叠加会「露底」
+       ——竖笔底黑块的真凶）；渐变只在 .hero-name 一层 */
+    color: var(--color-ink);
+    font-weight: 700;
+  }
+
+  .hero-title .hero-en {
+    /* 英文副标题单独渐变（静态 90° 墨→灰紫，与大字同语言） */
+    background-image: linear-gradient(90deg, #1d1d22 0%, #9b8aa8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>

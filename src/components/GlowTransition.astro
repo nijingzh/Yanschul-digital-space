@@ -1,0 +1,56 @@
+---
+/**
+ * GlowTransition —— P1-4 滚动辉光过渡
+ *
+ * 落在首页 02 地带与 03 最近更新之间的空档区：随滚动推进的环境光层
+ * 冷→暖缓变（只动 opacity）。不占布局高度（不挪间距）。
+ * 入场时保持静止终态，滚动才接管；prefers-reduced-motion 永远停在静止终态。
+ * 峰值透明度 0.16（emission 晕 ≤0.16 合规）。
+ */
+---
+
+<div class="glow-gap" data-glow aria-hidden="true">
+  <div class="glow-cool"></div>
+  <div class="glow-warm"></div>
+</div>
+
+<style>
+  .glow-gap {
+    position: relative;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .glow-cool,
+  .glow-warm {
+    /* fixed（非 absolute）：absolute + height:110vh 会溢出撑高文档，导致页脚下方出现空白 */
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: -55vh;
+    height: 110vh;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* 冷晕：起点侧（02 技术区方向），静止终态 0.5 */
+  .glow-cool {
+    background: radial-gradient(52% 58% at 28% 50%, rgba(232, 230, 246, 0.16), transparent 72%);
+    opacity: 0.5;
+  }
+
+  /* 暖晕：落点侧（03 方向），静止终态 0.5 */
+  .glow-warm {
+    background: radial-gradient(52% 58% at 72% 50%, rgba(250, 244, 248, 0.16), transparent 72%);
+    opacity: 0.5;
+  }
+
+  /* 夜航：冷/暖晕由浅紫改为暗紫，融入暗背景（避免白光带） */
+  :global([data-theme='night']) .glow-cool {
+    background: radial-gradient(52% 58% at 28% 50%, rgba(122, 110, 196, 0.16), transparent 72%);
+  }
+
+  :global([data-theme='night']) .glow-warm {
+    background: radial-gradient(52% 58% at 72% 50%, rgba(140, 118, 170, 0.14), transparent 72%);
+  }
+</style>

@@ -1,0 +1,130 @@
+---
+import SectionHead from '../SectionHead.astro';
+import { getNowItems } from '../../data/content';
+
+const nowItems = await getNowItems();
+---
+
+<section class="section now">
+  <div class="shell">
+    <SectionHead num="01" en="Now" title="现在 · 进行时" desc="最近的时间，大多流向了这些地方。" />
+
+    <ol class="rail">
+      {
+        nowItems.map((item) => (
+          <li class="rail-item" data-reveal>
+            <span class:list={['rail-dot', { live: item.live }]} aria-hidden="true" />
+            <p class="mono rail-meta">
+              {item.period}
+              <span class="rail-status">{item.status}</span>
+            </p>
+            <div class="rail-body">
+              <h3 class="rail-title display">{item.title}</h3>
+              <p class="lead rail-desc">{item.desc}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* 极淡光晕：替代装饰图形的唯一手段之一（透明度 0.45，取环境光粉紫） */
+  .now::before {
+    content: "";
+    position: absolute;
+    width: 42vw;
+    height: 42vw;
+    max-width: 560px;
+    max-height: 560px;
+    right: -6vw;
+    top: 8%;
+    background: radial-gradient(closest-side, var(--color-glow-pink), transparent 72%);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .rail {
+    position: relative;
+    display: grid;
+    gap: 3.8rem;
+  }
+
+  .rail::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    width: 1px;
+    background: linear-gradient(180deg, rgba(29, 29, 34, 0.16), rgba(29, 29, 34, 0.03));
+  }
+
+  .rail-item {
+    position: relative;
+    display: grid;
+    gap: 0.6rem;
+    padding-left: 2.1rem;
+  }
+
+  .rail-dot {
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-space-0);
+    border: 1px solid rgba(29, 29, 34, 0.28);
+  }
+
+  .rail-dot.live::after {
+    content: "";
+    position: absolute;
+    inset: 1.5px;
+    border-radius: 50%;
+    background: var(--color-ink-2);
+    box-shadow: 0 0 0 4px rgba(214, 208, 242, 0.28);
+    animation: live 3.4s var(--ease-space) infinite;
+  }
+
+  @keyframes live {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .rail-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .rail-status {
+    color: var(--color-ink-2);
+    letter-spacing: 0.12em;
+  }
+
+  .rail-title {
+    font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  }
+
+  .rail-desc {
+    max-width: 52ch;
+    font-size: 0.92rem;
+  }
+
+  @media (min-width: 860px) {
+    .rail-item {
+      grid-template-columns: 13rem 1fr;
+      align-items: baseline;
+      gap: 2.5rem;
+      padding-left: 2.4rem;
+    }
+  }
+</style>

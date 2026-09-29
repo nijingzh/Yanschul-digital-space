@@ -1,0 +1,187 @@
+---
+import SectionHead from '../SectionHead.astro';
+import { getFeedItems } from '../../data/content';
+
+const feedItems = await getFeedItems();
+---
+
+<section class="section latest">
+  <div class="shell">
+    <SectionHead num="02" en="Latest" title="最近更新" desc="这个空间里最新的动静。" />
+
+    <div class="latest-grid">
+      <ol class="feed">
+        {
+          feedItems.map((item) => (
+            <li class="feed-item" data-reveal>
+              <a href={item.href} class="feed-link sweep">
+                <span class="feed-kind" data-kind={item.kind}>{item.kind}</span>
+                <span class="feed-main">
+                  <span class="feed-title">{item.title}</span>
+                  <span class="feed-desc">{item.desc}</span>
+                </span>
+                <time class="mono feed-date" datetime={item.date}>
+                  {item.date.replace(/-/g, '.')}
+                </time>
+              </a>
+            </li>
+          ))
+        }
+        <li class="feed-more" data-reveal>
+          <a href="/articles" class="u-link">查看全部文章 →</a>
+        </li>
+      </ol>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .latest-grid {
+    display: grid;
+    gap: 3.5rem;
+  }
+
+  .feed {
+    display: grid;
+  }
+
+  .feed-link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: 1.2rem;
+    padding: 1.15rem 0.85rem;
+    border-top: 1px solid var(--color-hair);
+    border-radius: var(--radius-hair);
+    transition: background 0.4s var(--ease-space);
+  }
+
+  .feed-item:last-child .feed-link {
+    border-bottom: 1px solid var(--color-hair);
+  }
+
+  .feed-link:hover {
+    background: var(--color-panel);
+  }
+
+  .feed-kind {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-2);
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.22rem 0.6rem;
+  }
+
+  /* v26.2 · 类型标签区分度：三类拉开色相（紫 / 粉 / 蓝）一眼可辨 */
+  .feed-kind[data-kind='文章'] {
+    color: var(--color-ink-2);
+    border-color: rgba(107, 95, 130, 0.4);
+    background: rgba(170, 155, 215, 0.22);
+  }
+  .feed-kind[data-kind='记录'] {
+    color: #b06172;
+    border-color: rgba(176, 97, 114, 0.4);
+    background: rgba(219, 150, 168, 0.24);
+  }
+  .feed-kind[data-kind='项目'] {
+    color: #4a7099;
+    border-color: rgba(74, 112, 153, 0.4);
+    background: rgba(130, 175, 215, 0.24);
+  }
+
+  .feed-main {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .feed-title {
+    font-size: 1rem;
+    transition: color 0.3s;
+  }
+
+  .feed-desc {
+    font-size: 0.8rem;
+    color: var(--color-ink-2);
+  }
+
+  .feed-date {
+    font-size: 0.6rem;
+  }
+
+  .feed-more {
+    padding: 1.4rem 0.85rem 0;
+    font-size: 0.85rem;
+    color: var(--color-ink-2);
+  }
+
+  .notes {
+    display: grid;
+    gap: 0;
+    align-content: start;
+    padding-left: 2.8rem;
+    border-left: 1px solid var(--color-hair);
+  }
+
+  .notes-title {
+    margin-bottom: 1rem;
+  }
+
+  .note {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 0.95rem;
+    border-bottom: 1px solid var(--color-hair);
+  }
+
+  .note:first-of-type {
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .note-kind {
+    font-size: 0.66rem;
+    color: var(--color-ink-3);
+    letter-spacing: 0.14em;
+  }
+
+  .note-title {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .note-meta {
+    font-size: 0.58rem;
+  }
+
+  .notes-more {
+    margin-top: 1.4rem;
+    font-size: 0.85rem;
+    color: var(--color-ink-2);
+    justify-self: start;
+  }
+
+  @media (min-width: 960px) {
+    .latest-grid {
+      grid-template-columns: 1.6fr 0.9fr;
+      gap: 4.5rem;
+    }
+  }
+
+  @media (max-width: 719px) {
+    .feed-link {
+      grid-template-columns: auto 1fr;
+    }
+
+    .feed-date {
+      grid-column: 2;
+      justify-self: start;
+    }
+
+    .notes {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+</style>

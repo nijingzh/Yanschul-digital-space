@@ -1,0 +1,241 @@
+/* ─────────────────────────────────────────────────────────
+   博客 UI 组件库 · ui-kit（v26 · 源自 Uiverse.io/galaxy 改造）
+   色板/动效映射博客 token：发丝线 · 胶囊 · 冷白粉紫 · 只 transform/opacity
+   ───────────────────────────────────────────────────────── */
+:root {
+  --ui-ink: #1d1d22;
+  --ui-ink-2: #777780;
+  --ui-hair: rgba(29, 29, 34, 0.12);
+  --ui-edge: rgba(29, 29, 34, 0.18);
+  --ui-lilac: rgba(186, 176, 230, 0.22);
+  --ui-lilac-line: rgba(155, 138, 168, 0.55);
+  --ui-lilac-glow: rgba(186, 176, 230, 0.28);
+  --ui-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── 按钮（1osm_rude-panda → 发丝线胶囊 + hover 微上浮辉光）── */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border: 1px solid var(--ui-edge);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ui-ink);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: transform 0.32s var(--ui-ease), box-shadow 0.32s var(--ui-ease), border-color 0.32s var(--ui-ease), background 0.32s var(--ui-ease);
+}
+.ui-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--ui-lilac-line);
+  box-shadow: 0 6px 20px var(--ui-lilac-glow);
+}
+.ui-btn--primary {
+  background: var(--ui-lilac);
+  border-color: var(--ui-lilac-line);
+}
+.ui-btn--ghost {
+  background: transparent;
+}
+.ui-btn__spark {
+  font-size: 0.7em;
+  opacity: 0.7;
+}
+
+/* ── 拨动开关（3bdel3ziz-T_honest-deer → 细轨道 + 小圆点滑动）── */
+.ui-toggle {
+  width: 54px;
+  height: 29px;
+  border: 1px solid var(--ui-edge);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  position: relative;
+  cursor: pointer;
+  transition: 0.32s var(--ui-ease);
+}
+.ui-toggle__dot {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: #c9c9d2;
+  transition: 0.32s var(--ui-ease);
+}
+.ui-toggle.is-on {
+  border-color: var(--ui-lilac-line);
+  background: rgba(186, 176, 230, 0.14);
+}
+.ui-toggle.is-on .ui-toggle__dot {
+  left: 28px;
+  background: var(--color-ink-2);
+  box-shadow: 0 2px 8px var(--ui-lilac-glow);
+}
+
+/* ── 卡片（0xnihilism_cold-tiger → 发丝线框 + 玻璃 + 薄阴影）── */
+.ui-card {
+  border: 1px solid var(--ui-hair);
+  border-radius: 14px;
+  background: var(--color-panel);
+  backdrop-filter: blur(8px);
+  padding: 26px 24px;
+  transition: transform 0.32s var(--ui-ease), box-shadow 0.32s var(--ui-ease);
+}
+.ui-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(186, 176, 230, 0.2);
+}
+.ui-card__tag {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.24em;
+  color: var(--color-ink-2);
+}
+.ui-card__title {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.18rem;
+  font-weight: 500;
+  margin: 14px 0 10px;
+}
+.ui-card__body {
+  font-size: 0.8rem;
+  line-height: 1.85;
+  color: var(--ui-ink-2);
+  margin: 0;
+}
+
+/* ── 复选框（勾选变星芒 ✦）── */
+.ui-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.84rem;
+  color: var(--ui-ink);
+}
+.ui-check input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.ui-check__box {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--ui-edge);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  color: transparent;
+  font-size: 0.72rem;
+  transition: 0.28s var(--ui-ease);
+}
+.ui-check input:checked + .ui-check__box {
+  border-color: var(--ui-lilac-line);
+  background: var(--ui-lilac);
+  color: var(--color-ink-2);
+  transform: scale(1.05);
+}
+
+/* ── Radio（星点点亮）── */
+.ui-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.84rem;
+  color: var(--ui-ink);
+}
+.ui-radio input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.ui-radio__dot {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--ui-edge);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: 0.28s var(--ui-ease);
+}
+.ui-radio__dot::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-ink-2);
+  transform: scale(0);
+  transition: 0.28s var(--ui-ease);
+}
+.ui-radio input:checked + .ui-radio__dot {
+  border-color: var(--ui-lilac-line);
+}
+.ui-radio input:checked + .ui-radio__dot::after {
+  transform: scale(1);
+}
+
+/* ── Input（发丝线下划线 + focus 灰紫）── */
+.ui-input {
+  border: none;
+  border-bottom: 1px solid var(--ui-edge);
+  background: transparent;
+  padding: 9px 2px;
+  font-size: 0.86rem;
+  color: var(--ui-ink);
+  letter-spacing: 0.04em;
+  transition: border-color 0.3s var(--ui-ease);
+}
+.ui-input:focus {
+  outline: none;
+  border-bottom-color: var(--ui-lilac-line);
+}
+.ui-input::placeholder {
+  color: var(--ui-ink-2);
+  opacity: 0.65;
+}
+
+/* ── Form（表单：输入 + 提交）── */
+.ui-form {
+  display: grid;
+  gap: 1.35rem;
+  max-width: 26rem;
+}
+.ui-form__field {
+  display: grid;
+  gap: 0.55rem;
+}
+.ui-form__label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  color: var(--ui-ink-2);
+}
+
+/* ── Loader（星芒点亮星图 · 已接 Base；此处留复用位）── */
+.ui-loader {
+  display: grid;
+  place-items: center;
+  gap: 0.7rem;
+  padding: 2.2rem;
+}
+.ui-loader__star {
+  font-size: 1.8rem;
+  color: var(--color-ink-2);
+  animation: ui-pulse 1.5s var(--ui-ease) infinite;
+}
+@keyframes ui-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.88); }
+  50% { opacity: 0.92; transform: scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-btn:hover, .ui-card:hover, .ui-check input:checked + .ui-check__box { transform: none; }
+  .ui-loader__star { animation: none; opacity: 0.7; }
+}

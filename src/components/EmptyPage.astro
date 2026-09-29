@@ -1,0 +1,97 @@
+---
+/**
+ * EmptyPage —— 区域规划中的空状态页（中文，角色在此值守）
+ */
+import Base from '../layouts/Base.astro';
+
+interface Props {
+  title: string;
+  desc: string;
+  plan: string[];
+}
+
+const { title, desc, plan } = Astro.props;
+---
+
+<Base title={title} description={desc}>
+  <section class="section empty">
+    <div class="shell empty-grid">
+      <div class="empty-copy">
+        <p class="mono" data-enter>此区域 · 规划中</p>
+        <h1 class="display empty-title" data-enter>{title}</h1>
+        <p class="lead empty-desc" data-enter>{desc}</p>
+
+        <ul class="plan">
+          {
+            plan.map((item, index) => (
+              <li class="plan-item" data-reveal>
+                <span class="mono plan-num">{String(index + 1).padStart(2, '0')}</span>
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <a href="/" class="u-link empty-back" data-enter>← 回到首页</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .empty-grid {
+    display: grid;
+    gap: 3.5rem;
+    align-items: end;
+    min-height: 60vh;
+    padding-top: 7rem;
+  }
+
+  .empty-title {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    margin-top: 1rem;
+  }
+
+  .empty-desc {
+    margin-top: 1.2rem;
+    max-width: 42ch;
+  }
+
+  .plan {
+    display: grid;
+    gap: 0;
+    margin-top: 2.4rem;
+    max-width: 30rem;
+  }
+
+  .plan-item {
+    display: flex;
+    align-items: baseline;
+    gap: 1.2rem;
+    padding: 0.85rem 0.5rem;
+    border-top: 1px solid var(--color-hair);
+    font-size: 0.92rem;
+    color: var(--color-ink-2);
+  }
+
+  .plan-item:last-child {
+    border-bottom: 1px solid var(--color-hair);
+  }
+
+  .plan-num {
+    font-size: 0.56rem;
+  }
+
+  .empty-back {
+    display: inline-block;
+    margin-top: 2.2rem;
+    font-size: 0.88rem;
+    color: var(--color-ink-2);
+  }
+
+  @media (min-width: 960px) {
+    .empty-grid {
+      grid-template-columns: minmax(0, 46rem);
+    }
+  }
+</style>

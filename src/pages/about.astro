@@ -1,0 +1,481 @@
+---
+// 玄关 —— v24「墨 · 星 · 门」整页重做（2026-09-28 裁决「开工」）
+// 视觉主体 = 书法「江衍」墨字（SVG fill=墨、楷体书法栈）+ 星芒光点 + 社交墨线排
+// 动效：入场墨迹晕开 / 星芒汇聚 / 图标 hover / 友链 ✦ 慢转（全 transform/opacity）
+import Base from '../layouts/Base.astro';
+
+/** 社交墨线图标（自绘 SVG 1.7px 描边、圆笔帽、墨色；hover 转灰紫）——v24 */
+const socials = [
+  { label: 'GitHub', href: 'https://github.com/nijingzh', title: 'GitHub · nijingzh' },
+  { label: 'Bilibili', href: 'https://space.bilibili.com/86719895', title: '哔哩哔哩空间' },
+  { label: 'Steam', href: 'https://steamcommunity.com/id/nijingzh/', title: 'Steam 主页' },
+  { label: 'Email', href: 'mailto:nijingzh@gmail.com', title: '邮件联络' },
+  { label: 'X', href: 'https://x.com/Yanschul', title: 'X · @Yanschul' },
+];
+
+/** 星芒汇聚起点（8 颗，从四周向墨字聚拢） */
+const glints = [
+  { x: 8, y: 18, s: 10, d: 0 },
+  { x: 22, y: 62, s: 8, d: 80 },
+  { x: 38, y: 12, s: 11, d: 160 },
+  { x: 55, y: 72, s: 7, d: 240 },
+  { x: 68, y: 22, s: 10, d: 320 },
+  { x: 80, y: 58, s: 8, d: 400 },
+  { x: 90, y: 16, s: 11, d: 480 },
+  { x: 46, y: 42, s: 9, d: 560 },
+];
+---
+
+<Base title="关于 — 江衍 · Digital Space" desc="江衍的数字空间玄关。">
+  <div class="gate" data-reveal-group>
+    {/* ── 墨字主视觉（v24 主体：书法「江衍」占屏 45%） ── */}
+    <section class="ink-stage" aria-label="江衍 · 玄关主视觉">
+      {/* v24.3 循环流星（江衍裁决：流星放在墨字这块）——5 条错拍 infinite 环绕墨字 */}
+      <i class="meteor-loop m1" aria-hidden="true"></i>
+      <i class="meteor-loop m2" aria-hidden="true"></i>
+      <i class="meteor-loop m3" aria-hidden="true"></i>
+      <i class="meteor-loop m4" aria-hidden="true"></i>
+      <i class="meteor-loop m5" aria-hidden="true"></i>
+      {glints.map((g) => (
+        <span
+          class="gate-glint"
+          aria-hidden="true"
+          style={`left:${g.x}%; top:${g.y}%; width:${g.s}px; height:${g.s}px; animation-delay:${g.d}ms`}
+        >✦</span>
+      ))}
+
+      <svg class="ink-svg" viewBox="0 0 470 168" role="img" aria-label="江衍">
+        <text x="235" y="138" class="ink-char" text-anchor="middle">江衍</text>
+      </svg>
+
+      <p class="ink-vertical mono" aria-hidden="true">YANSCHUL · DIGITAL SPACE</p>
+    </section>
+
+    {/* ── 身份行（B5 语录压缩一行） ── */}
+    <section class="gate-id" data-reveal-item>
+      <p class="gate-iam serif">i am Yanschul</p>
+      <p class="gate-quote serif">人在决定幸福的时候开始幸福。</p>
+    </section>
+
+    {/* ── 个人简介（v24.1：内容待江衍提供） ── */}
+    <section class="gate-bio" data-reveal-item aria-label="个人简介">
+      <p class="bio-label mono">ABOUT ME</p>
+      <div class="bio-text serif">
+        <p>这里是某位网络安全学习者的博客，女朋友一个，小猫一只<span class="bio-pet">（叫嘟嘟，经常踩键盘、偶尔关显示器、永远在捣乱）</span>。</p>
+        <p>女朋友会在我说“就差一点了”的第三个小时过来问一句“好了没”，<em class="bio-punch">这招比 Ctrl+C 还好用。</em></p>
+        <p class="bio-open">✦ 在找实习，欢迎投喂机会。</p>
+      </div>
+    </section>
+
+    {/* ── 社交墨线排 + 友链接力 ── */}
+    <section class="gate-social" aria-label="社交链接" data-reveal-item>
+      <ul class="social-row">
+        {socials.map((s) => (
+          <li>
+            <a class="social-ink magnetic pressable" href={s.href} target="_blank" rel="noopener" title={s.title} aria-label={s.title}>
+              {s.label === 'GitHub' && (
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4c-5.3 0-9.6 4.3-9.6 9.6 0 4.2 2.7 7.8 6.5 9.1.5.1.6-.2.6-.5v-1.7c-2.6.6-3.2-1.2-3.2-1.2-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.8.8.1-.6.3-1.1.6-1.3-2.1-.2-4.3-1-4.3-4.6 0-1 .4-1.9 1-2.5-.1-.3-.4-1.3.1-2.6 0 0 .8-.3 2.6 1a9 9 0 0 1 4.8 0c1.8-1.3 2.6-1 2.6-1 .5 1.3.2 2.3.1 2.6.6.6 1 1.5 1 2.5 0 3.6-2.2 4.4-4.3 4.6.3.3.6.9.6 1.8v2.6c0 .3.2.6.6.5a9.6 9.6 0 0 0 6.5-9.1c0-5.3-4.3-9.6-9.6-9.6z" /></svg>
+              )}
+              {s.label === 'Bilibili' && (
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 3.4 9.8 6h4.4l2.6-2.6M4.6 7h14.8a1.6 1.6 0 0 1 1.6 1.6v9.2a1.6 1.6 0 0 1-1.6 1.6H4.6a1.6 1.6 0 0 1-1.6-1.6V8.6A1.6 1.6 0 0 1 4.6 7zM8.6 11.2v2.2M15.4 11.2v2.2" /></svg>
+              )}
+              {s.label === 'Steam' && (
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><circle cx="14.6" cy="9.4" r="2.8" /><path d="M3.4 14.6l6.2 2.6M9.2 12.4l-.8 4.2" /></svg>
+              )}
+              {s.label === 'Email' && (
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.6" width="18" height="12.8" rx="1.8" /><path d="M3.8 7 12 12.8 20.2 7" /></svg>
+              )}
+              {s.label === 'X' && (
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 4.2h3.9l4.3 5.8 5-5.8h2.4l-6.2 7.2 6.6 8.4h-3.9l-4.6-6.1-5.4 6.1H3.9l6.6-7.5z" /></svg>
+              )}
+              <span class="social-label mono">{s.label}</span>
+            </a>
+          </li>
+        ))}
+        <li>
+          <a class="social-ink friend-ship magnetic pressable" href="https://www.travellings.cn/go" target="_blank" rel="noopener" title="开往 · 友链接力（随机跳转友链站点）">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6" /><path d="M12 3.4v2.8M12 17.8v2.8M3.4 12h2.8M17.8 12h2.8M12 9l1.4 3-1.4 3-1.4-3z" /></svg>
+            <span class="social-label mono">开往 · TRAVELLINGS</span>
+            <span class="ship-star" aria-hidden="true">✦</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    {/* ── 今晚挂着（Folia 动态装饰，保留） ── */}
+    <section class="gate-folia" aria-label="今晚挂着">
+      <p class="mono gate-folia-label">FOLIA</p>
+      <svg class="folia" viewBox="0 0 320 120" aria-hidden="true">
+        <path d="M20 84 C60 40 100 40 140 84 C180 40 220 40 260 84" stroke="var(--color-ink-2)" stroke-width="1.2" fill="none" opacity="0.35" />
+        <path d="M50 70 C80 52 110 52 140 70" stroke="#c9a8b8" stroke-width="1.2" fill="none" opacity="0.3" />
+      </svg>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .gate {
+    padding-block: clamp(2.2rem, 5vh, 3.6rem) 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── 墨字区循环流星（v24.3）：覆盖全局起点，环绕墨字划过 ── */
+  .ink-stage .meteor-loop {
+    z-index: 2;
+  }
+
+  .ink-stage .meteor-loop.m1 { top: 10%; left: 62%; animation-delay: 0s; animation-duration: 8s; width: 120px; }
+  .ink-stage .meteor-loop.m2 { top: 30%; left: 78%; animation-delay: 2.4s; animation-duration: 10s; width: 90px; }
+  .ink-stage .meteor-loop.m3 { top: 55%; left: 55%; animation-delay: 4.8s; animation-duration: 7.5s; width: 150px; }
+  .ink-stage .meteor-loop.m4 { top: 20%; left: 40%; animation-delay: 7s; animation-duration: 11s; width: 100px; }
+  .ink-stage .meteor-loop.m5 { top: 68%; left: 72%; animation-delay: 9.6s; animation-duration: 9s; width: 130px; }
+
+  /* ── 墨字主视觉 ── */
+  .ink-stage {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    min-height: 30vh;
+  }
+
+  .ink-svg {
+    width: min(56vw, 460px);
+    height: auto;
+    overflow: visible;
+    /* 入场：墨迹晕开（blur→清晰 + 轻微放大→归位） */
+    animation: ink-bloom 900ms var(--ease-space) both;
+  }
+
+  .ink-char {
+    font-family: 'STKaiti', 'KaiTi', 'Kaiti SC', '楷体', serif;
+    font-size: 138px;
+    letter-spacing: 12px;
+    fill: var(--color-ink);
+  }
+
+  @keyframes ink-bloom {
+    from {
+      opacity: 0;
+      filter: blur(6px);
+      transform: scale(1.03);
+    }
+
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+  }
+
+  /* 入场后极缓呼吸（墨字「活着」，5.6s 幅度 1.5%） */
+  .ink-svg {
+    animation: ink-bloom 900ms var(--ease-space) both, ink-breathe 5.6s ease-in-out 1s infinite alternate;
+  }
+
+  @keyframes ink-breathe {
+    from {
+      transform: scale(1);
+    }
+
+    to {
+      transform: scale(1.015);
+    }
+  }
+
+  .ink-vertical {
+    writing-mode: vertical-rl;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.34em;
+    color: var(--color-ink-faint);
+    animation: ink-bloom 900ms var(--ease-space) both;
+    animation-delay: 220ms;
+  }
+
+  /* 星芒汇聚（从四周聚向墨字后静止） */
+  .gate-glint {
+    position: absolute;
+    color: var(--color-ink-2);
+    line-height: 1;
+    opacity: 0;
+    animation: glint-in 1200ms var(--ease-space) both;
+  }
+
+  @keyframes glint-in {
+    from {
+      opacity: 0;
+      transform: translate(var(--gx, 18px), var(--gy, 14px)) scale(0.5);
+    }
+
+    60% {
+      opacity: 0.75;
+    }
+
+    to {
+      opacity: 0.55;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+
+  /* 入场后持续慢闪（星芒「活着」）——层叠：glint-in 播完接力 twinkle */
+  .gate-glint {
+    animation: glint-in 1200ms var(--ease-space) both, glint-twinkle 3.4s ease-in-out 1.2s infinite alternate;
+  }
+
+  @keyframes glint-twinkle {
+    from {
+      opacity: 0.32;
+    }
+
+    to {
+      opacity: 0.72;
+    }
+  }
+
+  /* ── 身份行 ── */
+  .gate-id {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .gate-iam {
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    color: var(--color-ink);
+    font-style: italic;
+  }
+
+  .gate-quote {
+    margin-top: 12px;
+    font-size: 1.15rem;
+    color: var(--color-ink-soft);
+  }
+
+  /* ── 个人简介 ── */
+  .gate-bio {
+    margin-top: clamp(28px, 4.5vh, 44px);
+    max-width: 560px;
+    text-align: center;
+  }
+
+  .bio-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.32em;
+    color: var(--color-ink-faint);
+    margin-bottom: 14px;
+  }
+
+  .bio-text {
+    font-size: 1.02rem;
+    line-height: 2;
+    color: var(--color-ink-soft);
+    text-wrap: pretty;
+    text-align: left;
+    text-indent: 2em;
+  }
+
+  .bio-text p {
+    margin-bottom: 14px;
+  }
+
+  .bio-text p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* 小猫括注：灰紫轻注（不改文案字符） */
+  .bio-pet {
+    color: var(--color-ink-faint);
+    font-size: 0.92em;
+  }
+
+  /* 金句：衬线斜体墨色 */
+  .bio-punch {
+    font-style: italic;
+    color: var(--color-ink);
+  }
+
+  /* 求实习重点行：无缩进、墨色加重、✦ 起头 */
+  .bio-open {
+    text-indent: 0;
+    margin-top: 20px;
+    font-weight: 700;
+    font-size: 1.08rem;
+    color: var(--color-ink);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── 社交墨线排（v24.1 dock 动态：入场 stagger + idle 错拍浮动） ── */
+  .social-ink {
+    animation: dock-in 520ms var(--ease-space) both;
+  }
+
+  /* idle 浮动挂外层 li（a 层留给 hover transform，两层不打架） */
+  .social-row li {
+    animation: dock-float 4.6s ease-in-out infinite alternate;
+  }
+
+  .social-row li:nth-child(1) { animation-delay: 0ms; }
+  .social-row li:nth-child(2) { animation-delay: 0.6s; }
+  .social-row li:nth-child(3) { animation-delay: 1.2s; }
+  .social-row li:nth-child(4) { animation-delay: 1.8s; }
+  .social-row li:nth-child(5) { animation-delay: 2.4s; }
+  .social-row li:nth-child(6) { animation-delay: 3s; }
+
+  @keyframes dock-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.86);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* idle 错拍浮动（dock 栏「活」起来） */
+  @keyframes dock-float {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(-4px);
+    }
+  }
+
+  /* ── 社交墨线排 ── */
+  .gate-social {
+    margin-top: clamp(32px, 5vh, 48px);
+  }
+
+  .social-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+  }
+
+  .social-ink {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: color 180ms ease, transform 220ms var(--ease-space), box-shadow 220ms ease;
+    border-radius: 12px;
+    padding: 8px 4px;
+  }
+
+  .social-ink svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .social-ink:hover {
+    color: var(--color-ink-2);
+    transform: translateY(-5px);
+    box-shadow: 0 5px 18px rgba(155, 138, 168, 0.3);
+  }
+
+  .social-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-soft);
+    transition: color 180ms ease;
+  }
+
+  .social-ink:hover .social-label {
+    color: var(--color-ink);
+  }
+
+  /* 友链开往按钮（墨线胶囊 + ✦ 慢转） */
+  .friend-ship {
+    border: 1px solid rgba(29, 29, 34, 0.16);
+    border-radius: 999px;
+    padding: 8px 18px;
+  }
+
+  .ship-star {
+    color: var(--color-ink-2);
+    font-size: 0.85rem;
+    transition: transform 400ms var(--ease-space);
+  }
+
+  .friend-ship:hover .ship-star {
+    transform: rotate(180deg);
+  }
+
+  /* ── Folia（保留） ── */
+  .gate-folia {
+    margin-top: clamp(40px, 7vh, 72px);
+    text-align: center;
+  }
+
+  .gate-folia-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.32em;
+    color: var(--color-ink-faint);
+    margin-bottom: 10px;
+  }
+
+  .folia {
+    width: min(320px, 76vw);
+    height: auto;
+    animation: folia-drift 9s ease-in-out infinite alternate;
+  }
+
+  @keyframes folia-drift {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(-10px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ink-svg,
+    .ink-vertical,
+    .gate-glint,
+    .social-ink,
+    .social-row li,
+    .folia {
+      animation: none;
+    }
+
+    .gate-glint {
+      opacity: 0.55;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .ink-vertical {
+      display: none;
+    }
+
+    .ink-char {
+      font-size: 160px;
+      letter-spacing: 12px;
+    }
+
+    .social-row {
+      gap: 18px;
+    }
+  }
+</style>

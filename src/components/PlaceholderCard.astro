@@ -1,0 +1,53 @@
+---
+// 占位卡片 —— v24.3：未完成功能/内容的建设中占位（发丝线框 + ✦ 标记，白瓷语言）
+// 用法：<PlaceholderCard label="BUILDING" title="…" note="…" />
+interface Props {
+  label?: string;
+  title: string;
+  note?: string;
+}
+
+const { label = 'BUILDING', title, note } = Astro.props;
+---
+
+<aside class="placeholder-card" role="note" aria-label={`建设中：${title}`}>
+  <p class="ph-label mono"><span class="ph-star" aria-hidden="true">✦</span>{label}</p>
+  <p class="ph-title serif">{title}</p>
+  {note && <p class="ph-note">{note}</p>}
+</aside>
+
+<style>
+  .placeholder-card {
+    border: 1px solid var(--hair-frame);
+    border-radius: 12px;
+    padding: 26px 28px;
+    background: var(--color-panel);
+  }
+
+  .ph-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    color: var(--color-ink-faint);
+  }
+
+  .ph-star {
+    color: var(--color-ink-2);
+  }
+
+  .ph-title {
+    margin-top: 10px;
+    font-size: 1.12rem;
+    color: var(--color-ink);
+  }
+
+  .ph-note {
+    margin-top: 8px;
+    font-size: 0.88rem;
+    line-height: 1.9;
+    color: var(--color-ink-soft);
+  }
+</style>

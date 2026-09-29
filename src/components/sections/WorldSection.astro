@@ -1,0 +1,248 @@
+---
+/**
+ * 「我的世界」—— 横向光温地带（P0-2）
+ * 无卡片、无外框、无网格：四个场所摊在同一条隐性地平线上，
+ * 技术侧冷紫、生活侧暖白，交界渐变过渡，分区靠光温不靠边框。
+ */
+import SectionHead from '../SectionHead.astro';
+import { getWorldItems } from '../../data/content';
+
+const worldItems = await getWorldItems();
+---
+
+<section class="section world">
+  <div class="shell">
+    <SectionHead num="03" en="World" title="我的世界" desc="四个方向，其实是同一片空间。" />
+  </div>
+
+  <!-- 光温带：可向视口两侧溢出做光感 -->
+  <div class="temp-band">
+    <div class="band-cool" aria-hidden="true"></div>
+    <div class="band-warm" aria-hidden="true"></div>
+    <div class="shell">
+      <div class="places" data-reveal-group>
+        {
+          worldItems.map((item) =>
+            item.label === '兴趣' ? (
+              // 兴趣场所：latest 位加「听歌舞台」发丝线入口（裁决 §12B.2），故外壳不用 <a> 避免嵌套
+              <div class="place" data-reveal-item>
+                <h3 class="place-name">{item.label}</h3>
+                <p class="place-desc">{item.desc}</p>
+                <div class="place-latest">
+                  <span class="latest-title">{item.latest.title}</span>
+                  <time class="mono latest-date" datetime={item.latest.date}>
+                    {item.latest.date}
+                  </time>
+                  <a class="u-link mono stage-link" href="/life#stage">听歌舞台 →</a>
+                </div>
+              </div>
+            ) : (
+              <a href={item.href} class="place" data-reveal-item>
+                <h3 class="place-name">{item.label}</h3>
+                <p class="place-desc">{item.desc}</p>
+                <div class="place-latest">
+                  <span class="latest-title">{item.latest.title}</span>
+                  <time class="mono latest-date" datetime={item.latest.date}>
+                    {item.latest.date}
+                  </time>
+                </div>
+              </a>
+            ),
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── 横向光温带：带体趋近无色（alpha 0.7）+ 上下缘羽化，色温交给冷纱/暖纱层 ── */
+  .temp-band {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    padding-block: clamp(3.5rem, 8vh, 6rem);
+    background: var(--color-panel);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+    overflow: hidden;
+  }
+
+  /* 冷纱：冷侧（技术）叠极淡冷紫纱，约 600px 渐变过渡到纯净（暖侧无纱） */
+  .band-cool {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(232, 230, 246, 0.5) 0%,
+      rgba(232, 230, 246, 0.5) calc(50% - 300px),
+      transparent calc(50% + 300px),
+      transparent 100%
+    );
+    opacity: 1;
+    transition: opacity 700ms ease-out;
+    pointer-events: none;
+  }
+
+  /* 夜航：冷纱由浅紫改为暗紫，避免暗背景下变成突兀亮带 */
+  :global([data-theme='night']) .band-cool {
+    background: linear-gradient(
+      90deg,
+      rgba(122, 110, 196, 0.22) 0%,
+      rgba(122, 110, 196, 0.22) calc(50% - 300px),
+      transparent calc(50% + 300px),
+      transparent 100%
+    );
+  }
+
+  /* hover 场所时：整片地带色温向暖白插值（约 700ms ease-out）——冷纱退场 + 暖纱升起 */
+  .band-warm {
+    position: absolute;
+    inset: 0;
+    background: var(--color-panel);
+    opacity: 0;
+    transition: opacity 700ms ease-out;
+    pointer-events: none;
+  }
+
+  .temp-band:has(.place:hover) .band-cool {
+    opacity: 0;
+  }
+
+  .temp-band:has(.place:hover) .band-warm {
+    opacity: 1;
+  }
+
+  /* ── 四个场所：摊在隐性地平线上，不等高不等宽，像桌面上的东西 ── */
+  .places {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(1.2rem, 2.5vw, 2.8rem);
+  }
+
+  .place {
+    flex: 0 0 auto;
+    display: grid;
+    gap: 0.45rem;
+    padding-bottom: 0.55rem;
+    /* 接触阴影：光轴统一，落向左下 */
+    box-shadow: var(--shadow-contact);
+    transition:
+      transform 700ms var(--ease-space),
+      opacity 700ms var(--ease-space),
+      box-shadow 700ms var(--ease-space);
+  }
+
+  /* 夜航：暗背景下接触阴影会形成突兀底框，去掉 */
+  :global([data-theme='night']) .place {
+    box-shadow: none;
+  }
+
+  /* v23 杂志网格：1 大 2 小 3 中错落（尺寸对比拉开），hover 整卡微升 */
+  .place:hover {
+    transform: translateY(-6px);
+  }
+
+  .place:nth-child(1) {
+    width: 26%;
+  }
+
+  .place:nth-child(2) {
+    width: 22%;
+    margin-top: 12px;
+  }
+
+  .place:nth-child(3) {
+    width: 24%;
+    margin-top: 6px;
+  }
+
+  .place:nth-child(4) {
+    width: 24%;
+    margin-top: 18px;
+  }
+
+  .place-name {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: clamp(1.55rem, 2.6vw, 2.15rem);
+    letter-spacing: 0.05em;
+    line-height: 1.15;
+  }
+
+  .place-desc {
+    font-size: 0.82rem;
+    line-height: 1.9;
+    color: var(--color-ink-2);
+    max-width: 17em;
+  }
+
+  /* 最新条目：发丝线 + 条目名 + 日期 */
+  .place-latest {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.42rem;
+    padding-top: 0.55rem;
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .latest-title {
+    font-size: 0.78rem;
+    line-height: 1.7;
+  }
+
+  .latest-date {
+    font-size: 0.56rem;
+  }
+
+  /* ── hover：当前场所上浮、接触阴影加深一档；其余轻微退让。无卡片式 hover ── */
+  .place:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-contact-deep);
+  }
+
+  .places:hover .place:not(:hover) {
+    opacity: 0.75;
+  }
+
+  /* ── 移动端：光温带变上下渐变，场所纵向排列，错落幅度减小 ── */
+  @media (max-width: 859px) {
+    .temp-band {
+      width: 100%;
+      margin-left: 0;
+      background: var(--color-panel);
+      /* 羽化方向随布局变为左右羽化 */
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+      mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+    }
+
+    /* 渐变交界收窄到 200px */
+    .band-cool {
+      background: linear-gradient(180deg, rgba(232, 230, 246, 0.5) 0%, transparent 200px);
+    }
+
+    .places {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.4rem;
+    }
+
+    .place:nth-child(1),
+    .place:nth-child(2),
+    .place:nth-child(3),
+    .place:nth-child(4) {
+      width: 100%;
+      margin-top: 0;
+    }
+
+    .place:nth-child(2),
+    .place:nth-child(4) {
+      margin-top: 10px;
+    }
+
+    .place-desc {
+      max-width: none;
+    }
+  }
+</style>

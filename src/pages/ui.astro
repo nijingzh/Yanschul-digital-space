@@ -1,0 +1,349 @@
+---
+/**
+ * /ui · 博客 UI 组件库展示（v26 · 源自 Uiverse.io/galaxy 改造）
+ * 8 类组件统一「发丝线 · 胶囊 · 冷白粉紫 · 只 transform/opacity」。
+ */
+import Base from '../layouts/Base.astro';
+import '../styles/ui-kit.css';
+---
+
+<Base title="UI 组件库">
+  <section class="ui-showcase">
+    <header class="ui-head">
+      <p class="ui-kicker">✦ COMPONENTS · 组件库</p>
+      <h1>博客 UI 组件库</h1>
+      <p class="ui-sub">
+        源自 <a href="https://github.com/uiverse-io/galaxy" target="_blank" rel="noopener">Uiverse.io / galaxy</a> 改造 ·
+        发丝线 · 胶囊 · 冷白粉紫 · 只用 transform/opacity · 尊重 reduced-motion
+      </p>
+    </header>
+
+    <!-- 1 按钮 -->
+    <div class="ui-group">
+      <h2><span class="ui-num">01</span>按钮 · Buttons</h2>
+      <div class="ui-row">
+        <button class="ui-btn ui-btn--primary">主要操作</button>
+        <button class="ui-btn">发丝线描边</button>
+        <button class="ui-btn ui-btn--ghost">次要 · Ghost</button>
+      </div>
+    </div>
+
+    <!-- 2 拨动开关 -->
+    <div class="ui-group">
+      <h2><span class="ui-num">02</span>拨动开关 · Toggle</h2>
+      <div class="ui-row">
+        <span class="ui-label">关</span>
+        <div class="ui-toggle"><div class="ui-toggle__dot"></div></div>
+        <span class="ui-label">开</span>
+        <div class="ui-toggle is-on"><div class="ui-toggle__dot"></div></div>
+      </div>
+    </div>
+
+    <!-- 3 卡片 -->
+    <div class="ui-group">
+      <h2><span class="ui-num">03</span>卡片 · Cards</h2>
+      <div class="ui-cards">
+        <div class="ui-card">
+          <div class="ui-card__tag">✦ BUILDING</div>
+          <h3 class="ui-card__title">占位卡标题</h3>
+          <p class="ui-card__body">发丝线框 + 半透明玻璃 + 薄阴影，hover 微上浮。玻璃衬在粉紫光晕上才显通透。</p>
+        </div>
+        <div class="ui-card">
+          <div class="ui-card__tag">✦ NOTE</div>
+          <h3 class="ui-card__title">内容卡标题</h3>
+          <p class="ui-card__body">衬线墨字标题 + 灰紫正文，统一博客色板与动效约束。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 复选框 -->
+    <div class="ui-group">
+      <h2><span class="ui-num">04</span>复选框 · Checkbox</h2>
+      <div class="ui-row">
+        <label class="ui-check"><input type="checkbox" checked /><span class="ui-check__box">✦</span>勾选态 · 星芒</label>
+        <label class="ui-check"><input type="checkbox" /><span class="ui-check__box">✦</span>未勾选</label>
+      </div>
+    </div>
+
+    <!-- 5 Radio -->
+    <div class="ui-group">
+      <h2><span class="ui-num">05</span>单选 · Radio</h2>
+      <div class="ui-row">
+        <label class="ui-radio"><input type="radio" name="ui-demo" checked /><span class="ui-radio__dot"></span>星点点亮</label>
+        <label class="ui-radio"><input type="radio" name="ui-demo" /><span class="ui-radio__dot"></span>未选</label>
+      </div>
+    </div>
+
+    <!-- 6 Inputs -->
+    <div class="ui-group">
+      <h2><span class="ui-num">06</span>输入 · Inputs</h2>
+      <div class="ui-row">
+        <input class="ui-input" type="text" placeholder="发丝线下划线输入…" />
+      </div>
+    </div>
+
+    <!-- 7 Forms -->
+    <div class="ui-group">
+      <h2><span class="ui-num">07</span>表单 · Forms</h2>
+      <form class="ui-form" onsubmit="return false">
+        <div class="ui-form__field">
+          <label class="ui-form__label">NAME · 称呼</label>
+          <input class="ui-input" type="text" placeholder="你的名字" />
+        </div>
+        <div class="ui-form__field">
+          <label class="ui-form__label">MESSAGE · 留言</label>
+          <input class="ui-input" type="text" placeholder="想说的话…" />
+        </div>
+        <div><button class="ui-btn ui-btn--primary" type="submit">发送留言</button></div>
+      </form>
+    </div>
+
+    <!-- 8 Loaders -->
+    <div class="ui-group">
+      <h2><span class="ui-num">08</span>加载 · Loaders</h2>
+      <p class="ui-note">「星芒点亮星图」全站加载动画已接 <code>Base</code>（进站显示、load 后淡出）。</p>
+      <div class="ui-cards"><div class="ui-loader"><div class="ui-loader__star">✦</div><div class="ui-card__tag">正在点亮星图</div></div></div>
+    </div>
+
+    <!-- 9 发丝线语言 · A/B/C 优化小样 -->
+    <div class="ui-group">
+      <h2><span class="ui-num">09</span>发丝线语言 · 优化小样</h2>
+      <div class="hair-compare">
+        <div>
+          <div class="hair-label">A · 现状发丝线（淡 + 框中框）</div>
+          <div class="sample sample-a">
+            <div class="s-tag">✦ NOTE</div>
+            <h3>示例标题</h3>
+            <p>淡边框全包、内部元素也套框——框多、边界糊。</p>
+            <div class="s-meta">2026 · 记录 · 框中框</div>
+          </div>
+        </div>
+        <div>
+          <div class="hair-label">B · 无框语言（底色分层）</div>
+          <div class="sample sample-b">
+            <div class="s-tag">✦ NOTE</div>
+            <h3>示例标题</h3>
+            <p>彻底去边框，淡底色块 + 微阴影分层，最清爽。</p>
+            <div class="s-meta">2026 · 记录 · 无框</div>
+          </div>
+        </div>
+        <div>
+          <div class="hair-label">C · 优化发丝线（深 + 内去框）</div>
+          <div class="sample sample-c">
+            <div class="s-tag">✦ NOTE</div>
+            <h3>示例标题</h3>
+            <p>外框加深清晰，内部去框改留白 + 细线——清晰又清爽。</p>
+            <div class="s-meta">2026 · 记录 · 外框内清</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 粒子点缀 · 小样 -->
+    <div class="ui-group">
+      <h2><span class="ui-num">10</span>粒子点缀 · 小样</h2>
+      <div class="particle-demo">
+        <span class="p-star p1">✦</span>
+        <span class="p-star p2">✦</span>
+        <span class="p-star p3">✦</span>
+        <span class="p-star p4">✦</span>
+        <div class="p-content">
+          <div class="s-tag">✦ SAMPLE</div>
+          <h3>星芒粒子点缀</h3>
+          <p>克制的星芒微粒缓慢飘散，只用 transform/opacity，尊重 prefers-reduced-motion，不抢内容。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .ui-showcase {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 6.5rem 2rem 4rem;
+  }
+  .ui-head {
+    margin-bottom: 3.5rem;
+  }
+  .ui-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.34em;
+    color: var(--color-ink-2);
+    margin: 0 0 1.1rem;
+  }
+  .ui-head h1 {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    margin: 0 0 1rem;
+  }
+  .ui-sub {
+    font-size: 0.82rem;
+    line-height: 1.9;
+    color: var(--ui-ink-2);
+    margin: 0;
+  }
+  .ui-sub a {
+    color: var(--color-ink-2);
+  }
+  .ui-group {
+    margin-bottom: 3.25rem;
+  }
+  .ui-group h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin: 0 0 1.5rem;
+  }
+  .ui-num {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    color: var(--ui-ink-2);
+  }
+  .ui-row {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    flex-wrap: wrap;
+  }
+  .ui-label {
+    font-size: 0.82rem;
+    color: var(--ui-ink-2);
+    letter-spacing: 0.08em;
+  }
+  /* 玻璃衬托：粉紫光晕底，让卡片通透感显出来 */
+  .ui-cards {
+    display: flex;
+    gap: 1.75rem;
+    flex-wrap: wrap;
+    padding: 1.75rem;
+    border-radius: 18px;
+    background: radial-gradient(120% 140% at 15% 20%, rgba(186, 176, 230, 0.22), rgba(253, 250, 252, 0.4) 60%);
+    border: 1px solid var(--ui-hair);
+  }
+  .ui-note {
+    font-size: 0.82rem;
+    color: var(--ui-ink-2);
+    margin: 0 0 1.25rem;
+    line-height: 1.85;
+  }
+  .ui-note code {
+    font-family: var(--font-mono);
+    font-size: 0.78em;
+    color: var(--color-ink-2);
+  }
+  /* 发丝线对比小样 */
+  .hair-compare {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .hair-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-2);
+    margin-bottom: 0.85rem;
+  }
+  .sample {
+    padding: 1.5rem 1.4rem;
+    border-radius: 12px;
+  }
+  .sample .s-tag {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-2);
+  }
+  .sample h3 {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1.02rem;
+    font-weight: 500;
+    margin: 0.7rem 0 0.55rem;
+  }
+  .sample p {
+    font-size: 0.77rem;
+    line-height: 1.8;
+    color: var(--ui-ink-2);
+    margin: 0;
+  }
+  .sample-a { border: 1px solid rgba(29, 29, 34, 0.1); background: var(--color-panel); }
+  .sample-b { background: #faf4f8; box-shadow: 0 6px 22px rgba(186, 176, 230, 0.14); }
+  .sample-c { border: 1px solid rgba(29, 29, 34, 0.3); background: rgba(255, 255, 255, 0.62); }
+  .s-meta {
+    margin-top: 1.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    color: var(--ui-ink-2);
+  }
+  /* A：内部也套框（框中框） */
+  .sample-a .s-meta {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid rgba(29, 29, 34, 0.1);
+    border-radius: 6px;
+  }
+  /* B/C：内部去框，只用细分隔线 */
+  .sample-b .s-meta { padding-top: 0.85rem; border-top: 1px solid rgba(29, 29, 34, 0.1); }
+  .sample-c .s-meta { padding-top: 0.85rem; border-top: 1px solid rgba(29, 29, 34, 0.18); }
+
+  /* 粒子点缀小样 */
+  .particle-demo {
+    position: relative;
+    padding: 3.2rem 2.2rem;
+    border: 1px solid var(--hair-frame);
+    border-radius: 14px;
+    background: radial-gradient(120% 140% at 80% 10%, rgba(186, 176, 230, 0.14), rgba(255, 255, 255, 0.5) 60%);
+    overflow: hidden;
+  }
+  .p-star {
+    position: absolute;
+    color: var(--hair-frame);
+    font-size: 0.62rem;
+    animation: p-drift 5.5s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+  .p1 { top: 16%; left: 10%; animation-delay: 0s; }
+  .p2 { top: 64%; left: 80%; animation-delay: 1.4s; font-size: 0.5rem; }
+  .p3 { top: 26%; left: 70%; animation-delay: 2.6s; font-size: 0.74rem; }
+  .p4 { top: 74%; left: 24%; animation-delay: 3.8s; font-size: 0.56rem; }
+  @keyframes p-drift {
+    0%, 100% { transform: translateY(0) scale(0.9); opacity: 0.28; }
+    50% { transform: translateY(-12px) scale(1.12); opacity: 0.72; }
+  }
+  .p-content { position: relative; z-index: 1; }
+  .p-content h3 {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 1.18rem;
+    font-weight: 500;
+    margin: 0.65rem 0 0.6rem;
+  }
+  .p-content p {
+    font-size: 0.82rem;
+    line-height: 1.85;
+    color: var(--ui-ink-2);
+    margin: 0;
+    max-width: 32rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .p-star { animation: none; opacity: 0.5; }
+  }
+
+  @media (max-width: 599px) {
+    .ui-showcase {
+      padding: 5.5rem 1.25rem 3rem;
+    }
+    .ui-row {
+      gap: 1.1rem;
+    }
+    .hair-compare {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

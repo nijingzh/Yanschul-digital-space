@@ -1,0 +1,167 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SearchPalette from '../components/SearchPalette.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteLoader from '../components/SiteLoader.astro';
+import StarField from '../components/StarField.astro';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = '江衍 YANSCHUL 的个人数字空间：技术、学习、生活，以及一切正在发生的事。0为过去，1即未来。',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    <title>{title} — 江衍 Digital Space</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" />
+    <ClientRouter />
+    <script is:inline>
+      if (location.protocol !== 'file:') document.documentElement.classList.add('js');
+    </script>
+  </head>
+
+  <body>
+    <StarField />
+    <SiteLoader />
+    <!-- 纪念日灰色模式（运行时判断，body 级 class；非当日零影响） -->
+    <script is:inline>
+      (function () {
+        var d = new Date();
+        var mmdd = String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        if (['09-18', '09-30', '12-13', '04-04'].indexOf(mmdd) >= 0) {
+          document.body.classList.add('memorial-day');
+        }
+      })();
+    </script>
+
+    <!-- 转场 0/1 闪码（View Transitions 页面间；reduced-motion 下 CSS 隐藏） -->
+    <div class="transition-flash" data-transition-flash aria-hidden="true">01</div>
+
+    <!-- 空间环境：白世界里的浅粉紫光 + 极淡点阵 -->
+    <div class="ambient" aria-hidden="true">
+      <div class="ambient-blob blob-a"></div>
+      <div class="ambient-blob blob-b"></div>
+      <div class="ambient-blob blob-c"></div>
+      <div class="cool-veil"></div>
+      <div class="dot-grid"></div>
+    </div>
+
+    <!-- 星芒 ✦（参考站规格学法）：四芒尖星聚文字区 + 流星斜线，钉首屏滚动不跟随 -->
+    <div class="stardust stardust-c" aria-hidden="true"></div>
+    <div class="stardust stardust-d" aria-hidden="true"></div>
+    <div class="stardust stardust-e" aria-hidden="true"></div>
+    <div class="startrail" aria-hidden="true"></div>
+
+
+
+    <SiteHeader />
+    <SearchPalette />
+    <div class="read-progress" data-read-progress aria-hidden="true"></div>
+    <button class="to-top" data-to-top aria-label="回到顶部">✦</button>
+
+    <script is:inline>
+      (() => {
+        // v23 流星随机划过（每 8–14s 一条，reduce 不生成）+ 星海三层视差（只 transform）
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const host = document.querySelector('.stardust-c')?.parentElement;
+        if (host && !reduce) {
+          const spawn = () => {
+            const s = document.createElement('div');
+            s.className = 'shooting-star';
+            s.style.top = 8 + Math.random() * 55 + '%';
+            s.style.left = 45 + Math.random() * 45 + '%';
+            host.appendChild(s);
+            s.addEventListener('animationend', () => s.remove());
+            setTimeout(spawn, 5000 + Math.random() * 3000);
+          };
+          setTimeout(spawn, 3200);
+          // 三层视差（rAF 节流）
+          const layers = [...document.querySelectorAll('.stardust-c,.stardust-d,.stardust-e')];
+          let ticking = false;
+          window.addEventListener('scroll', () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+              const y = window.scrollY;
+              layers.forEach((el) => {
+                const k = parseFloat(getComputedStyle(el).getPropertyValue('--parallax')) || 0;
+                el.style.transform = 'translateY(' + -(y * k) + 'px)';
+              });
+              ticking = false;
+            });
+          }, { passive: true });
+        }
+
+        // v23 回顶 + 阅读进度线（只 transform/opacity）
+        const toTop = document.querySelector('[data-to-top]');
+        const progress = document.querySelector('[data-read-progress]');
+        if (toTop || progress) {
+          window.addEventListener('scroll', () => {
+            const y = window.scrollY;
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            if (toTop) toTop.classList.toggle('is-on', y > window.innerHeight * 0.2);
+            if (progress && max > 0) progress.style.transform = 'scaleX(' + Math.min(y / max, 1) + ')';
+          }, { passive: true });
+          toTop?.addEventListener('click', () => {
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+          });
+        }
+
+        function applyTheme() {
+          const saved = localStorage.getItem('jy-theme');
+          if (saved === 'night') document.documentElement.dataset.theme = 'night';
+          else delete document.documentElement.dataset.theme;
+        }
+        applyTheme();
+        // SPA 导航后 html[data-theme] 会被 ClientRouter 重置，故每次导航重应用主题
+        document.addEventListener('astro:page-load', applyTheme);
+        document.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-theme-toggle]');
+          if (!btn) return;
+          const isNight = document.documentElement.dataset.theme === 'night';
+          if (isNight) {
+            delete document.documentElement.dataset.theme;
+            localStorage.setItem('jy-theme', 'day');
+            btn.textContent = '☾';
+          } else {
+            document.documentElement.dataset.theme = 'night';
+            localStorage.setItem('jy-theme', 'night');
+            btn.textContent = '☀';
+          }
+        });
+      })();
+    </script>
+
+    <main class="page">
+      <slot />
+    </main>
+
+    <SiteFooter />
+
+
+    <script>
+      import { initSpace, initTransitionFlash } from '../lib/motion';
+      initSpace();
+      initTransitionFlash();
+      // View Transitions 换页后重跑页内编排
+      document.addEventListener('astro:page-load', () => {
+        initSpace();
+      });
+    </script>
+  </body>
+</html>

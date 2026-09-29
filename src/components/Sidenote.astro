@@ -1,0 +1,19 @@
+---
+/**
+ * Sidenote —— 旁注排版（设计语言 v2）
+ *
+ * 正文关键词上方的小字批注（0.56rem 衬线）；tether 时发丝线牵出。
+ * 用法：<Sidenote note="批注">关键词</Sidenote>
+ */
+interface Props {
+  note: string;
+  /** 发丝线牵出（可选） */
+  tether?: boolean;
+}
+
+const { note, tether = false } = Astro.props;
+---
+
+<span class:list={['sidenote', { 'has-tether': tether }]}>
+  <em class="sidenote-note"><span class="sidenote-tilde mono" aria-hidden="true">~</span>{note}</em><span class="sidenote-key"><slot /></span>
+</span>

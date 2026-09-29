@@ -1,0 +1,109 @@
+---
+// NotesFlow —— 痕迹随笔流（v23 第二幕 · 不对称双栏右栏）
+// 真实 media 数据：kind 小标签 + title 衬线 + meta 小字，hover 微亮
+import { getMediaNotes } from '../../data/content';
+
+const notes = (await getMediaNotes()).slice(0, 6);
+---
+
+<section class="notes-flow" data-reveal aria-label="痕迹">
+  <header class="flow-head">
+    <h2 class="mono">痕迹 / NOTES</h2>
+    <a class="mono flow-more" href="/life">全部痕迹</a>
+  </header>
+  <ol class="flow-list">
+    {
+      notes.map((n) => (
+        <li class="flow-item">
+          <span class="mono kind">{n.kind}</span>
+          <p class="serif">{n.title}</p>
+          <span class="mono meta">{n.meta}</span>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .notes-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .flow-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 0.95rem;
+    border-bottom: 1px solid var(--color-hair);
+  }
+
+  .flow-head h2 {
+    font-size: var(--text-mono);
+    font-weight: 450;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-soft);
+  }
+
+  .flow-more {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition:
+      color 0.32s var(--ease-out-quart),
+      border-color 0.32s var(--ease-out-quart);
+  }
+
+  .flow-more:hover {
+    color: var(--color-ink);
+    border-bottom-color: var(--color-edge);
+  }
+
+  .flow-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flow-item {
+    display: grid;
+    grid-template-columns: 4.4em 1fr;
+    align-items: baseline;
+    gap: 0.35rem 1.15rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-hair);
+    transition: background 0.32s var(--ease-out-quart);
+  }
+
+  .flow-item:hover {
+    background: var(--color-panel-2);
+  }
+
+  .flow-item .kind {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-soft);
+  }
+
+  .flow-item p {
+    font-family: var(--font-serif);
+    font-size: 0.98rem;
+    letter-spacing: 0.025em;
+    color: var(--color-ink-soft);
+    transition: color 0.32s var(--ease-out-quart);
+  }
+
+  .flow-item:hover p {
+    color: var(--color-ink);
+  }
+
+  .flow-item .meta {
+    grid-column: 2;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-soft);
+    opacity: 0.75;
+  }
+</style>

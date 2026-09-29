@@ -1,0 +1,9 @@
+# 宿主机日志轮转（放 /etc/logrotate.d/folia-site；compose 内 json-file 已限 10m×5）
+D:/IT/project/jiangyan-digital-space/logs/*.log {
+  weekly
+  rotate 8
+  compress
+  missingok
+  notifempty
+  copytruncate
+}

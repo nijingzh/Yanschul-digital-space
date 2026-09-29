@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="走到了边缘" description="这一页还不存在。">
+  <section class="section lost">
+    <div class="shell lost-grid">
+      <div class="lost-copy">
+        <p class="mono" data-enter>404 · 空间边缘</p>
+        <h1 class="display lost-title" data-enter>你走到了空间的边缘</h1>
+        <p class="lead" data-enter>这一页还不存在——也许它正在被建造，也许它只是走丢了。</p>
+        <a href="/" class="u-link lost-back" data-enter>← 回到首页</a>
+      </div>    </div>
+  </section>
+</Base>
+
+<style>
+  .lost-grid {
+    display: grid;
+    gap: 3rem;
+    align-items: end;
+    min-height: 62vh;
+    padding-top: 7rem;
+  }
+
+  .lost-title {
+    font-size: clamp(2.1rem, 5vw, 3.2rem);
+    margin-top: 1rem;
+  }
+
+  .lost-copy .lead {
+    margin-top: 1.2rem;
+    max-width: 40ch;
+  }
+
+  .lost-back {
+    display: inline-block;
+    margin-top: 2rem;
+    font-size: 0.88rem;
+    color: var(--color-ink-2);
+  }
+
+  @media (min-width: 960px) {
+    .lost-grid {
+      grid-template-columns: minmax(0, 46rem);
+    }
+  }
+</style>

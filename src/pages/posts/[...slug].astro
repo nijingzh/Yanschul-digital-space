@@ -1,0 +1,388 @@
+---
+// 文章详情页 —— v23.2（江衍裁决「建」）：正文渲染 + TOC 悬浮目录 + 阅读时长 + 上一篇/下一篇
+// TOC = Table of Contents：右侧悬浮小节目录，点击跳节、滚动时当前节高亮
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import SparkIcon from '../../components/SparkIcon.astro';
+import PlaceholderCard from '../../components/PlaceholderCard.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('feed');
+  return entries.map((entry) => ({
+    params: { slug: entry.id.replace(/^\d+-/, '') },
+    props: { entry, entries },
+  }));
+}
+
+const { entry, entries } = Astro.props;
+const { Content, headings } = await render(entry);
+
+// TOC：只要 h2/h3
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+// 阅读时长（中文口径 ≈ 400 字/分钟）
+const text = entry.body ?? '';
+const minutes = Math.max(1, Math.round(text.replace(/\s/g, '').length / 400));
+
+// 上一篇/下一篇（按 date 倒序邻接）
+const sorted = [...entries].sort((a, b) => (a.data.date === b.data.date ? 0 : a.data.date < b.data.date ? 1 : -1));
+const idx = sorted.findIndex((e) => e.id === entry.id);
+const older = sorted[idx + 1] ?? null;
+const newer = sorted[idx - 1] ?? null;
+const slugOf = (id: string) => id.replace(/^\d+-/, '');
+---
+
+<Base title={entry.data.title} description={entry.data.desc}>
+  <article class="post-room">
+    <div class="room-cool" aria-hidden="true"></div>
+
+    <header class="post-head">
+      <p class="mono post-eyebrow" data-enter>
+        SPACE 01 / {entry.data.category} · {entry.data.date.replaceAll('-', '.')}
+      </p>
+      <h1 class="page-title post-title" data-enter>{entry.data.title}</h1>
+      <p class="lead post-lead" data-enter>{entry.data.desc}</p>
+      <p class="mono post-meta" data-enter>
+        全文 {(entry.body ?? '').replace(/\s/g, '').length} 字 · 约 {minutes} 分钟 · {entry.data.tags.join(' / ')}
+        <button class="copy-link mono" type="button" id="copy-link">复制链接 <span aria-hidden="true">✦</span></button>
+      </p>
+    </header>
+
+    {/* 封面带（v23.8 · 方案 #10）：纯 CSS 渐变封面——白瓷语言内的光带，不是图片 */}
+    <div class="cover-band" data-enter aria-hidden="true"></div>
+
+    <div class="post-body-row">
+      <div class="post-prose prose" data-reveal>
+        <Content />
+      </div>
+
+      {
+        toc.length > 0 && (
+          <aside class="post-toc" aria-label="本文目录">
+            <p class="mono toc-head">目录 / TOC</p>
+            <ol class="toc-list">
+              {toc.map((h) => (
+                <li class={'toc-item depth-' + h.depth}>
+                  <a href={'#' + h.slug}>{h.text}</a>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        )
+      }
+    </div>
+
+    {/* 评论功能（v23 优化批 #11 江衍裁决「搁置」）：部署后开放，先占位 */}
+    <div class="post-comments">
+      <PlaceholderCard
+        label="COMING SOON"
+        title="评论区还在路上"
+        note="等站点部署完就开放——到时候欢迎来坐坐。"
+      />
+    </div>
+
+    <nav class="post-pager" aria-label="上下篇">
+      {
+        older && (
+          <a class="pager-item magnetic pressable" href={'/posts/' + slugOf(older.id)}>
+            <span class="mono">上一篇</span>
+            <p class="serif">{older.data.title}</p>
+          </a>
+        )
+      }
+      {
+        newer && (
+          <a class="pager-item pager-newer magnetic pressable" href={'/posts/' + slugOf(newer.id)}>
+            <span class="mono">下一篇</span>
+            <p class="serif">{newer.data.title}</p>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Base>
+
+<script>
+  // 复制链接（v24.5 修：非 https/localhost 下 navigator.clipboard 被禁=静默失败
+  // → execCommand fallback + 失败提示）
+  const copyBtn = document.getElementById('copy-link');
+  const copyText = (text: string): Promise<boolean> => {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch {
+      ok = false;
+    }
+    ta.remove();
+    return Promise.resolve(ok);
+  };
+
+  copyBtn?.addEventListener('click', () => {
+    copyText(window.location.href).then((ok) => {
+      copyBtn.textContent = ok ? '已复制 ✦' : '复制失败，手动选地址栏';
+      setTimeout(() => (copyBtn.textContent = '复制链接 ✦'), 1800);
+    });
+  });
+</script>
+
+<script>
+  // TOC scrollspy：IntersectionObserver 高亮当前节（只改 class）
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc-item a')];
+  const map = new Map(links.map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
+  const seen = new Set<string>();
+  const refresh = () => {
+    let active: HTMLAnchorElement | null = null;
+    for (const id of seen) {
+      const a = map.get(id);
+      if (a && (!active || a.compareDocumentPosition(active) & Node.DOCUMENT_POSITION_FOLLOWING)) active = a;
+    }
+    // 底部兜底：全部滚出观察带时高亮最后一节
+    if (!active && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80) {
+      active = links[links.length - 1] ?? null;
+    }
+    // 首节兜底：初始/回顶（无节在观察带且接近顶部）高亮第一节
+    if (!active && window.scrollY < window.innerHeight * 0.3) {
+      active = links[0] ?? null;
+    }
+    links.forEach((a) => a.parentElement?.classList.toggle('is-active', a === active));
+  };
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const id = e.target.id;
+        if (e.isIntersecting) seen.add(id);
+        else seen.delete(id);
+      }
+      refresh();
+    },
+    { rootMargin: '0px 0px -72% 0px' }
+  );
+  document.querySelectorAll('.post-prose h2, .post-prose h3').forEach((h) => io.observe(h));
+  // scroll 也触发（滚到底 IO 不回调的兜底；rAF 节流）
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      refresh();
+      ticking = false;
+    });
+  }, { passive: true });
+</script>
+
+<style>
+  .post-room {
+    position: relative;
+    padding-block: clamp(2.2rem, 5vh, 3.6rem);
+  }
+
+  .room-cool {
+    position: absolute;
+    inset: 0;
+    background: var(--color-panel-2);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    pointer-events: none;
+  }
+
+  .post-head,
+  .post-body-row,
+  .post-pager {
+    position: relative;
+    width: min(62rem, 100% - 3rem);
+    margin-inline: auto;
+  }
+
+  .post-eyebrow {
+    color: var(--color-ink-2);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .post-title {
+    margin-top: 0.95rem;
+    font-size: clamp(2rem, 4.4vw, 3.1rem);
+    line-height: 1.32;
+    letter-spacing: 0.02em;
+  }
+
+  .post-lead {
+    margin-top: 1.15rem;
+    max-width: 52ch;
+    color: var(--color-ink-2);
+  }
+
+  .post-meta {
+    margin-top: 1.15rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-soft);
+  }
+
+  /* 正文 + TOC 两栏（v23.8 #7：整体居中、gap 72px、TOC top 120px） */
+  .post-body-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: 4.5rem;
+    margin: 3.6rem auto 0;
+    max-width: 67rem;
+    align-items: start;
+  }
+
+  /* 封面带（#10）：纯 CSS 光带封面——白瓷语言内的渐变，不是图 */
+  .cover-band {
+    height: 8px;
+    margin-top: 2.8rem;
+    border-radius: 4px;
+    background: linear-gradient(90deg, rgba(214, 208, 242, 0.55), rgba(252, 238, 242, 0.6), rgba(201, 168, 184, 0.5), rgba(214, 208, 242, 0.45));
+    background-size: 200% 100%;
+    animation: grad-flow 11s linear infinite;
+  }
+
+  .copy-link {
+    margin-left: 14px;
+    padding: 3px 11px;
+    border: 1px solid rgba(29, 29, 34, 0.12);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    cursor: pointer;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
+
+  .copy-link:hover {
+    color: var(--color-ink);
+    border-color: var(--hair-frame);
+  }
+
+  .post-prose {
+    min-width: 0;
+    max-width: 44rem;
+  }
+
+  /* TOC 悬浮目录（桌面右侧 sticky） */
+  .post-comments {
+    max-width: 67rem;
+    margin: 3.6rem auto 0;
+  }
+
+  .post-toc {
+    position: sticky;
+    top: 7.5rem;
+    padding-left: 1.35rem;
+    border-left: 1px solid var(--color-hair);
+  }
+
+  .toc-head {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-soft);
+    margin-bottom: 0.95rem;
+  }
+
+  .toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc-item a {
+    display: block;
+    padding: 0.32rem 0;
+    font-size: 0.82rem;
+    letter-spacing: 0.025em;
+    line-height: 1.65;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    border-left: 1px solid transparent;
+    margin-left: -1.38rem;
+    padding-left: 1.38rem;
+    transition:
+      color 0.32s var(--ease-out-quart),
+      border-color 0.32s var(--ease-out-quart);
+  }
+
+  .toc-item.depth-3 a {
+    padding-left: 2.35rem;
+    font-size: 0.78rem;
+    opacity: 0.82;
+  }
+
+  .toc-item a:hover {
+    color: var(--color-ink);
+  }
+
+  .toc-item.is-active a {
+    color: var(--color-ink);
+    border-left-color: #b2a8de;
+  }
+
+  /* 上一篇/下一篇 */
+  .post-pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.6rem;
+    margin-top: 4.8rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .pager-item {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1.15rem 1.35rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.32s var(--ease-out-quart);
+  }
+
+  .pager-item:hover {
+    box-shadow: 0 0 0 4px rgba(214, 208, 242, 0.22);
+  }
+
+  .pager-item .mono {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-soft);
+  }
+
+  .pager-item .serif {
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+  }
+
+  .pager-newer {
+    text-align: right;
+  }
+
+  @media (max-width: 959px) {
+    .post-body-row {
+      grid-template-columns: 1fr;
+      gap: 2.4rem;
+    }
+
+    .post-toc {
+      position: static;
+      order: -1;
+    }
+
+    .post-pager {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

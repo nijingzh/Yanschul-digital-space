@@ -1,0 +1,514 @@
+---
+/**
+ * 生活页 = 空镜与痕迹（生活区：无纱暖白光温，全站暖调仅此页与关于页）
+ *
+ * 痕迹红线（§9 收口）：痕迹以纯文字呈现，不引入任何角色图、不做图槽位预留。
+ * 听歌舞台（裁决 §12B）：静止态 = 歌名 + 一行歌词小字；点击进入 Folia 全屏歌词演出，
+ * 演出引擎懒加载（不进视口不加载、点击才注入 iframe）。
+ */
+import Base from '../layouts/Base.astro';
+import PlaceholderCard from '../components/PlaceholderCard.astro';
+import Sidenote from '../components/Sidenote.astro';
+import { getFeedItems, getMediaNotes } from '../data/content';
+
+const feedItems = await getFeedItems();
+const mediaNotes = await getMediaNotes();
+
+const lifeFeed = feedItems.filter((item) => item.href === '/life');
+import SparkIcon from '../components/SparkIcon.astro';
+const song = mediaNotes.find((note) => note.kind === '在听');
+---
+
+<Base title="生活" description="空镜与痕迹 —— 有人住过的房间。">
+  <div class="life-room">
+    <!-- 暖白无纱层（02 暖侧同语言：白层 + 无纱），禁止冷纱 -->
+    <div class="room-warm" aria-hidden="true"></div>
+
+    <header class="life-head">
+      <p class="mono life-eyebrow" data-enter>SPACE 03 / LIFE</p>
+      <h1 class="page-title life-title icon-hover" data-enter><SparkIcon name="life" />生活</h1>
+      <p class="lead life-lead" data-enter>一些没什么用、但很想记下来的瞬间。嗯，就这些。</p>
+    </header>
+
+    <!-- 空镜与痕迹（§9 收口 = 纯文字痕迹，无图槽位） -->
+    <section class="traces" data-reveal-group aria-label="空镜与痕迹">
+      <figure class="trace" data-reveal-item>
+        <figcaption>
+          <p class="trace-date mono">2026-09-19</p>
+          <p class="trace-text">翻到一页没画完的。就先这样吧。</p>
+        </figcaption>
+      </figure>
+      <figure class="trace" data-reveal-item>
+        <figcaption>
+          <p class="trace-date mono">2026-09-15</p>
+          <p class="trace-text">出门前拍的。今天装了两本书，其实只看了一本。</p>
+        </figcaption>
+      </figure>
+      <figure class="trace" data-reveal-item>
+        <figcaption>
+          <p class="trace-date mono">2026-09-08</p>
+          <p class="trace-text">风翻到<Sidenote note="随它" tether>哪页</Sidenote>，就算哪页。</p>
+        </figcaption>
+      </figure>
+      <figure class="trace" data-reveal-item>
+        <figcaption>
+          <p class="trace-date mono">2026-09-21</p>
+          <p class="trace-text">写了一半的开头，比写完的好看。</p>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- 此刻状态 -->
+    <section class="moment" data-reveal>
+      <p class="mono moment-label" data-enter-char>此刻</p>
+      <p class="moment-text">在给桌面换壁纸。第三个了，前两个都太亮。</p>
+      <p class="trace-date mono">2026-09-21 · 22:40</p>
+    </section>
+
+    <!-- 在读 / 在玩 / 在听（与首页「最近记录」侧栏同源） -->
+    <section class="media" data-reveal-group aria-label="最近记录">
+      {
+        mediaNotes.map((note) => (
+          <div class="media-note" data-reveal-item>
+            <p class="mono media-kind">{note.kind}</p>
+            <p class="media-title">{note.title}</p>
+            <p class="media-meta">{note.meta}</p>
+            {note.kind === '在听' && (
+              <a class="stage-entry magnetic" href="#stage">
+                <span aria-hidden="true">♪</span> 听歌舞台 <span aria-hidden="true">✦</span>
+              </a>
+            )}
+          </div>
+        ))
+      }
+    </section>
+
+    <!-- 听歌舞台（裁决 §12B）：静止态一行字，不自动播演出 -->
+    <section class="stage" id="stage" data-reveal aria-label="听歌舞台">
+      <p class="mono stage-kind">听歌舞台</p>
+      <div
+        class="song-stage magnetic"
+        data-song-stage
+        role="button"
+        tabindex="0"
+        aria-label="进入歌词演出"
+      >
+        <p class="stage-song">{song ? song.title : '未在播放'}</p>
+        <p class="stage-lyric">「船向西飞，夜还长。」</p>
+      </div>
+      {/* 播放条拟态（v17 · D）：终端语法 + 发丝线进度；不接 Folia，纯占位形态 */}
+      <p class="mono stage-cmdline" aria-hidden="true">
+        $ play ▶ <span class="cmd-progress"></span> 0:00 / 1:47
+      </p>
+
+      {/* Folia 演出占位（部署后开放） */}
+      <div class="stage-ph">
+        <PlaceholderCard
+          label="BUILDING"
+          title="歌词演出还在调试"
+          note="Folia 全屏歌词演出要等站外服务部署好——现在点舞台只有这行小字。"
+        />
+      </div>
+    </section>
+
+    <!-- 全屏歌词演出壳（Folia Stage；懒加载注入 iframe，发光仅限演出内） -->
+    <div class="stage-overlay" data-stage-overlay aria-hidden="true">
+      <button class="stage-close mono" type="button" data-stage-close>关闭</button>
+      <!-- TODO: Folia 部署地址确定后替换 src（同域反代 /player/stage；等江衍提供形态） -->
+    </div>
+
+    <!-- 最近动态（FeedItem 生活向条目，同源不同视图） -->
+    <section class="life-feed" data-reveal-group aria-label="最近动态">
+      {
+        lifeFeed.map((item) => (
+          <a class="life-entry link-grow pressable" data-reveal-item href={item.href}>
+            <h2 class="entry-title">{item.title}</h2>
+            <p class="entry-desc">{item.desc}</p>
+            <p class="entry-date mono">{item.date.replace(/-/g, '.')}</p>
+          </a>
+        ))
+      }
+    </section>
+  </div>
+</Base>
+
+<style>
+  .life-room {
+    position: relative;
+    padding-block: clamp(2.2rem, 5vh, 3.6rem);
+  }
+
+  /* 暖白无纱层：02 暖侧同语言（白层 253,253,255，无纱），羽化 12%/88% */
+  .room-warm {
+    position: absolute;
+    inset: 0;
+    background: var(--color-panel);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    pointer-events: none;
+  }
+
+  .life-head,
+  .traces,
+  .moment,
+  .media,
+  .life-feed {
+    position: relative;
+    width: min(56rem, 100% - 3rem);
+    margin-inline: auto;
+  }
+
+  .life-head {
+    margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  /* 眉标语法：编号 / 英文标签 + 发丝线 */
+  .life-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-ink-2);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .life-eyebrow::after {
+    content: '';
+    flex: 0 0 3.5rem;
+    height: 1px;
+    background: var(--color-hair);
+  }
+
+  .life-title {
+    margin-top: 0.9rem;
+    font-size: clamp(2.15rem, 5vw, 3.15rem);
+    letter-spacing: 0.04em;
+  }
+
+  .life-lead {
+    margin-top: 1.1rem;
+    max-width: 42ch;
+    color: var(--color-ink-2);
+  }
+
+  /* ── 空镜与痕迹：浅色占位块 + 文案 + 可信时间戳 ── */
+  /* v23 时间轴切片（方案批准项）：竖线 + ✦ 节点 + 单列图文 */
+  .traces {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3.2rem;
+    padding-left: 2.6rem;
+  }
+
+  .traces::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: var(--color-hair);
+  }
+
+  .trace {
+    position: relative;
+    width: min(38rem, 100%);
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+    transition:
+      transform 700ms var(--ease-space),
+      opacity 700ms var(--ease-space);
+  }
+
+  /* ✦ 时间轴节点 */
+  .trace::before {
+    content: '✦';
+    position: absolute;
+    left: -2.6rem;
+    top: 0.35rem;
+    width: 11px;
+    text-align: center;
+    font-size: 11px;
+    line-height: 1;
+    color: #b2a8de;
+    background: var(--color-space-0);
+    padding: 2px 0;
+  }
+
+  .trace:hover {
+    transform: translateY(-3px);
+  }
+
+  .traces:hover .trace:not(:hover) {
+    opacity: 0.75;
+  }
+
+  .trace-text {
+    font-family: var(--font-serif);
+    font-size: 0.98rem;
+    line-height: 1.9;
+    max-width: 30ch;
+  }
+
+  .trace-date {
+    /* v23.8 #5：日期在内容上方（时间先于内容的阅读顺序） */
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+    opacity: 0.8;
+    margin-bottom: 6px;
+  }
+
+  /* ── 此刻状态 ── */
+  .moment {
+    margin-top: clamp(3rem, 7vh, 5rem);
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .moment-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-2);
+  }
+
+  .moment-text {
+    margin-top: 0.8rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    line-height: 1.9;
+    max-width: 36ch;
+  }
+
+  /* ── 在读 / 在玩 / 在听 ── */
+  .media {
+    margin-top: clamp(3rem, 7vh, 5rem);
+    display: flex;
+    gap: clamp(1.8rem, 4vw, 3.5rem);
+  }
+
+  .media-note {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .media-kind {
+    font-size: 0.56rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-2);
+  }
+
+  .media-title {
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    line-height: 1.5;
+  }
+
+  .media-meta {
+    font-size: 0.72rem;
+    color: var(--color-ink-2);
+    line-height: 1.8;
+  }
+
+  /* ── 最近动态：发丝线语法 ── */
+  .life-feed {
+    margin-top: clamp(3rem, 7vh, 5rem);
+    border-top: 1px solid var(--color-hair);
+  }
+
+  .life-entry {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.55rem 0 1.45rem;
+    border-bottom: 1px solid var(--color-hair);
+    color: inherit;
+    text-decoration: none;
+    box-shadow: var(--shadow-contact);
+    transition:
+      transform 700ms var(--ease-space),
+      opacity 700ms var(--ease-space),
+      box-shadow 700ms var(--ease-space);
+  }
+
+  .life-entry:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-contact-deep);
+  }
+
+  .life-feed:hover .life-entry:not(:hover) {
+    opacity: 0.75;
+  }
+
+  .entry-title {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.18rem;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+  }
+
+  .entry-desc {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--color-ink-2);
+    max-width: 48ch;
+  }
+
+  .entry-date {
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+    opacity: 0.8;
+  }
+
+  @media (max-width: 859px) {
+    .trace,
+    .trace:nth-child(even) {
+      width: 100%;
+    }
+
+    .trace:nth-child(even) {
+      margin-left: 10px;
+    }
+
+    .media {
+      flex-direction: column;
+    }
+  }
+
+  /* ── 听歌舞台（§12B）：静止态 = 歌名 + 一行歌词小字 ── */
+  .stage {
+    margin-top: clamp(3rem, 7vh, 5rem);
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .stage-kind {
+    font-size: 0.56rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-2);
+  }
+
+  .stage-song {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.28rem;
+    letter-spacing: 0.03em;
+  }
+
+  .stage-lyric {
+    font-family: var(--font-serif);
+    font-size: 0.88rem;
+    color: var(--color-ink-2);
+    line-height: 1.9;
+  }
+
+  .stage-ph {
+    margin-top: 22px;
+    max-width: 460px;
+  }
+
+  .stage-cmdline {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 1.15rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-2);
+    font-variant-numeric: tabular-nums;
+    text-transform: none; /* 终端拟态保持小写 $ play（mono 类的 uppercase 不适用） */
+  }
+
+  .cmd-progress {
+    display: inline-block;
+    width: 6rem;
+    height: 1px;
+    background: var(--color-ink-3);
+    vertical-align: middle;
+  }
+
+  .stage-hint {
+    font-size: 0.56rem;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-3);
+  }
+
+  /* v25：三卡排版统一——按钮平时隐形（透明无边=与 meta 行同排版），hover 才现胶囊 */
+  .stage-entry {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 0.45rem;
+    justify-self: start;
+    padding: 6px 13px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    transition: color 180ms ease, border-color 180ms ease, transform 220ms var(--ease-space), box-shadow 220ms ease, background 180ms ease;
+  }
+
+  .stage-entry:hover {
+    color: var(--color-ink);
+    border-color: var(--hair-frame);
+    background: var(--color-panel);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(155, 138, 168, 0.25);
+  }
+</style>
+
+<script>
+  // 听歌舞台：点击才注入 Folia Stage iframe（演出引擎懒加载）；关闭即释放
+  const stageEl = document.querySelector<HTMLElement>('[data-song-stage]');
+  const overlay = document.querySelector<HTMLElement>('[data-stage-overlay]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-stage-close]');
+
+  // 演出层必须在最上（§12B.1 禁止垫在任何内容层之下）：搬出 .page 的层叠上下文
+  if (overlay && overlay.parentElement !== document.body) {
+    document.body.appendChild(overlay);
+  }
+
+  const openStage = (): void => {
+    if (!overlay) return;
+    if (!overlay.querySelector('iframe')) {
+      const frame = document.createElement('iframe');
+      // TODO: Folia 部署地址确定后确认路径（同域反代 /player/stage）
+      frame.src = '/player/stage';
+      frame.title = '歌词演出';
+      frame.allow = 'autoplay';
+      overlay.appendChild(frame);
+    }
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+  };
+
+  const closeStage = (): void => {
+    if (!overlay) return;
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.querySelector('iframe')?.remove();
+  };
+
+  stageEl?.addEventListener('click', openStage);
+  stageEl?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openStage();
+    }
+  });
+  closeBtn?.addEventListener('click', closeStage);
+  // 点演出外的背景也可退回（关闭按钮避让 fixed 导航，双保险）
+  overlay?.addEventListener('click', (e) => {
+    if (e.target === overlay) closeStage();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeStage();
+  });
+</script>
