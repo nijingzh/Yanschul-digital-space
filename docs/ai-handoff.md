@@ -1,4 +1,9 @@
-江衍个人数字空间 ｜ AI 交接上下文 v27（v1 上线定稿 · 2026-09-30）
+江衍个人数字空间 ｜ AI 交接上下文 v28（v1 上线定稿 · 2026-09-30）
+v28 更新（2026-09-30，纪念日循环动画误伤修复；触发 =「为什么电脑端这个地方滚动播放的速度跟起飞了一样」（跑马灯））：
+【根因】09-30 是纪念日（body.memorial-day 灰态生效），「动效转极缓」规则 animation-duration: 2100ms !important 是**定值**——对短动效 ≈×3 变缓（注释语义），但对 infinite 长循环是反向压缩（跑马灯 36s→2.1s/圈 = 2908px/s 起飞）；全站 16 处 infinite 动画全中招。
+【修复】global.css 追加「循环动画豁免清单」16 条（原时长 ×3 兑现「统一 ×3」语义）：.marquee-track 108s / .shadow-drift 60s / .spark-main 21s / .scroll-line 9.6s / .rail-dot.live::after 10.2s / .status-dot 9.6s / .loader-arc 18s / .star 4.8s / .sf-star calc(var(--dur)*3) / .twinkle 10.8s / .ink-svg 2700ms,16.8s（双值列表）/ .gate-glint 3600ms,10.2s / .social-row li 13.8s / .folia 27s / .year-no 24s / .cover-band 33s。**⚠ 新增 infinite 循环动画须登记清单（原值 ×3）**。
+【验收】build 21 页；09-30 真实纪念日环境实测：memorial-day ✓、marquee-track computed 108s ✓、位移 365px/4s（≈91px/s，原 2908px/s 慢 32 倍）✓、status-dot 9.6s ✓、twinkle 10.8s ✓；非纪念日不受影响（规则本体未动）。
+【教训】「动效减速」类全局规则用定值会误伤长循环动画（duration 被压 = 循环变快），对 infinite 类必须按原值 ×N；grep 验证 CSS 无效（外链），一律 computedStyle 实测。
 v27 更新（2026-09-30，手机端适配批；触发 =「space status观测台挡住了整个屏幕，你可以设置一个最小化按钮，点击隐藏观测台。另外手机段可以取消下滑吸附效果」）：
 【观测台最小化】手机端（≤959px）默认收起为右下浮钮（.stats-fab，✦，2.75rem 玻璃圆钮 bottom:88px 避开回顶钮）；点浮钮展开 .stats-body（fixed 浮层、width calc(100vw-32px)/max 19.5rem、右上角 − 最小化钮 .stats-min 收回）。桌面端两钮 display:none、观测台 sticky/margin-hack/v25.10 红框上限全未动。绑定 = module script + astro:page-load + data-stats-bound 幂等标记（SPA 导航后新 DOM 重绑、同 DOM 不重复绑）。**默认收起为我的决策**（用户原话「设置一个最小化按钮，点击隐藏」是默认展开语义；收起根治进页挡屏，待复审）。
 【手机端取消吸附】@media (max-width:959px) html{scroll-snap-type:none}（与项目既有断点一致）；桌面 mandatory 翻页不动。

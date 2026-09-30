@@ -1454,6 +1454,26 @@ body.memorial-day *::after {
   animation-duration: 2100ms !important;
 }
 
+/* 纪念日极缓 · 循环动画豁免（v28，2026-09-30）：上面的 2100ms 定值对 infinite 长循环
+   是反向加速（跑马灯 36s→2.1s = 起飞），「统一 ×3」的语义在此逐条兑现；
+   ⚠ 新增 infinite 循环动画须登记到本清单（原时长 ×3） */
+body.memorial-day .marquee-track { animation-duration: 108s !important; }
+body.memorial-day .shadow-drift { animation-duration: 60s !important; }
+body.memorial-day .spark-main { animation-duration: 21s !important; }
+body.memorial-day .scroll-line { animation-duration: 9.6s !important; }
+body.memorial-day .rail-dot.live::after { animation-duration: 10.2s !important; }
+body.memorial-day .status-dot { animation-duration: 9.6s !important; }
+body.memorial-day .loader-arc { animation-duration: 18s !important; }
+body.memorial-day .star { animation-duration: 4.8s !important; }
+body.memorial-day .sf-star { animation-duration: calc(var(--dur) * 3) !important; }
+body.memorial-day .twinkle { animation-duration: 10.8s !important; }
+body.memorial-day .ink-svg { animation-duration: 2700ms, 16.8s !important; }
+body.memorial-day .gate-glint { animation-duration: 3600ms, 10.2s !important; }
+body.memorial-day .social-row li { animation-duration: 13.8s !important; }
+body.memorial-day .folia { animation-duration: 27s !important; }
+body.memorial-day .year-no { animation-duration: 24s !important; }
+body.memorial-day .cover-band { animation-duration: 33s !important; }
+
 body.memorial-day [data-enter],
 body.memorial-day [data-enter-char],
 body.memorial-day [data-reveal],
