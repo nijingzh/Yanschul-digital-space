@@ -171,7 +171,10 @@ html::before {
 body::after {
   content: '';
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: radial-gradient(ellipse closest-corner at 50% 50%, transparent 62%, rgba(29, 29, 34, 0.18) 100%);
   pointer-events: none;
   z-index: 100;
@@ -182,7 +185,10 @@ body::after {
 html::after {
   content: '';
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background-image: radial-gradient(circle, rgba(29, 29, 34, 0.055) 1px, transparent 1.3px);
   background-size: 24px 24px;
   mix-blend-mode: multiply;
@@ -594,7 +600,10 @@ html::after {
    ──────────────────────────────────────────────── */
 .ambient {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -631,7 +640,10 @@ html::after {
 
 .cool-veil {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: #e8e6f6;
   opacity: 0;
 }
@@ -644,7 +656,10 @@ html::after {
 
 .dot-grid {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background-image: radial-gradient(circle, rgba(29, 29, 34, 0.06) 1px, transparent 1.3px);
   background-size: 26px 26px;
   -webkit-mask-image: radial-gradient(ellipse 85% 65% at 50% 18%, #000 25%, transparent 100%);
@@ -659,7 +674,8 @@ html::after {
 }
 
 .shell {
-  width: min(1120px, calc(100% - 3rem));
+  width: calc(100% - 3rem);
+  max-width: 1120px;
   margin-inline: auto;
 }
 
@@ -710,7 +726,10 @@ html::after {
 .display::after {
   content: attr(data-text);
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background-image: linear-gradient(90deg, #6b5f82 0%, #c9a8b8 22%, #9b8aa8 44%, #4a4258 56%, #9b8aa8 78%, #6b5f82 100%);
   background-size: 200% 400%;
   background-position: 0 50%;
@@ -748,7 +767,10 @@ html::after {
 .sweep::after {
   content: "";
   position: absolute;
-  inset: -1px;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: -1px;
   background: linear-gradient(
     105deg,
     transparent 35%,
@@ -1018,7 +1040,10 @@ html.js .ambient-blob:not(.is-settled) {
 /* Hero 光尘：唯一允许的「粒子」形态（≤20 颗、≤2px、≤0.12） */
 .hero-dust {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   overflow: hidden;
   pointer-events: none;
 }
@@ -1088,7 +1113,10 @@ html.js .ambient-blob:not(.is-settled) {
 /* 转场 0/1 闪码（View Transitions 页面间，≤160ms 脉冲） */
 .transition-flash {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 200;
   display: grid;
   place-items: center;
@@ -1356,7 +1384,10 @@ html.js .ambient-blob:not(.is-settled) {
 /* 全屏歌词演出壳（Folia Stage 嵌入层；发光仅限演出内） */
 .stage-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 120;
   display: grid;
   place-items: center;
@@ -1372,7 +1403,8 @@ html.js .ambient-blob:not(.is-settled) {
 }
 
 .stage-overlay iframe {
-  width: min(1120px, 100% - 3rem);
+  width: calc(100% - 3rem);
+  max-width: 1120px;
   height: min(72vh, 720px);
   border: 1px solid var(--hair-frame);
   background: var(--color-panel);

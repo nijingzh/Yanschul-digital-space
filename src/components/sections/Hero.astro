@@ -163,7 +163,10 @@ const motes = [
   /* 远景线稿层（v8）：只用 transform/opacity；入场第 1 拍仅透明度渐入（motion.ts） */
   .hero-shadow {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: -1;
     overflow: hidden;
     pointer-events: none;
@@ -230,7 +233,8 @@ const motes = [
 
   .hero-name-svg {
     display: block;
-    width: min(100%, 24em);
+    width: 100%;
+    max-width: 24em;
     height: auto;
     overflow: visible;
   }
@@ -465,8 +469,9 @@ const motes = [
   .stage-glow {
     position: absolute;
     width: 34vw;
+    height: 34vw;
     max-width: 420px;
-    aspect-ratio: 1;
+    max-height: 420px;
     bottom: -8%;
     background: radial-gradient(closest-side, var(--color-glow-pink), transparent 70%);
     opacity: 0.7;

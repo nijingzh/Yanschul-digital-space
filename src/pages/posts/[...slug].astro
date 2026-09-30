@@ -126,7 +126,7 @@ const slugOf = (id: string) => id.replace(/^\d+-/, '');
     return Promise.resolve(ok);
   };
 
-  copyBtn?.addEventListener('click', () => {
+  if (copyBtn) copyBtn.addEventListener('click', () => {
     copyText(window.location.href).then((ok) => {
       copyBtn.textContent = ok ? '已复制 ✦' : '复制失败，手动选地址栏';
       setTimeout(() => (copyBtn.textContent = '复制链接 ✦'), 1800);
@@ -153,7 +153,7 @@ const slugOf = (id: string) => id.replace(/^\d+-/, '');
     if (!active && window.scrollY < window.innerHeight * 0.3) {
       active = links[0] ?? null;
     }
-    links.forEach((a) => a.parentElement?.classList.toggle('is-active', a === active));
+    links.forEach(function (a) { if (a.parentElement) a.parentElement.classList.toggle('is-active', a === active); });
   };
   const io = new IntersectionObserver(
     (entries) => {
@@ -187,7 +187,10 @@ const slugOf = (id: string) => id.replace(/^\d+-/, '');
 
   .room-cool {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: var(--color-panel-2);
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
@@ -198,7 +201,8 @@ const slugOf = (id: string) => id.replace(/^\d+-/, '');
   .post-body-row,
   .post-pager {
     position: relative;
-    width: min(62rem, 100% - 3rem);
+    width: calc(100% - 3rem);
+    max-width: 62rem;
     margin-inline: auto;
   }
 

@@ -115,7 +115,10 @@ const maxDays = Math.max(1, ...days);
   /* 页面级冷纱（登记值：rgba(232,230,246,0.4)，羽化 12%/88%） */
   .room-cool {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: var(--color-panel-2);
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
@@ -126,7 +129,8 @@ const maxDays = Math.max(1, ...days);
   .reading,
   .study-list {
     position: relative;
-    width: min(56rem, 100% - 3rem);
+    width: calc(100% - 3rem);
+    max-width: 56rem;
     margin-inline: auto;
   }
 
@@ -178,7 +182,8 @@ const maxDays = Math.max(1, ...days);
   }
 
   .book {
-    width: min(26rem, 100%);
+    width: 100%;
+    max-width: 26rem;
     display: grid;
     gap: 0.45rem;
     padding: 1.35rem 1.55rem 1.25rem;

@@ -144,7 +144,8 @@ const glints = [
   }
 
   .ink-svg {
-    width: min(56vw, 460px);
+    width: 460px;
+    max-width: 56vw;
     height: auto;
     overflow: visible;
     /* 入场：墨迹晕开（blur→清晰 + 轻微放大→归位） */
@@ -434,7 +435,8 @@ const glints = [
   }
 
   .folia {
-    width: min(320px, 76vw);
+    width: 76vw;
+    max-width: 320px;
     height: auto;
     animation: folia-drift 9s ease-in-out infinite alternate;
   }

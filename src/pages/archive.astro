@@ -65,7 +65,10 @@ const total = items.length;
 
   .room-cool {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: var(--color-panel-2);
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
@@ -75,7 +78,8 @@ const total = items.length;
   .archive-head,
   .archive-year {
     position: relative;
-    width: min(56rem, 100% - 3rem);
+    width: calc(100% - 3rem);
+    max-width: 56rem;
     margin-inline: auto;
   }
 

@@ -65,7 +65,8 @@ const index = items.map((it) => ({
     };
 
     document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      var isK = (e.key || '').toLowerCase() === 'k' || e.code === 'KeyK';
+      if ((e.metaKey || e.ctrlKey) && isK) {
         e.preventDefault();
         root.hidden ? open() : close();
         return;
@@ -91,21 +92,29 @@ const index = items.map((it) => ({
       cursor = 0;
       render(input.value);
     });
-    root.querySelector('[data-search-close]')?.addEventListener('click', close);
-    document.querySelector('[data-search-open]')?.addEventListener('click', open);
+    var closeBtnEl = root.querySelector('[data-search-close]');
+    if (closeBtnEl) closeBtnEl.addEventListener('click', close);
+    var openBtnEl = document.querySelector('[data-search-open]');
+    if (openBtnEl) openBtnEl.addEventListener('click', open);
   })();
 </script>
 
 <style>
   .search-palette {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 400;
   }
 
   .palette-backdrop {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: rgba(29, 29, 34, 0.18);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
@@ -113,7 +122,8 @@ const index = items.map((it) => ({
 
   .palette-panel {
     position: relative;
-    width: min(34rem, calc(100vw - 2.5rem));
+    width: calc(100vw - 2.5rem);
+    max-width: 34rem;
     margin: 14vh auto 0;
     padding: 1.15rem 1.35rem 1rem;
     border: 1px solid var(--hair-frame);

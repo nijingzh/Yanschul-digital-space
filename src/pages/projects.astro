@@ -67,7 +67,10 @@ const projectItems = await getProjectItems();
   /* 页面级冷纱（工坊气质：冷纱偏紫 rgba(230,227,249,0.45)，羽化 12%/88% 不变） */
   .room-cool {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: var(--color-panel-2);
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
@@ -77,7 +80,8 @@ const projectItems = await getProjectItems();
   .works-head,
   .works-grid {
     position: relative;
-    width: min(56rem, 100% - 3rem);
+    width: calc(100% - 3rem);
+    max-width: 56rem;
     margin-inline: auto;
   }
 

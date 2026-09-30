@@ -141,7 +141,10 @@ const song = mediaNotes.find((note) => note.kind === '在听');
   /* 暖白无纱层：02 暖侧同语言（白层 253,253,255，无纱），羽化 12%/88% */
   .room-warm {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: var(--color-panel);
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
@@ -154,7 +157,8 @@ const song = mediaNotes.find((note) => note.kind === '在听');
   .media,
   .life-feed {
     position: relative;
-    width: min(56rem, 100% - 3rem);
+    width: calc(100% - 3rem);
+    max-width: 56rem;
     margin-inline: auto;
   }
 
@@ -213,7 +217,8 @@ const song = mediaNotes.find((note) => note.kind === '在听');
 
   .trace {
     position: relative;
-    width: min(38rem, 100%);
+    width: 100%;
+    max-width: 38rem;
     margin: 0;
     display: grid;
     gap: 0.75rem;
@@ -493,19 +498,20 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     if (!overlay) return;
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
-    overlay.querySelector('iframe')?.remove();
+    var stageIframe = overlay.querySelector('iframe');
+    if (stageIframe) stageIframe.remove();
   };
 
-  stageEl?.addEventListener('click', openStage);
-  stageEl?.addEventListener('keydown', (e) => {
+  if (stageEl) stageEl.addEventListener('click', openStage);
+  if (stageEl) stageEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       openStage();
     }
   });
-  closeBtn?.addEventListener('click', closeStage);
+  if (closeBtn) closeBtn.addEventListener('click', closeStage);
   // 点演出外的背景也可退回（关闭按钮避让 fixed 导航，双保险）
-  overlay?.addEventListener('click', (e) => {
+  if (overlay) overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeStage();
   });
   document.addEventListener('keydown', (e) => {

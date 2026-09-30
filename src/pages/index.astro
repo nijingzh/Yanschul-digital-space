@@ -97,7 +97,8 @@ import StatsPanel from '../components/StatsPanel.astro';
     /* 起点对齐「现在 · 进行时」标题（实测 marquee 底 1716→标题 1827 = 111px）；负底距抵消自身 111+341=452，净占位 0 */
     margin-top: 111px;
     margin-bottom: -452px;
-    width: min(19.5rem, 88vw);
+    width: 88vw;
+    max-width: 19.5rem;
     /* v25.5：贴视口最右（红框位）——右边距 30px，正文在左，零重叠 */
     margin-left: auto;
     margin-right: 30px;

@@ -5,6 +5,8 @@ node_modules/
 dist/
 #网易云API
 api-enhanced/ 
+#folia
+folia-major
 .astro/
 coverage/
 .cache/

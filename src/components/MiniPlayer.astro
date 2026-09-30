@@ -22,7 +22,7 @@ const track = nowPlaying ? `${nowPlaying.title} · ${nowPlaying.meta}` : '未在
 <script>
   // 占位态：切换按钮状态文案（不写死地址、不加载真实音源；dev 下占位不报错）
   const toggle = document.querySelector<HTMLButtonElement>('[data-mini-toggle]');
-  toggle?.addEventListener('click', () => {
+  if (toggle) toggle.addEventListener('click', () => {
     const playing = toggle.getAttribute('aria-pressed') === 'true';
     toggle.setAttribute('aria-pressed', String(!playing));
     toggle.textContent = playing ? '播放' : '暂停';

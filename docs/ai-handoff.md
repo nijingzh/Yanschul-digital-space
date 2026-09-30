@@ -1,4 +1,10 @@
-江衍个人数字空间 ｜ AI 交接上下文 v25（v1 上线定稿 · 2026-09-29）
+江衍个人数字空间 ｜ AI 交接上下文 v26（v1 上线定稿 · 2026-09-30）
+v26 更新（2026-09-30，浏览器兼容性加固批；触发 =「部署到服务器后用不了搜索功能」「对浏览器的兼容性很差啊，你自己出方案修一下」）：
+【根因】内联脚本（is:inline / define:vars，**不经 esbuild 转译、原样进产物**）用了 Chrome 80+ 语法：`?.` 可选链 13 处 + `??` 空值合并 1 处（SiteFooter）——语法不支持的浏览器（旧内核国产浏览器/旧 Safari/旧 Firefox）**整段 <script> 直接 SyntaxError 崩掉**，症状 = 搜索/回顶/夜航/痕迹挂件全部没反应，不止那一行失效。服务端产物经逐项核查本来完好（DOM/索引/绑定/资源全 200/无 CSP）——问题只出在浏览器侧语法。
+【修复】①JS 降级 27 处中的 18 patch：14 处 `?.`→显式 if 判断（SearchPalette×2 / SiteHeader / Base×2 / MiniPlayer / life.astro×5 / posts/[...slug]×2）、1 处 `??`→`||`（SiteFooter 时钟）；SearchPalette 键盘判定加 `e.code === 'KeyK'` 后备（中文输入法下 e.key 可能不是 'k'）；搜索按钮 title 补 Ctrl+K。②CSS 等价降级 31 处（17 `inset`→top/right/bottom/left、14 `width: min(A,B)`→width:B(calc 化)+max-width:A、Hero aspect-ratio 正方形→width/height 34vw 双上限）——零视觉变化。③module 脚本（motion.ts 等经 Vite 转译）与 frontmatter `??`（构建时 TS 不进浏览器）按红线不动。
+【兼容基线（定稿）】Chrome/Edge 84+ / Safari 14+ / Firefox 88+（flex gap 84 决定下限）；**IE 内核兼容模式不支持**（Tailwind 4 @layer 本身需 Chrome 99+/Safari 15.4+，属框架基线，未动构建配置）。
+【验收】build 21 页；残留 0（grep inset/min(//?. 脚本内）；实测：按钮开面板 ✓、搜「AI」命中 ✓、code=KeyK 切换 ✓、SPA 导航后按钮可用 ✓、五页无宽度塌陷 ✓、starfield 2560×1440 等价 ✓、hero 双栏 606/477 ✓、搜索面板截图 vision 无破损错位 ✓。
+【教训】Astro `is:inline`/`define:vars` 脚本不经转译——里面用新语法 = 把兼容性炸弹原样发给用户；`define:vars` 输出被 Astro 包 IIFE（变量不裸露全局，重跑安全）。
 v25 更新（2026-09-29，v1.x 迭代批「主页翻页式滚动 + 刷新回顶」；裁决链：「先A,只做主页」→「换 mandatory」→「四个区块…我的世界最顶端分割点是对的，01 02的分割点也这么区分。主页和页脚可以不用吸附」→「01的区块顶部可以定在这一条状态栏上面吗」→「刷新界面应该返回首页主页最顶端」→「01和02间可以增加点间隙，吸附到第二区块时能看到第三区块」→「我要的是01屏内见不到02」）：
 【翻页式滚动】方案 A · CSS scroll-snap 只主页（index.astro 样式随主页打包，其他页 snap:none 天然不吸附）：scroll-snap-type: y mandatory + scroll-padding-top: 60px（SiteHeader fixed 高）。分割点三个 = 01 屏顶在跑马灯条上沿（.marquee）、02/03 眉标贴 nav（.content-square .section-eyebrow / .world .section-eyebrow）。主页首屏与页脚不作翻页目标但须合法停位（mandatory 下非法停留会被强制拉到 01/03）= .hero scroll-snap-align:start + scroll-margin-top:-60px（停位精确 0）+ .site-footer scroll-snap-align:end（落底 3846）。
 【屏内规则】01 屏内见不到 02：.latest padding-top: max(5rem, calc(100vh - 932px))（02 眉标恰好推出 100vh 外、随窗口高度自适应；1266/1440 双视口实测 02 眉标 y=1266/1440 = 视口底零像素露出）；02 停位见 03（02 屏 996px，1266 视口露 210px、1440 露 384px）。

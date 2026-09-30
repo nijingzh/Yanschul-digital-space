@@ -71,7 +71,10 @@ const worldItems = await getWorldItems();
   /* 冷纱：冷侧（技术）叠极淡冷紫纱，约 600px 渐变过渡到纯净（暖侧无纱） */
   .band-cool {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: linear-gradient(
       90deg,
       rgba(232, 230, 246, 0.5) 0%,
@@ -98,7 +101,10 @@ const worldItems = await getWorldItems();
   /* hover 场所时：整片地带色温向暖白插值（约 700ms ease-out）——冷纱退场 + 暖纱升起 */
   .band-warm {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: var(--color-panel);
     opacity: 0;
     transition: opacity 700ms ease-out;

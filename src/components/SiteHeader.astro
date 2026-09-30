@@ -45,7 +45,7 @@ const isActive = (href: string): boolean =>
     <div class="header-side">
       <span class="status mono"><i class="status-dot"></i>空间在线</span>
 <button class="theme-toggle mono" data-theme-toggle aria-label="切换夜航模式" title="夜航模式">☾</button>
-<button class="search-btn mono" data-search-open aria-label="搜索" title="搜索（⌘K）">搜索 ⌘K</button>
+<button class="search-btn mono" data-search-open aria-label="搜索" title="搜索（⌘K / Ctrl+K）">搜索 ⌘K</button>
       <button class="menu-btn mono" type="button" aria-expanded="false" aria-controls="mobile-menu">
         菜单
       </button>
@@ -285,7 +285,8 @@ const isActive = (href: string): boolean =>
   }
 
   .mobile-menu {
-    width: min(1120px, calc(100% - 3rem));
+    width: calc(100% - 3rem);
+    max-width: 1120px;
     margin: 0.8rem auto 0;
     border-radius: var(--radius-glass);
   }
@@ -342,7 +343,7 @@ const isActive = (href: string): boolean =>
 
   // 滚动后切换为玻璃导航
   const onScroll = (): void => {
-    header?.classList.toggle('is-scrolled', window.scrollY > 12);
+    if (header) header.classList.toggle('is-scrolled', window.scrollY > 12);
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
