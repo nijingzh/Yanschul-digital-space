@@ -20,7 +20,12 @@ import StatsPanel from '../components/StatsPanel.astro';
   <MarqueeStrip />
   {/* v25.6：起点与「现在 · 进行时」标题齐平，贴视口最右跟随 */}
   <aside class="stats-sticky" aria-label="空间状态">
-    <StatsPanel />
+    {/* v27 移动端：默认收起为浮钮（修「观测台挡全屏」）；桌面端两钮隐藏、面板照旧 */}
+    <button class="stats-fab mono" data-stats-toggle type="button" aria-expanded="false" aria-controls="stats-body" aria-label="展开空间状态观测台"><span aria-hidden="true">✦</span></button>
+    <div class="stats-body" id="stats-body">
+      <button class="stats-min mono" data-stats-toggle type="button" aria-label="最小化观测台">−</button>
+      <StatsPanel />
+    </div>
   </aside>
   <NowSection />
   {/* v26 A+C：痕迹右栏已删 → 单栏舒展；右侧极轻星线点缀 */}
@@ -109,6 +114,12 @@ import StatsPanel from '../components/StatsPanel.astro';
     pointer-events: auto;
   }
 
+  /* v27 移动端观测台最小化（江衍 2026-09-30）：默认收起为右下浮钮，点击展开 / 最小化收起 */
+  .stats-fab,
+  .stats-min {
+    display: none;
+  }
+
   /* v26 内容广场：单栏舒展（痕迹右栏已删）+ 右侧极轻星线点缀 */
   .content-square {
     position: relative;
@@ -169,5 +180,94 @@ import StatsPanel from '../components/StatsPanel.astro';
       padding-bottom: 5rem;
     }
     .star-trail { display: none; }
+
+    /* 移动端取消翻页吸附（江衍 2026-09-30）：手机上连续滚动，不分屏 */
+    :global(html) {
+      scroll-snap-type: none;
+    }
+
+    /* 观测台：弃用桌面端 sticky/margin-hack 浮跟随，改右下固定浮钮 */
+    .stats-sticky {
+      position: fixed;
+      right: 16px;
+      bottom: 88px;
+      top: auto;
+      margin: 0;
+      width: auto;
+      max-width: none;
+      z-index: 60;
+    }
+
+    .stats-fab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--hair-frame);
+      background: var(--color-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--color-ink-2);
+      font-size: 0.9rem;
+      box-shadow: var(--shadow-contact);
+      cursor: pointer;
+    }
+
+    .stats-body {
+      display: none;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: calc(100vw - 32px);
+      max-width: 19.5rem;
+    }
+
+    .stats-sticky.is-open .stats-body {
+      display: block;
+    }
+
+    .stats-sticky.is-open .stats-fab {
+      display: none;
+    }
+
+    .stats-min {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0.45rem;
+      right: 0.45rem;
+      z-index: 2;
+      width: 1.7rem;
+      height: 1.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--hair-frame);
+      background: var(--color-panel);
+      color: var(--color-ink-2);
+      font-size: 0.85rem;
+      line-height: 1;
+      cursor: pointer;
+    }
   }
 </style>
+
+<script>
+  // v27 移动端观测台展开/收起（astro:page-load 幂等：SPA 导航后新 DOM 重绑、同 DOM 不重复绑）
+  function initStats() {
+    var sticky = document.querySelector('.stats-sticky');
+    if (!sticky || sticky.getAttribute('data-stats-bound') === '1') return;
+    sticky.setAttribute('data-stats-bound', '1');
+    var toggles = sticky.querySelectorAll('[data-stats-toggle]');
+    for (var i = 0; i < toggles.length; i++) {
+      toggles[i].addEventListener('click', function () {
+        var open = sticky.classList.toggle('is-open');
+        var fab = sticky.querySelector('.stats-fab');
+        if (fab) fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+  }
+  initStats();
+  document.addEventListener('astro:page-load', initStats);
+</script>

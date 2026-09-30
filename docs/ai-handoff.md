@@ -1,4 +1,9 @@
-江衍个人数字空间 ｜ AI 交接上下文 v26（v1 上线定稿 · 2026-09-30）
+江衍个人数字空间 ｜ AI 交接上下文 v27（v1 上线定稿 · 2026-09-30）
+v27 更新（2026-09-30，手机端适配批；触发 =「space status观测台挡住了整个屏幕，你可以设置一个最小化按钮，点击隐藏观测台。另外手机段可以取消下滑吸附效果」）：
+【观测台最小化】手机端（≤959px）默认收起为右下浮钮（.stats-fab，✦，2.75rem 玻璃圆钮 bottom:88px 避开回顶钮）；点浮钮展开 .stats-body（fixed 浮层、width calc(100vw-32px)/max 19.5rem、右上角 − 最小化钮 .stats-min 收回）。桌面端两钮 display:none、观测台 sticky/margin-hack/v25.10 红框上限全未动。绑定 = module script + astro:page-load + data-stats-bound 幂等标记（SPA 导航后新 DOM 重绑、同 DOM 不重复绑）。**默认收起为我的决策**（用户原话「设置一个最小化按钮，点击隐藏」是默认展开语义；收起根治进页挡屏，待复审）。
+【手机端取消吸附】@media (max-width:959px) html{scroll-snap-type:none}（与项目既有断点一致）；桌面 mandatory 翻页不动。
+【验收】build 21 页；375×812 实测 snap:none ✓、默认收起（fab 显示/面板隐藏）✓、点浮钮展开（面板 312px+最小化钮）✓、点最小化收回 ✓；2560×1440 回归 snap:y mandatory ✓、面板照常显示 ✓、双钮隐藏 ✓、sticky 不变 ✓；截图 vision：收起态正文零遮挡/浮钮不压回顶钮、展开态右上角有最小化钮。
+【坑·续】dev/产物 grep 验证 CSS 会被 Astro 外链 CSS 坑（样式在 _astro/*.css 不在 HTML，grep index.html 全 False 假阴性）——CSS 断言必须走 computedStyle/offsetParent 实测，不能 grep HTML。
 v26 更新（2026-09-30，浏览器兼容性加固批；触发 =「部署到服务器后用不了搜索功能」「对浏览器的兼容性很差啊，你自己出方案修一下」）：
 【根因】内联脚本（is:inline / define:vars，**不经 esbuild 转译、原样进产物**）用了 Chrome 80+ 语法：`?.` 可选链 13 处 + `??` 空值合并 1 处（SiteFooter）——语法不支持的浏览器（旧内核国产浏览器/旧 Safari/旧 Firefox）**整段 <script> 直接 SyntaxError 崩掉**，症状 = 搜索/回顶/夜航/痕迹挂件全部没反应，不止那一行失效。服务端产物经逐项核查本来完好（DOM/索引/绑定/资源全 200/无 CSP）——问题只出在浏览器侧语法。
 【修复】①JS 降级 27 处中的 18 patch：14 处 `?.`→显式 if 判断（SearchPalette×2 / SiteHeader / Base×2 / MiniPlayer / life.astro×5 / posts/[...slug]×2）、1 处 `??`→`||`（SiteFooter 时钟）；SearchPalette 键盘判定加 `e.code === 'KeyK'` 后备（中文输入法下 e.key 可能不是 'k'）；搜索按钮 title 补 Ctrl+K。②CSS 等价降级 31 处（17 `inset`→top/right/bottom/left、14 `width: min(A,B)`→width:B(calc 化)+max-width:A、Hero aspect-ratio 正方形→width/height 34vw 双上限）——零视觉变化。③module 脚本（motion.ts 等经 Vite 转译）与 frontmatter `??`（构建时 TS 不进浏览器）按红线不动。
