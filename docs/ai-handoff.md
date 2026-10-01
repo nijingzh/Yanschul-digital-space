@@ -1,4 +1,5 @@
-江衍个人数字空间 ｜ AI 交接上下文 v28（v1 上线定稿 · 2026-09-30）
+江衍个人数字空间 ｜ AI 交接上下文 v29（v1 上线定稿 · 2026-09-30）
+v29 更新（2026-09-30，部署信息登记；用户提供）：**Folia 已部署到 VPS**：前端 `http://124.223.162.190:81/`（81 端口，实测 200 + `<title>Folia</title>` ✓）、API 在服务器 3000 端口。注意：3000 端口**公网直连不可达**（curl 000）——大概率 API 只监听 127.0.0.1 / 安全组未开，走 81 前端同源 `/api/*` 反代即可视为正常；若要公网直调需用户在安全组开 3000 或配 nginx 反代。此前 Blocked 的「Folia 全屏演出/歌单音源」由此解锁（站点内集成待用户裁决）。
 v28 更新（2026-09-30，纪念日循环动画误伤修复；触发 =「为什么电脑端这个地方滚动播放的速度跟起飞了一样」（跑马灯））：
 【根因】09-30 是纪念日（body.memorial-day 灰态生效），「动效转极缓」规则 animation-duration: 2100ms !important 是**定值**——对短动效 ≈×3 变缓（注释语义），但对 infinite 长循环是反向压缩（跑马灯 36s→2.1s/圈 = 2908px/s 起飞）；全站 16 处 infinite 动画全中招。
 【修复】global.css 追加「循环动画豁免清单」16 条（原时长 ×3 兑现「统一 ×3」语义）：.marquee-track 108s / .shadow-drift 60s / .spark-main 21s / .scroll-line 9.6s / .rail-dot.live::after 10.2s / .status-dot 9.6s / .loader-arc 18s / .star 4.8s / .sf-star calc(var(--dur)*3) / .twinkle 10.8s / .ink-svg 2700ms,16.8s（双值列表）/ .gate-glint 3600ms,10.2s / .social-row li 13.8s / .folia 27s / .year-no 24s / .cover-band 33s。**⚠ 新增 infinite 循环动画须登记清单（原值 ×3）**。
