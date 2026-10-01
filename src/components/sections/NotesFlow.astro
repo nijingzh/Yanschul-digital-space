@@ -15,7 +15,6 @@ const notes = (await getMediaNotes()).slice(0, 6);
     {
       notes.map((n) => (
         <li class="flow-item">
-          <span class="mono kind">{n.kind}</span>
           <p class="serif">{n.title}</p>
           <span class="mono meta">{n.meta}</span>
         </li>

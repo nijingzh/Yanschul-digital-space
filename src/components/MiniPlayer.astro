@@ -15,8 +15,8 @@ import { getMediaNotes } from '../data/content';
 import { FOLIA_BASE, FOLIA_PLAYLIST_ID } from '../lib/config';
 
 const mediaNotes = await getMediaNotes();
-const nowPlaying = mediaNotes.find((note) => note.kind === '在听');
-const fallbackTrack = nowPlaying ? `${nowPlaying.title} · ${nowPlaying.meta}` : '未在播放';
+// v31：占位文案中性化（真曲目由 Folia 歌单加载后接管；「夜航西飞」示例数据退休）
+const fallbackTrack = '未在播放';
 ---
 
 <div class="mini-player" data-mini-player data-folia-base={FOLIA_BASE} data-playlist-id={FOLIA_PLAYLIST_ID}>
@@ -38,6 +38,9 @@ const fallbackTrack = nowPlaying ? `${nowPlaying.title} · ${nowPlaying.meta}` :
   interface Track {
     id: number;
     text: string;
+    title: string;
+    artist: string;
+    pic: string;
     url?: string;
   }
   let tracks: Track[] = [];
@@ -47,6 +50,15 @@ const fallbackTrack = nowPlaying ? `${nowPlaying.title} · ${nowPlaying.meta}` :
 
   const renderTrack = (): void => {
     if (trackEl && tracks[index]) trackEl.textContent = tracks[index].text;
+    // v31：广播当前曲目（音乐空间 CD 卡同源监听 jy:track）
+    const t = tracks[index];
+    if (t) {
+      document.dispatchEvent(
+        new CustomEvent('jy:track', {
+          detail: { id: t.id, title: t.title, artist: t.artist, pic: t.pic },
+        })
+      );
+    }
   };
 
   const setToggle = (playing: boolean): void => {
@@ -115,9 +127,12 @@ const fallbackTrack = nowPlaying ? `${nowPlaying.title} · ${nowPlaying.meta}` :
       if (!res.ok) return;
       const data = await res.json();
       const songs = (data && data.songs) || [];
-      tracks = songs.slice(0, 50).map((s: { id: number; name: string; ar?: { name?: string }[] }) => ({
+      tracks = songs.slice(0, 50).map((s: { id: number; name: string; ar?: { name?: string }[]; al?: { picUrl?: string } }) => ({
         id: s.id,
         text: '♪ ' + s.name + (s.ar && s.ar[0] && s.ar[0].name ? ' – ' + s.ar[0].name : ''),
+        title: s.name,
+        artist: (s.ar && s.ar[0] && s.ar[0].name) || '',
+        pic: (s.al && s.al.picUrl ? s.al.picUrl.replace(/^http:/, 'https:') : ''),
       }));
       renderTrack();
       prefetch(0);

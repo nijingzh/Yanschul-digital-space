@@ -1473,6 +1473,7 @@ body.memorial-day .social-row li { animation-duration: 13.8s !important; }
 body.memorial-day .folia { animation-duration: 27s !important; }
 body.memorial-day .year-no { animation-duration: 24s !important; }
 body.memorial-day .cover-band { animation-duration: 33s !important; }
+body.memorial-day .cd-disc { animation-duration: 24s !important; }
 
 body.memorial-day [data-enter],
 body.memorial-day [data-enter-char],

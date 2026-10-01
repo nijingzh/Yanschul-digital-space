@@ -1,8 +1,8 @@
 ---
 /**
- * 学习页 = 在读/在学的桌面（技术区，页面级冷纱沿用登记值）
+ * 学习页 = 书桌（技术区，页面级冷纱沿用登记值）
  *
- * 内容身份：与首页「最近记录」侧栏 MediaNote 同源（在读项 → 摊开的书物件）；
+ * 内容身份：与首页「最近记录」侧栏 MediaNote 同源（书桌项 → 摊开的书物件）；
  * 学习领域条目走 FeedItem 同源（网安 / 外语 / 业余开发，对应 worldItems「学习」方向）。
  * 形态 = 书房语法（发丝线列表 + 交替缩进），禁止卡片网格、禁止进度条/百分比。
  */
@@ -27,7 +27,7 @@ const days = directions.map((d) => Math.max(1, Math.round((today - new Date(d.it
 const maxDays = Math.max(1, ...days);
 ---
 
-<Base title="学习" description="在读/在学的桌面。">
+<Base title="学习" description="书桌与自习室。">
   <div class="study-room">
     <div class="room-cool" aria-hidden="true"></div>
 
@@ -37,12 +37,12 @@ const maxDays = Math.max(1, ...days);
       <p class="lead study-lead" data-enter>网安、外语、业余开发。都在慢慢跑，没停。</p>
     </header>
 
-    <!-- 在读：摊开的书（物件可有容器） -->
+    <!-- 书桌：摊开的书（物件可有容器；v31「在读」→「书桌」） -->
     {
       reading && (
-        <section class="reading" data-reveal-group aria-label="在读">
+        <section class="reading" data-reveal-group aria-label="书桌">
           <p class="mono reading-kind" data-enter-char>
-            在读
+            书桌
             <span class="ticks" aria-hidden="true"><i></i><i></i><i></i></span>
           </p>
           <article class="book" data-reveal-item>

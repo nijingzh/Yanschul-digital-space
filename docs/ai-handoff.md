@@ -1,4 +1,10 @@
-江衍个人数字空间 ｜ AI 交接上下文 v31（v1 上线定稿 · 2026-09-30）
+江衍个人数字空间 ｜ AI 交接上下文 v32（v1 上线定稿 · 2026-09-30）
+v32 更新（2026-09-30，生活页重做批；触发 =「生活页不美观 重新做 全站不要出现'我在听'什么的。可以改成CD机卡片。听歌舞台这个名字也改成'音乐空间'…排版不要错位和突兀」+ 拍板：歌单 = 江-衍喜欢的音乐 id 593219640、封面方案 A 碟面即封面、演出钮改图标不要文字、↗ 小箭头、学习页「在读」→「书桌」）：
+【去「在X」】生活页三卡删 kind 标签、NotesFlow（首页痕迹流）删 kind 标签、learning「在读」→「书桌」（label/aria/meta description 全改）、「听歌舞台」→「音乐空间」（life stage-kind/stage-entry/WorldSection 兴趣卡链接）；**UI 清零后产物 grep「夜航西飞」false**（mediaNotes「在听」示例数据退休：MiniPlayer 占位改「未在播放」、CD 卡接 jy:track 真曲目）。数据层 kind 字段保留（内部标记，不渲染）。
+【CD 机卡】life.astro 重做：媒体三卡 grid 1:1:1.35 等高 176px（书/游戏纯排版 + 音乐位 cd-mini Ø78 碟）；音乐空间主卡 music-card（cd-disc Ø220 **碟面即专辑封面**（al.picUrl https 替换防混合内容）+ 中心孔 58px + cd-spin 8s/圈（reduce 停；**已登记纪念日豁免 24s**）+ 真曲名/歌手/歌词（/lyric LRC 解析首句非制作行）+ stage-go Ø44 黑圆 ▶ 图标钮（aria-label 进入歌词演出，无文字）+ stage-ext ↗ 小箭头（打开 Folia）+ cmdline 收卡内底行 border-top 分隔）。排版修：.stage 进统一栏（width calc(100%-3rem)/max 56rem=896px——**贴边根因 = .stage 没在统一栏列表**）。
+【真曲目同源】MiniPlayer 广播 CustomEvent('jy:track', {id,title,artist,pic})（renderTrack 时）；life 卡监听更新 cd-disc/cd-mini 封面、media 卡曲名歌手、/lyric 歌词。歌单 = 593219640（短链 163cn.tv/bhDKpRlH 302 解析 id=593219640）。
+【验收】build 21 页；实测三卡等高/无标签/底对齐、音乐卡真数据（寂寞先生–曹格/「你的笑容是恩惠」封面碟）、stage 宽 896 居中、vision 确认零贴边零错位、产物「在读/在玩/在听」仅剩 HTML 注释（UI 清零）、learning description「书桌与自习室。」。
+【教训】stale 注释要顺手清（v30 的 TODO「等江衍提供形态」残留误导）；meta description 是 UI 可见面（搜索面板展示），文案清理要覆盖它。
 v31 更新（2026-09-30，Folia 集成批；触发 =「推进folia和主站的集成。后续我会将folia解析到music.nijingzh.top注意集成时做好兼容」）：
 【形态】Folia = 网易云音乐 API Enhanced（NeteaseCloudMusicApi）+ 自带前端；81 端口前端、3000 端口 API（81 同源反代 /api/*）；实测 API CORS 回显 Origin（跨域集成 OK）、无 X-Frame-Options（iframe 可嵌）、/playlist/track/all + /song/url/v1 均可用（付费曲也回音源 URL）。
 【配置单点·兼容】`src/lib/config.ts`：PUBLIC_FOLIA_BASE（默认 http://124.223.162.190:81）/ PUBLIC_FOLIA_STAGE_PATH（默认 /player/stage——按 §12A.2 原规格；Folia 实际路由以用户实测为准）/ PUBLIC_FOLIA_PLAYLIST_ID（空 = 占位态）；**music.nijingzh.top 解析后只改 PUBLIC_FOLIA_BASE 重 build，演出 iframe 与歌单音源一次切换**。deploy/.env.example 已登记。本地 .env（gitignore）用测试歌单 24381616 验链路，生产换江衍的歌单。
