@@ -115,7 +115,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
 
     <!-- 全屏歌词演出壳（Folia Stage；懒加载注入 iframe，发光仅限演出内） -->
     <div class="stage-overlay" data-stage-overlay aria-hidden="true">
-      <button class="stage-close mono" type="button" data-stage-close>关闭</button>
+      <button class="stage-close mono" type="button" data-stage-close>收起</button>
     </div>
 
     <!-- 最近动态（FeedItem 生活向条目，同源不同视图） -->
@@ -523,6 +523,21 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     color: var(--color-ink-2);
   }
 
+  /* v32：小窗演出态（静态小点标记，不引新循环动画） */
+  .music-card.is-live .music-eyebrow {
+    color: var(--color-ink);
+  }
+
+  .music-card.is-live .music-eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-right: 7px;
+    border-radius: 50%;
+    background: var(--color-ink);
+  }
+
   .music-artist {
     font-size: 0.62rem;
     letter-spacing: 0.14em;
@@ -652,6 +667,14 @@ const song = mediaNotes.find((note) => note.kind === '在听');
   const cdMini = document.querySelector('[data-cd-mini]');
   const mediaSong = document.querySelector('.cd-note [data-media-song]');
   const mediaMeta = document.querySelector('.cd-note [data-media-meta]');
+  const musicCard = document.querySelector('.music-card');
+  const musicEyebrow = document.querySelector('.music-eyebrow');
+
+  // v32：小窗演出状态上卡片（跨域读不到 Folia 内部播放态——如实标注「小窗演出中」）
+  const setLive = (on: boolean): void => {
+    if (musicCard) musicCard.classList.toggle('is-live', on);
+    if (musicEyebrow) musicEyebrow.textContent = on ? '♪ 小窗演出中' : '♪ 正在播放';
+  };
 
   interface TrackDetail {
     id?: number;
@@ -720,14 +743,14 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     }
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
+    setLive(true);
   };
 
+  // v32：「收起」≠「停止」——iframe 保留（visibility 隐藏不杀媒体），小窗音乐继续放
   const closeStage = (): void => {
     if (!overlay) return;
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
-    var stageIframe = overlay.querySelector('iframe');
-    if (stageIframe) stageIframe.remove();
   };
 
   // v31：CD 碟与 ▶ 图标钮都开演出（button 原生 Enter/Space 触发 click，无需手绑键盘）

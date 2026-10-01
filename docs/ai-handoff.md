@@ -1,4 +1,10 @@
-江衍个人数字空间 ｜ AI 交接上下文 v32（v1 上线定稿 · 2026-09-30）
+江衍个人数字空间 ｜ AI 交接上下文 v33（v1 上线定稿 · 2026-09-30）
+v33 更新（2026-09-30，小窗演出播放 bug；触发 =「我点击按钮进入小窗后播放音乐，然后点击关闭 音乐就暂停了，卡片也没有出现播放状态」）：
+【根因】closeStage 里 `iframe.remove()` 把 Folia 连播放器一起销毁 = 音乐随关闭而断；且 Folia（iframe 内播放器）与 MiniPlayer（主站 audio）是**两套播放内核**，卡片状态走主站一套、小窗播放是另一套，天然不同步。
+【修复】①「关闭」→「收起」：closeStage 只移除 .is-open（overlay 本就用 opacity/visibility 显隐），**iframe 永不销毁**——收起后小窗音乐继续放，再点 ▶ 回小窗（openStage 复用已有 iframe）；②卡片补演出态：music-card.is-live（静态小圆点 + 眉标「♪ 小窗演出中」）——**如实标注小窗开着**，不假装知道 Folia 内部播放态（跨域隔离读不到）。
+【验收】build 21 页；实测开→收起：openedThenClosed/iframeAlive/overlayHidden/isLive/「♪ 小窗演出中」全真值、vision 确认眉标排版正常（● ♪ 小窗演出中）。
+【遗留提案·未拍板】两套播放内核并存是架构债：彻底解法 = 播放统一到主站（MiniPlayer audio 为唯一音源，演出 overlay 自绘 CD+歌词+光效视觉，Folia 只留「打开」外链）——音乐永不断、卡片真播放状态；代价 = 演出视觉从 Folia 换成主站自绘（§12B 形态变更）。已向江衍提案待拍板。
+【已知边界】浏览器自动化工具（browser_click）对 .magnetic 磁吸按钮坐标命中不稳（eval click 可触发、坐标 click 偶落空）——真实用户点击正常（江衍实测能进小窗），非 bug。
 v32 更新（2026-09-30，生活页重做批；触发 =「生活页不美观 重新做 全站不要出现'我在听'什么的。可以改成CD机卡片。听歌舞台这个名字也改成'音乐空间'…排版不要错位和突兀」+ 拍板：歌单 = 江-衍喜欢的音乐 id 593219640、封面方案 A 碟面即封面、演出钮改图标不要文字、↗ 小箭头、学习页「在读」→「书桌」）：
 【去「在X」】生活页三卡删 kind 标签、NotesFlow（首页痕迹流）删 kind 标签、learning「在读」→「书桌」（label/aria/meta description 全改）、「听歌舞台」→「音乐空间」（life stage-kind/stage-entry/WorldSection 兴趣卡链接）；**UI 清零后产物 grep「夜航西飞」false**（mediaNotes「在听」示例数据退休：MiniPlayer 占位改「未在播放」、CD 卡接 jy:track 真曲目）。数据层 kind 字段保留（内部标记，不渲染）。
 【CD 机卡】life.astro 重做：媒体三卡 grid 1:1:1.35 等高 176px（书/游戏纯排版 + 音乐位 cd-mini Ø78 碟）；音乐空间主卡 music-card（cd-disc Ø220 **碟面即专辑封面**（al.picUrl https 替换防混合内容）+ 中心孔 58px + cd-spin 8s/圈（reduce 停；**已登记纪念日豁免 24s**）+ 真曲名/歌手/歌词（/lyric LRC 解析首句非制作行）+ stage-go Ø44 黑圆 ▶ 图标钮（aria-label 进入歌词演出，无文字）+ stage-ext ↗ 小箭头（打开 Folia）+ cmdline 收卡内底行 border-top 分隔）。排版修：.stage 进统一栏（width calc(100%-3rem)/max 56rem=896px——**贴边根因 = .stage 没在统一栏列表**）。
