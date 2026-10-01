@@ -7,7 +7,6 @@
  * 演出引擎懒加载（不进视口不加载、点击才注入 iframe）。
  */
 import Base from '../layouts/Base.astro';
-import PlaceholderCard from '../components/PlaceholderCard.astro';
 import Sidenote from '../components/Sidenote.astro';
 import { getFeedItems, getMediaNotes } from '../data/content';
 
@@ -101,14 +100,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
         $ play ▶ <span class="cmd-progress"></span> 0:00 / 1:47
       </p>
 
-      {/* Folia 演出占位（部署后开放） */}
-      <div class="stage-ph">
-        <PlaceholderCard
-          label="BUILDING"
-          title="歌词演出还在调试"
-          note="Folia 全屏歌词演出要等站外服务部署好——现在点舞台只有这行小字。"
-        />
-      </div>
+      {/* v30：Folia 已部署接入——BUILDING 占位卡退场，恢复 §12B 规格静止态（歌名 + 歌词小字） */}
     </section>
 
     <!-- 全屏歌词演出壳（Folia Stage；懒加载注入 iframe，发光仅限演出内） -->
@@ -471,6 +463,8 @@ const song = mediaNotes.find((note) => note.kind === '在听');
 
 <script>
   // 听歌舞台：点击才注入 Folia Stage iframe（演出引擎懒加载）；关闭即释放
+  import { FOLIA_STAGE_URL } from '../lib/config';
+
   const stageEl = document.querySelector<HTMLElement>('[data-song-stage]');
   const overlay = document.querySelector<HTMLElement>('[data-stage-overlay]');
   const closeBtn = document.querySelector<HTMLButtonElement>('[data-stage-close]');
@@ -484,10 +478,15 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     if (!overlay) return;
     if (!overlay.querySelector('iframe')) {
       const frame = document.createElement('iframe');
-      // TODO: Folia 部署地址确定后确认路径（同域反代 /player/stage）
-      frame.src = '/player/stage';
+      // v30：Folia 部署地址走单点配置（IP:81 → music.nijingzh.top 只改 env）
+      frame.src = FOLIA_STAGE_URL;
       frame.title = '歌词演出';
       frame.allow = 'autoplay';
+      // 拒嵌兜底（Folia 当前无 X-Frame-Options 可嵌；若日后加拒嵌头，退新窗口）
+      frame.addEventListener('error', () => {
+        closeStage();
+        window.open(FOLIA_STAGE_URL, '_blank', 'noopener');
+      });
       overlay.appendChild(frame);
     }
     overlay.classList.add('is-open');

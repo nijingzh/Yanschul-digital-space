@@ -1,4 +1,11 @@
-江衍个人数字空间 ｜ AI 交接上下文 v29（v1 上线定稿 · 2026-09-30）
+江衍个人数字空间 ｜ AI 交接上下文 v31（v1 上线定稿 · 2026-09-30）
+v31 更新（2026-09-30，Folia 集成批；触发 =「推进folia和主站的集成。后续我会将folia解析到music.nijingzh.top注意集成时做好兼容」）：
+【形态】Folia = 网易云音乐 API Enhanced（NeteaseCloudMusicApi）+ 自带前端；81 端口前端、3000 端口 API（81 同源反代 /api/*）；实测 API CORS 回显 Origin（跨域集成 OK）、无 X-Frame-Options（iframe 可嵌）、/playlist/track/all + /song/url/v1 均可用（付费曲也回音源 URL）。
+【配置单点·兼容】`src/lib/config.ts`：PUBLIC_FOLIA_BASE（默认 http://124.223.162.190:81）/ PUBLIC_FOLIA_STAGE_PATH（默认 /player/stage——按 §12A.2 原规格；Folia 实际路由以用户实测为准）/ PUBLIC_FOLIA_PLAYLIST_ID（空 = 占位态）；**music.nijingzh.top 解析后只改 PUBLIC_FOLIA_BASE 重 build，演出 iframe 与歌单音源一次切换**。deploy/.env.example 已登记。本地 .env（gitignore）用测试歌单 24381616 验链路，生产换江衍的歌单。
+【演出集成】life.astro：iframe src 从硬编码 '/player/stage' 改 FOLIA_STAGE_URL；保持 §12B 懒加载（点击才注入、关闭即释放、搬 document.body 防层叠）；iframe error 降级新窗口打开；BUILDING 占位卡退场（恢复规格静止态）。
+【歌单音源】MiniPlayer（§12.2 视觉规格不动）：playlist/track/all 拉曲目、song/url/v1 取音源、曲终自动下一首、无配置/失败降级 mediaNotes 占位。**坑：点击后 await fetch 再 play() 脱离用户手势栈被 autoplay 策略拒** → 预取音源 URL（loadPlaylist 后 prefetch(0)、播放时 prefetch(index+1)）、点击瞬间同步 play()；未就绪兜底走 fetch 后 play（可能被拒，按钮态如实回退）。
+【验收】build 21 页；真播放实测 paused:false/readyState 4/currentTime 30.2s·272.7s、自动预取下一首（fetchLog）；演出实测 overlay 开 + iframe src 正确 + vision 确认 Folia 界面（发光标题/波形/控制条）完整嵌入、无破损；产物 data-folia-base/data-playlist-id 注入正确。
+【教训】浏览器音频 autoplay：play() 必须落在用户手势同步栈内，任何 await（fetch 音源）都会让手势过期——预取是正解；agent-browser daemon 版本不匹配会反复重启打断长验证，改用内置 browser 工具（localhost 不受裸 IP 限制）。
 v29 更新（2026-09-30，部署信息登记；用户提供）：**Folia 已部署到 VPS**：前端 `http://124.223.162.190:81/`（81 端口，实测 200 + `<title>Folia</title>` ✓）、API 在服务器 3000 端口。注意：3000 端口**公网直连不可达**（curl 000）——大概率 API 只监听 127.0.0.1 / 安全组未开，走 81 前端同源 `/api/*` 反代即可视为正常；若要公网直调需用户在安全组开 3000 或配 nginx 反代。此前 Blocked 的「Folia 全屏演出/歌单音源」由此解锁（站点内集成待用户裁决）。
 v28 更新（2026-09-30，纪念日循环动画误伤修复；触发 =「为什么电脑端这个地方滚动播放的速度跟起飞了一样」（跑马灯））：
 【根因】09-30 是纪念日（body.memorial-day 灰态生效），「动效转极缓」规则 animation-duration: 2100ms !important 是**定值**——对短动效 ≈×3 变缓（注释语义），但对 infinite 长循环是反向压缩（跑马灯 36s→2.1s/圈 = 2908px/s 起飞）；全站 16 处 infinite 动画全中招。
