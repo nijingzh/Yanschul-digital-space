@@ -1432,10 +1432,6 @@ body.memorial-day .folia { animation-duration: 27s !important; }
 body.memorial-day .year-no { animation-duration: 24s !important; }
 body.memorial-day .cover-band { animation-duration: 33s !important; }
 body.memorial-day .cd-disc { animation-duration: 24s !important; }
-body.memorial-day .stage-disc { animation-duration: 24s !important; }
-body.memorial-day .spark { animation-duration: 18s !important; }
-body.memorial-day .spark-2 { animation-duration: 23s !important; }
-body.memorial-day .spark-3 { animation-duration: 27s !important; }
 
 body.memorial-day [data-enter],
 body.memorial-day [data-enter-char],

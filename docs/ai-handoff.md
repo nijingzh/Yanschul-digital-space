@@ -1,4 +1,11 @@
-江衍个人数字空间 ｜ AI 交接上下文 v34（v1 上线定稿 · 2026-10-02）
+江衍个人数字空间 ｜ AI 交接上下文 v35（v1 上线定稿 · 2026-10-02）
+v35 更新（2026-10-02，卡片即播放器批；触发 =「要拖动。你目前是做了个弹出窗口。我不要窗口，把他删了 我就要点击这个播放按钮就能播放，再添加一个上下曲。并且这个卡片里能显示状态和cd封面。不要点击后弹出窗口的那种」）：
+【形态终局】**演出弹窗（stage-overlay）整体删除**——音乐空间卡 = 完整内联播放器：CD 封面碟（播放才转）+ 状态眉标（♪ 待播放/正在播放/已暂停）+ 曲名/歌手/当前歌词行（LRC 随进度滚）+ 控制行（‹‹ 上一首 / ▶ 播放暂停大黑圆 / ›› 下一首 / ↗ Folia 外链）+ 底部 $ play 播放条（v17·D 拟态语法保留，进度条升级真交互）。
+【可拖进度】stage-track（role=slider）鼠标 mousedown/move/up + 触摸 touchstart/move/end 拖动 seek（跟手）、方向键 ±5s。实测拖到 80% → t=36.3s ✓。
+【音源边界（重要）】网易 API 未登录音源受限：部分曲目返回 **30s/45s 试听片段**（duration 显示 0:30/0:45），部分曲目拿不到 URL（MiniPlayer 自动跳下一首——表现为「点上一首显示的是别的曲」= 音源失败跳曲，链条逻辑本身正确）。**全曲解锁 = 服务器端给 NeteaseCloudMusicApi 配网易账号 cookie（NCL_COOKIE）**，前端无法修。
+【同步协议沿用 v34】jy:track / jy:player / jy:player-tick / jy:player-cmd 不变；MiniPlayer 仍是唯一 audio 内核。
+【清理】global.css 纪念日豁免删 .stage-disc/.spark×3（元素已删）；「船向西飞」等假数据全清。
+【验收】build 21 页；overlayGone true、▶ 真播放（paused:false t=2.7s）、上下曲切换（淘汰→背叛等）、拖动 seek 80%→36.3s、卡片四件套（封面碟/状态/歌词/控制）vision 确认零错位。
 v34 更新（2026-10-02，歌词演出主站自绘批；拍板 =「做缓缓漂浮动效，明显一点。在播放时界面还是这个样子的（小样）。在生活页要不你直接调用3000端口的网易api，不经过folia（保留folia主页进入入口）」）：
 【架构终态·统一播放内核】站内 `<audio>`（MiniPlayer）= 唯一音源；演出 overlay / CD 机卡 / 页脚播放器**三方同源**——曲目/进度/播放暂停实时一致，关闭演出音乐不断（「收起」= 隐藏壳，同一 audio 继续）。Folia 只留「↗ 在 Folia 打开」外链入口。
 【API 直连】浏览器直连网易 API（NeteaseCloudMusicApi）：歌单 `/api/playlist/track/all`、音源 `/api/song/url/v1`、歌词 `/api/lyric`。实测 **3000 端口公网不通（000）**，浏览器入口 = **81 端口 `/api/*` 同源反代**（同一服务）；CORS 全开（`access-control-allow-origin: *` + 预检 204）✓ 跨端口调用无障碍。地址单点 = `PUBLIC_FOLIA_BASE`（src/lib/config.ts FOLIA_BASE + '/api'）。

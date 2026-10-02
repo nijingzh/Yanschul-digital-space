@@ -90,7 +90,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
       <p class="mono stage-kind">音乐空间 / MUSIC SPACE</p>
       <div class="music-card">
         <div class="music-grid">
-          <button class="cd-disc-wrap magnetic" data-song-stage type="button" aria-label="进入歌词演出">
+          <button class="cd-disc-wrap magnetic" data-cmd="toggle" type="button" aria-label="播放或暂停">
             <span class="cd-disc" data-cd-disc aria-hidden="true"></span>
           </button>
           <div class="music-info">
@@ -99,63 +99,25 @@ const song = mediaNotes.find((note) => note.kind === '在听');
             <p class="mono music-artist" data-stage-artist></p>
             <p class="stage-lyric" data-stage-lyric>未在播放</p>
             <div class="music-actions">
-              <button class="stage-go" data-song-stage type="button" aria-label="进入歌词演出" title="进入歌词演出">
+              <button class="step-btn mono" data-cmd="prev" type="button" aria-label="上一首" title="上一首">‹‹</button>
+              <button class="stage-go" data-cmd="toggle" type="button" aria-label="播放或暂停" title="播放或暂停">
                 <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><path d="M3 1.5 L11.5 6.5 L3 11.5 Z" fill="currentColor"></path></svg>
               </button>
+              <button class="step-btn mono" data-cmd="next" type="button" aria-label="下一首" title="下一首">››</button>
               <a class="stage-ext mono" data-stage-ext href={FOLIA_BASE} target="_blank" rel="noopener" aria-label="在 Folia 打开" title="在 Folia 打开">↗</a>
             </div>
           </div>
         </div>
-        {/* 播放条拟态（v17 · D）：终端语法 + 发丝线进度；纯占位形态 */}
-        <p class="mono stage-cmdline" aria-hidden="true">
-          $ play ▶ <span class="cmd-progress"></span> 0:00 / 1:47
-        </p>
+        {/* 播放条（v17 · D 拟态语法 + v35 真进度：可拖 seek） */}
+        <div class="mono stage-cmdline">
+          <span class="cmd-prompt" aria-hidden="true">$ play</span>
+          <span class="stage-track" data-stage-track role="slider" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0"><span class="stage-track-fill" data-stage-fill></span></span>
+          <span class="cmd-time"><span data-stage-cur>0:00</span> / <span data-stage-dur>0:00</span></span>
+        </div>
       </div>
     </section>
 
-    <!-- 歌词演出（v34 主站自绘：同一 audio 唯一内核，发光仅限演出内） -->
-    <div class="stage-overlay" data-stage-overlay aria-hidden="true">
-      <div class="stage-sparks" aria-hidden="true">
-        <span class="spark">✦</span>
-        <span class="spark spark-2">✧</span>
-        <span class="spark spark-3">✦</span>
-        <span class="spark spark-2">✧</span>
-        <span class="spark spark-3">✦</span>
-        <span class="spark">✧</span>
-        <span class="spark spark-3">✦</span>
-        <span class="spark spark-2">✧</span>
-        <span class="spark">✦</span>
-        <span class="spark spark-2">✧</span>
-      </div>
-      <div class="stage-top">
-        <p class="mono stage-eyebrow">♪ LYRICS STAGE / 歌词演出</p>
-        <button class="stage-close mono" type="button" data-stage-close>收起</button>
-      </div>
-      <div class="stage-core">
-        <button class="stage-disc-wrap" type="button" data-cmd="toggle" aria-label="播放或暂停">
-          <span class="stage-disc" data-stage-disc aria-hidden="true"></span>
-        </button>
-        <div class="stage-lyrics">
-          <p class="stage-l-prev" data-l-prev></p>
-          <p class="stage-l-now" data-l-now>未在播放</p>
-          <p class="stage-l-next" data-l-next></p>
-          <div class="stage-song-info">
-            <p class="stage-song-title" data-stage-song>未在播放</p>
-            <p class="mono stage-song-artist" data-stage-artist></p>
-          </div>
-        </div>
-      </div>
-      <div class="stage-controls">
-        <button class="c-btn mono" type="button" data-cmd="prev" aria-label="上一首">‹‹</button>
-        <button class="c-btn c-play" type="button" data-cmd="toggle" data-stage-play aria-label="播放或暂停">▶</button>
-        <button class="c-btn mono" type="button" data-cmd="next" aria-label="下一首">››</button>
-        <div class="stage-progress">
-          <span class="mono" data-stage-cur>0:00</span>
-          <div class="stage-track" data-stage-track><div class="stage-track-fill" data-stage-fill></div></div>
-          <span class="mono" data-stage-dur>0:00</span>
-        </div>
-      </div>
-    </div>
+    <!-- v35：弹窗已删——卡片即播放器（CD 封面 + 状态 + 上/播/下 + 可拖进度） -->
 
     <!-- 最近动态（FeedItem 生活向条目，同源不同视图） -->
     <section class="life-feed" data-reveal-group aria-label="最近动态">
@@ -583,252 +545,62 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     background: var(--color-ink);
   }
 
-  /* ── v34 歌词演出（主站自绘；深色沉浸，发光仅限演出内） ── */
-  .stage-overlay {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 120;
-    display: flex;
-    flex-direction: column;
-    background: radial-gradient(900px 560px at 50% 12%, rgba(177, 161, 222, 0.14), transparent 62%), #0F0F14;
-    color: #F4F5F9;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 400ms var(--ease-space), visibility 400ms;
-    overflow: hidden;
-  }
-
-  .stage-overlay.is-open {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  /* 星芒飘浮（明显：±16px 漂移 + 明暗呼吸；reduce 静止；纪念日豁免已登记 global.css） */
-  .spark {
-    position: absolute;
-    color: rgba(201, 187, 255, 0.55);
-    font-size: 11px;
-    animation: spark-float 6s ease-in-out infinite;
-  }
-
-  .spark:nth-child(1) { top: 14%; left: 12%; }
-  .spark:nth-child(2) { top: 24%; right: 16%; font-size: 9px; color: rgba(247, 205, 225, 0.6); }
-  .spark:nth-child(3) { top: 64%; left: 20%; font-size: 10px; }
-  .spark:nth-child(4) { top: 42%; right: 26%; font-size: 8px; color: rgba(173, 216, 240, 0.6); }
-  .spark:nth-child(5) { top: 12%; left: 46%; font-size: 7px; color: rgba(247, 205, 225, 0.5); }
-  .spark:nth-child(6) { top: 62%; left: 8%; font-size: 9px; }
-  .spark:nth-child(7) { top: 72%; right: 12%; font-size: 7px; color: rgba(173, 216, 240, 0.55); }
-  .spark:nth-child(8) { top: 34%; left: 32%; font-size: 6px; color: rgba(244, 245, 249, 0.45); }
-  .spark:nth-child(9) { bottom: 20%; right: 32%; font-size: 8px; color: rgba(201, 187, 255, 0.5); }
-  .spark:nth-child(10) { top: 22%; left: 68%; font-size: 6px; }
-
-  .spark-2 { animation-duration: 7.5s; animation-delay: -2s; }
-  .spark-3 { animation-duration: 9s; animation-delay: -4s; }
-
-  @keyframes spark-float {
-    0% { transform: translate(0, 0); opacity: 0.35; }
-    50% { transform: translate(6px, -16px); opacity: 1; }
-    100% { transform: translate(0, 0); opacity: 0.35; }
-  }
-
-  .stage-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.35rem 2.2rem;
+  /* ── v35 卡片播放器控制（弹窗已删：上/播/下 + 可拖进度） ── */
+  .step-btn {
+    width: 38px;
+    height: 38px;
     flex: none;
-  }
-
-  .stage-eyebrow {
-    font-size: 0.56rem;
-    letter-spacing: 0.32em;
-    color: rgba(244, 245, 249, 0.52);
-  }
-
-  .stage-close {
-    border: 1px solid rgba(244, 245, 249, 0.28);
+    border-radius: 50%;
+    border: 1px solid var(--hair-frame);
     background: transparent;
-    color: rgba(244, 245, 249, 0.8);
-    border-radius: 999px;
-    padding: 0.55rem 1.25rem;
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
+    color: var(--color-ink);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    transition: background 200ms var(--ease-space), color 200ms;
+    transition: background 200ms var(--ease-space), transform 200ms var(--ease-space);
   }
 
-  .stage-close:hover {
-    background: rgba(244, 245, 249, 0.12);
-    color: #F4F5F9;
+  .step-btn:hover {
+    background: var(--color-bg-soft);
+    transform: translateY(-1px);
   }
 
-  .stage-core {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6.5rem;
-    padding: 1rem 2.2rem 2.4rem;
-    min-height: 0;
-  }
-
-  .stage-disc-wrap {
-    width: 320px;
-    height: 320px;
-    flex: none;
-    position: relative;
-    border: none;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-  }
-
-  .stage-disc {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: linear-gradient(140deg, #4a3f66 0%, #7a6ba8 38%, #b1a1de 62%, #f7cde1 88%);
-    background-size: cover;
-    background-position: center;
-    box-shadow: 0 32px 72px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 64px rgba(177, 161, 222, 0.22);
-    position: relative;
-    animation: cd-spin 8s linear infinite;
-    animation-play-state: paused;
-  }
-
-  .stage-disc.is-playing {
-    animation-play-state: running;
-  }
-
-  .stage-disc::before {
-    content: "";
-    position: absolute;
-    top: 3%;
-    left: 6%;
-    width: 26%;
-    height: 14%;
-    border-radius: 50%;
-    background: linear-gradient(128deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0));
-    transform: rotate(-28deg);
-  }
-
-  .stage-disc::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 62px;
-    height: 62px;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    background: #0F0F14;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-  }
-
-  .stage-lyrics {
-    max-width: 560px;
-    text-align: center;
-  }
-
-  .stage-l-prev,
-  .stage-l-next {
-    font-size: 1.02rem;
-    letter-spacing: 0.08em;
-    color: rgba(244, 245, 249, 0.32);
-    margin: 1.05rem 0;
-    min-height: 1.5em;
-  }
-
-  .stage-l-now {
-    font-size: 1.85rem;
-    letter-spacing: 0.12em;
-    color: #F7F8FC;
-    text-shadow: 0 0 18px rgba(201, 187, 255, 0.75), 0 0 46px rgba(177, 161, 222, 0.4);
-    padding: 0.85rem 0;
-    min-height: 1.6em;
-  }
-
-  .stage-song-info {
-    margin-top: 2.8rem;
-  }
-
-  .stage-song-title {
-    font-size: 1.32rem;
-    letter-spacing: 0.18em;
-  }
-
-  .stage-song-artist {
-    margin-top: 0.55rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.32em;
-    color: rgba(244, 245, 249, 0.56);
-  }
-
-  .stage-controls {
-    flex: none;
-    margin: 0 2.2rem 2.2rem;
-    border: 1px solid rgba(244, 245, 249, 0.22);
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 20px;
-    padding: 1.05rem 1.85rem;
-    display: flex;
-    align-items: center;
-    gap: 1.55rem;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-
-  .c-btn {
-    width: 46px;
-    height: 46px;
-    flex: none;
-    border-radius: 50%;
-    border: 1px solid rgba(244, 245, 249, 0.28);
-    background: transparent;
-    color: rgba(244, 245, 249, 0.85);
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background 200ms var(--ease-space);
-  }
-
-  .c-btn:hover {
-    background: rgba(244, 245, 249, 0.12);
-  }
-
-  .c-play {
-    width: 52px;
-    height: 52px;
-    background: #F4F5F9;
-    color: #0F0F14;
-    border: none;
-    font-size: 1rem;
-  }
-
-  .c-play:hover {
-    background: #ffffff;
-  }
-
-  .stage-progress {
-    flex: 1;
+  .stage-cmdline {
     display: flex;
     align-items: center;
     gap: 0.95rem;
+    margin: 1.15rem 0 0;
+    padding: 0.85rem 1.15rem 0;
+    border-top: 1px solid var(--hair-frame);
     font-size: 0.62rem;
     letter-spacing: 0.14em;
-    color: rgba(244, 245, 249, 0.5);
+    color: var(--color-ink-2);
   }
 
+  .cmd-prompt {
+    flex: none;
+    color: var(--color-ink-2);
+  }
+
+  .cmd-time {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 可拖进度条（v35：鼠标 + 触摸拖动 seek） */
   .stage-track {
     flex: 1;
-    height: 3px;
-    background: rgba(244, 245, 249, 0.22);
+    height: 4px;
+    min-width: 120px;
+    background: rgba(31, 27, 51, 0.1);
     border-radius: 99px;
     position: relative;
     cursor: pointer;
+    touch-action: none;
+  }
+
+  .stage-track:hover {
+    height: 6px;
   }
 
   .stage-track-fill {
@@ -837,7 +609,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     left: 0;
     bottom: 0;
     width: 0%;
-    background: linear-gradient(90deg, #B1A1DE, #F7CDE1);
+    background: linear-gradient(90deg, #7a6ba8, #b1a1de);
     border-radius: 99px;
     pointer-events: none;
   }
@@ -845,50 +617,15 @@ const song = mediaNotes.find((note) => note.kind === '在听');
   .stage-track-fill::after {
     content: "";
     position: absolute;
-    right: -5px;
+    right: -6px;
     top: 50%;
     transform: translateY(-50%);
-    width: 11px;
-    height: 11px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    background: #F4F5F9;
-  }
-
-  /* 演出内移动端：竖排收窄 */
-  @media (max-width: 959px) {
-    .stage-core {
-      flex-direction: column;
-      gap: 2.2rem;
-      justify-content: center;
-    }
-
-    .stage-disc-wrap {
-      width: 200px;
-      height: 200px;
-    }
-
-    .stage-l-now {
-      font-size: 1.35rem;
-    }
-
-    .stage-song-info {
-      margin-top: 1.6rem;
-    }
-
-    .stage-controls {
-      flex-wrap: wrap;
-      gap: 0.95rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .spark {
-      animation: none;
-    }
-
-    .stage-disc {
-      animation: none;
-    }
+    background: var(--color-ink);
+    border: 2px solid var(--color-bg);
+    box-shadow: 0 2px 8px rgba(31, 27, 51, 0.28);
   }
 
   .music-artist {
@@ -1014,7 +751,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
 <script>
   import { FOLIA_BASE } from '../lib/config';
 
-  // v34：播放三方同步（同一 audio 唯一内核）——jy:track 曲目 / jy:player 播放态 / jy:player-tick 时间轴
+  // v35：卡片即播放器（弹窗已删）——jy:track 曲目 / jy:player 播放态 / jy:player-tick 时间轴
   interface TrackDetail {
     id?: number;
     title?: string;
@@ -1034,16 +771,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
   const cdMini = document.querySelector('[data-cd-mini]');
   const mediaSong = document.querySelector('.cd-note [data-media-song]');
   const mediaMeta = document.querySelector('.cd-note [data-media-meta]');
-  const musicCard = document.querySelector('.music-card');
   const musicEyebrow = document.querySelector('.music-eyebrow');
-
-  // ── 歌词演出（主站自绘：深色沉浸 + 封面碟 + LRC 三层歌词；发光仅限演出内） ──
-  const overlay = document.querySelector('[data-stage-overlay]');
-  const stageDisc = document.querySelector('[data-stage-disc]');
-  const lPrev = document.querySelector('[data-l-prev]');
-  const lNow = document.querySelector('[data-l-now]');
-  const lNext = document.querySelector('[data-l-next]');
-  const stagePlay = document.querySelector('[data-stage-play]');
   const stageCur = document.querySelector('[data-stage-cur]');
   const stageDur = document.querySelector('[data-stage-dur]');
   const stageFill = document.querySelector('[data-stage-fill]');
@@ -1076,31 +804,10 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     return m + ':' + (ss < 10 ? '0' : '') + ss;
   };
 
-  const setLive = (on: boolean): void => {
-    if (musicCard) musicCard.classList.toggle('is-live', on);
-  };
-
-  const openStage = (): void => {
-    if (!overlay) return;
-    overlay.classList.add('is-open');
-    overlay.setAttribute('aria-hidden', 'false');
-    setLive(true);
-  };
-
-  // 「收起」= 隐藏演出壳（同一 audio 继续放——统一内核天然满足）
-  const closeStage = (): void => {
-    if (!overlay) return;
-    overlay.classList.remove('is-open');
-    overlay.setAttribute('aria-hidden', 'true');
-    setLive(false);
-  };
-
   // 播放态上卡（眉标 + 碟转/停 = 真实播放状态）
   const setPlayingUI = (playing: boolean): void => {
     if (cdDisc) cdDisc.classList.toggle('is-playing', playing);
-    if (stageDisc) stageDisc.classList.toggle('is-playing', playing);
     if (musicEyebrow) musicEyebrow.textContent = playing ? '♪ 正在播放' : '♪ 已暂停';
-    if (stagePlay) stagePlay.textContent = playing ? '❚❚' : '▶';
   };
 
   const updateLyricAt = (t: number): void => {
@@ -1111,9 +818,6 @@ const song = mediaNotes.find((note) => note.kind === '在听');
       else break;
     }
     const line = lyricLines[i] ? lyricLines[i].text : '';
-    if (lNow) lNow.textContent = line ? '「' + line + '」' : '未在播放';
-    if (lPrev) lPrev.textContent = i > 0 ? '「' + lyricLines[i - 1].text + '」' : '';
-    if (lNext) lNext.textContent = i < lyricLines.length - 1 ? '「' + lyricLines[i + 1].text + '」' : '';
     if (songLyric && line) songLyric.textContent = '「' + line + '」';
   };
 
@@ -1133,7 +837,6 @@ const song = mediaNotes.find((note) => note.kind === '在听');
 
   document.addEventListener('jy:track', (e) => {
     const d = ((e as CustomEvent<TrackDetail>).detail || {}) as TrackDetail;
-    // v34：data-stage-song/artist 有两处（音乐卡 + 演出壳）——querySelector 只命中第一个，须全量更新
     songTitles.forEach((el) => {
       el.textContent = d.title || '未在播放';
     });
@@ -1146,7 +849,6 @@ const song = mediaNotes.find((note) => note.kind === '在听');
       const css = 'url("' + d.pic + '")';
       if (cdDisc) cdDisc.style.backgroundImage = css;
       if (cdMini) cdMini.style.backgroundImage = css;
-      if (stageDisc) (stageDisc as HTMLElement).style.backgroundImage = css;
     }
     if (d.id) setLyric(d.id);
   });
@@ -1162,9 +864,10 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     if (stageCur) stageCur.textContent = fmtTime(d.t || 0);
     if (stageDur) stageDur.textContent = fmtTime(d.d || 0);
     if (stageFill && d.d) (stageFill as HTMLElement).style.width = Math.min(100, ((d.t || 0) / d.d) * 100) + '%';
+    if (stageTrack && d.d) stageTrack.setAttribute('aria-valuenow', String(Math.round(((d.t || 0) / d.d) * 100)));
   });
 
-  // 控制条指令（同一 audio：MiniPlayer 监听执行）
+  // 控制指令（同一 audio：MiniPlayer 监听执行）
   document.querySelectorAll<HTMLElement>('[data-cmd]').forEach((el) => {
     el.addEventListener('click', () => {
       const cmd = el.getAttribute('data-cmd') || '';
@@ -1172,25 +875,58 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     });
   });
 
-  // 进度条点击 seek
+  // v35：进度条拖动 seek（鼠标 + 触摸；拖动中实时跳，跟手）
+  const seekFromClientX = (clientX: number): void => {
+    if (!stageTrack) return;
+    const rect = (stageTrack as HTMLElement).getBoundingClientRect();
+    const audio = document.querySelector<HTMLAudioElement>('[data-mini-audio]');
+    const d = audio ? audio.duration : 0;
+    if (rect.width > 0 && d && isFinite(d)) {
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      audio.currentTime = ratio * d;
+    }
+  };
+
+  let dragging = false;
   if (stageTrack) {
-    stageTrack.addEventListener('click', (e) => {
-      const rect = (stageTrack as HTMLElement).getBoundingClientRect();
+    stageTrack.addEventListener('mousedown', (e) => {
+      dragging = true;
+      seekFromClientX((e as MouseEvent).clientX);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (dragging) seekFromClientX((e as MouseEvent).clientX);
+    });
+    window.addEventListener('mouseup', () => {
+      dragging = false;
+    });
+    stageTrack.addEventListener(
+      'touchstart',
+      (e) => {
+        dragging = true;
+        const t = (e as TouchEvent).touches[0];
+        if (t) seekFromClientX(t.clientX);
+      },
+      { passive: true }
+    );
+    stageTrack.addEventListener(
+      'touchmove',
+      (e) => {
+        if (!dragging) return;
+        const t = (e as TouchEvent).touches[0];
+        if (t) seekFromClientX(t.clientX);
+      },
+      { passive: true }
+    );
+    window.addEventListener('touchend', () => {
+      dragging = false;
+    });
+    // 键盘：方向键微调（accessibility）
+    stageTrack.addEventListener('keydown', (e) => {
       const audio = document.querySelector<HTMLAudioElement>('[data-mini-audio]');
       const d = audio ? audio.duration : 0;
-      if (rect.width > 0 && d && isFinite(d)) {
-        const t = Math.max(0, Math.min(1, ((e as MouseEvent).clientX - rect.left) / rect.width)) * d;
-        document.dispatchEvent(new CustomEvent('jy:player-cmd', { detail: { cmd: 'seek', t: t } }));
-      }
+      if (!audio || !d || !isFinite(d)) return;
+      if ((e as KeyboardEvent).key === 'ArrowRight') audio.currentTime = Math.min(d, audio.currentTime + 5);
+      else if ((e as KeyboardEvent).key === 'ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime - 5);
     });
   }
-
-  // 开演出（CD 碟 + ▶ 图标钮都开）
-  const stageEls = document.querySelectorAll<HTMLElement>('[data-song-stage]');
-  stageEls.forEach((el) => el.addEventListener('click', openStage));
-  const closeBtn = document.querySelector('[data-stage-close]');
-  if (closeBtn) closeBtn.addEventListener('click', closeStage);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeStage();
-  });
 </script>
