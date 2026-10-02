@@ -120,6 +120,13 @@ const fallbackTrack = '未在播放';
     playCurrent();
   };
 
+  const prev = (): void => {
+    if (!tracks.length) return;
+    index = (index - 1 + tracks.length) % tracks.length;
+    renderTrack();
+    playCurrent();
+  };
+
   const loadPlaylist = async (): Promise<void> => {
     if (!base || !playlistId) return;
     try {
@@ -142,6 +149,40 @@ const fallbackTrack = '未在播放';
   };
 
   if (audio) audio.addEventListener('ended', next);
+
+  // v34：播放状态三方同步协议（CD 卡 / 歌词演出同源监听——同一 audio 唯一内核）
+  if (audio) {
+    const broadcastState = (playing: boolean): void => {
+      document.dispatchEvent(
+        new CustomEvent('jy:player', {
+          detail: { playing: playing, t: audio.currentTime || 0, d: audio.duration || 0 },
+        })
+      );
+    };
+    audio.addEventListener('play', () => broadcastState(true));
+    audio.addEventListener('pause', () => broadcastState(false));
+    audio.addEventListener('timeupdate', () => {
+      document.dispatchEvent(
+        new CustomEvent('jy:player-tick', {
+          detail: { t: audio.currentTime || 0, d: audio.duration || 0 },
+        })
+      );
+    });
+  }
+
+  // v34：外部控制指令（歌词演出控制条 / CD 卡播放钮）
+  document.addEventListener('jy:player-cmd', (e) => {
+    const detail = ((e as CustomEvent<{ cmd?: string; t?: number }>).detail || {}) as { cmd?: string; t?: number };
+    if (detail.cmd === 'toggle') {
+      if (toggle) toggle.click();
+    } else if (detail.cmd === 'next') {
+      next();
+    } else if (detail.cmd === 'prev') {
+      prev();
+    } else if (detail.cmd === 'seek' && audio && typeof detail.t === 'number') {
+      audio.currentTime = detail.t;
+    }
+  });
 
   if (toggle) {
     toggle.addEventListener('click', () => {

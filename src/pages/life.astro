@@ -94,10 +94,10 @@ const song = mediaNotes.find((note) => note.kind === '在听');
             <span class="cd-disc" data-cd-disc aria-hidden="true"></span>
           </button>
           <div class="music-info">
-            <p class="mono music-eyebrow">♪ 正在播放</p>
+            <p class="mono music-eyebrow">♪ 待播放</p>
             <p class="stage-song" data-stage-song>未在播放</p>
             <p class="mono music-artist" data-stage-artist></p>
-            <p class="stage-lyric" data-stage-lyric>「船向西飞，夜还长。」</p>
+            <p class="stage-lyric" data-stage-lyric>未在播放</p>
             <div class="music-actions">
               <button class="stage-go" data-song-stage type="button" aria-label="进入歌词演出" title="进入歌词演出">
                 <svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><path d="M3 1.5 L11.5 6.5 L3 11.5 Z" fill="currentColor"></path></svg>
@@ -113,9 +113,48 @@ const song = mediaNotes.find((note) => note.kind === '在听');
       </div>
     </section>
 
-    <!-- 全屏歌词演出壳（Folia Stage；懒加载注入 iframe，发光仅限演出内） -->
+    <!-- 歌词演出（v34 主站自绘：同一 audio 唯一内核，发光仅限演出内） -->
     <div class="stage-overlay" data-stage-overlay aria-hidden="true">
-      <button class="stage-close mono" type="button" data-stage-close>收起</button>
+      <div class="stage-sparks" aria-hidden="true">
+        <span class="spark">✦</span>
+        <span class="spark spark-2">✧</span>
+        <span class="spark spark-3">✦</span>
+        <span class="spark spark-2">✧</span>
+        <span class="spark spark-3">✦</span>
+        <span class="spark">✧</span>
+        <span class="spark spark-3">✦</span>
+        <span class="spark spark-2">✧</span>
+        <span class="spark">✦</span>
+        <span class="spark spark-2">✧</span>
+      </div>
+      <div class="stage-top">
+        <p class="mono stage-eyebrow">♪ LYRICS STAGE / 歌词演出</p>
+        <button class="stage-close mono" type="button" data-stage-close>收起</button>
+      </div>
+      <div class="stage-core">
+        <button class="stage-disc-wrap" type="button" data-cmd="toggle" aria-label="播放或暂停">
+          <span class="stage-disc" data-stage-disc aria-hidden="true"></span>
+        </button>
+        <div class="stage-lyrics">
+          <p class="stage-l-prev" data-l-prev></p>
+          <p class="stage-l-now" data-l-now>未在播放</p>
+          <p class="stage-l-next" data-l-next></p>
+          <div class="stage-song-info">
+            <p class="stage-song-title" data-stage-song>未在播放</p>
+            <p class="mono stage-song-artist" data-stage-artist></p>
+          </div>
+        </div>
+      </div>
+      <div class="stage-controls">
+        <button class="c-btn mono" type="button" data-cmd="prev" aria-label="上一首">‹‹</button>
+        <button class="c-btn c-play" type="button" data-cmd="toggle" data-stage-play aria-label="播放或暂停">▶</button>
+        <button class="c-btn mono" type="button" data-cmd="next" aria-label="下一首">››</button>
+        <div class="stage-progress">
+          <span class="mono" data-stage-cur>0:00</span>
+          <div class="stage-track" data-stage-track><div class="stage-track-fill" data-stage-fill></div></div>
+          <span class="mono" data-stage-dur>0:00</span>
+        </div>
+      </div>
     </div>
 
     <!-- 最近动态（FeedItem 生活向条目，同源不同视图） -->
@@ -494,7 +533,13 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     background-position: center;
     box-shadow: 0 10px 30px rgba(155, 138, 168, 0.18);
     animation: cd-spin 8s linear infinite;
+    animation-play-state: paused;
     position: relative;
+  }
+
+  /* v34：碟转/停 = 真实播放状态（jy:player 驱动） */
+  .cd-disc.is-playing {
+    animation-play-state: running;
   }
 
   .cd-disc::after {
@@ -536,6 +581,314 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     margin-right: 7px;
     border-radius: 50%;
     background: var(--color-ink);
+  }
+
+  /* ── v34 歌词演出（主站自绘；深色沉浸，发光仅限演出内） ── */
+  .stage-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 120;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(900px 560px at 50% 12%, rgba(177, 161, 222, 0.14), transparent 62%), #0F0F14;
+    color: #F4F5F9;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 400ms var(--ease-space), visibility 400ms;
+    overflow: hidden;
+  }
+
+  .stage-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* 星芒飘浮（明显：±16px 漂移 + 明暗呼吸；reduce 静止；纪念日豁免已登记 global.css） */
+  .spark {
+    position: absolute;
+    color: rgba(201, 187, 255, 0.55);
+    font-size: 11px;
+    animation: spark-float 6s ease-in-out infinite;
+  }
+
+  .spark:nth-child(1) { top: 14%; left: 12%; }
+  .spark:nth-child(2) { top: 24%; right: 16%; font-size: 9px; color: rgba(247, 205, 225, 0.6); }
+  .spark:nth-child(3) { top: 64%; left: 20%; font-size: 10px; }
+  .spark:nth-child(4) { top: 42%; right: 26%; font-size: 8px; color: rgba(173, 216, 240, 0.6); }
+  .spark:nth-child(5) { top: 12%; left: 46%; font-size: 7px; color: rgba(247, 205, 225, 0.5); }
+  .spark:nth-child(6) { top: 62%; left: 8%; font-size: 9px; }
+  .spark:nth-child(7) { top: 72%; right: 12%; font-size: 7px; color: rgba(173, 216, 240, 0.55); }
+  .spark:nth-child(8) { top: 34%; left: 32%; font-size: 6px; color: rgba(244, 245, 249, 0.45); }
+  .spark:nth-child(9) { bottom: 20%; right: 32%; font-size: 8px; color: rgba(201, 187, 255, 0.5); }
+  .spark:nth-child(10) { top: 22%; left: 68%; font-size: 6px; }
+
+  .spark-2 { animation-duration: 7.5s; animation-delay: -2s; }
+  .spark-3 { animation-duration: 9s; animation-delay: -4s; }
+
+  @keyframes spark-float {
+    0% { transform: translate(0, 0); opacity: 0.35; }
+    50% { transform: translate(6px, -16px); opacity: 1; }
+    100% { transform: translate(0, 0); opacity: 0.35; }
+  }
+
+  .stage-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.35rem 2.2rem;
+    flex: none;
+  }
+
+  .stage-eyebrow {
+    font-size: 0.56rem;
+    letter-spacing: 0.32em;
+    color: rgba(244, 245, 249, 0.52);
+  }
+
+  .stage-close {
+    border: 1px solid rgba(244, 245, 249, 0.28);
+    background: transparent;
+    color: rgba(244, 245, 249, 0.8);
+    border-radius: 999px;
+    padding: 0.55rem 1.25rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    transition: background 200ms var(--ease-space), color 200ms;
+  }
+
+  .stage-close:hover {
+    background: rgba(244, 245, 249, 0.12);
+    color: #F4F5F9;
+  }
+
+  .stage-core {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6.5rem;
+    padding: 1rem 2.2rem 2.4rem;
+    min-height: 0;
+  }
+
+  .stage-disc-wrap {
+    width: 320px;
+    height: 320px;
+    flex: none;
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .stage-disc {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(140deg, #4a3f66 0%, #7a6ba8 38%, #b1a1de 62%, #f7cde1 88%);
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 32px 72px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0 64px rgba(177, 161, 222, 0.22);
+    position: relative;
+    animation: cd-spin 8s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .stage-disc.is-playing {
+    animation-play-state: running;
+  }
+
+  .stage-disc::before {
+    content: "";
+    position: absolute;
+    top: 3%;
+    left: 6%;
+    width: 26%;
+    height: 14%;
+    border-radius: 50%;
+    background: linear-gradient(128deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0));
+    transform: rotate(-28deg);
+  }
+
+  .stage-disc::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 62px;
+    height: 62px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #0F0F14;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  .stage-lyrics {
+    max-width: 560px;
+    text-align: center;
+  }
+
+  .stage-l-prev,
+  .stage-l-next {
+    font-size: 1.02rem;
+    letter-spacing: 0.08em;
+    color: rgba(244, 245, 249, 0.32);
+    margin: 1.05rem 0;
+    min-height: 1.5em;
+  }
+
+  .stage-l-now {
+    font-size: 1.85rem;
+    letter-spacing: 0.12em;
+    color: #F7F8FC;
+    text-shadow: 0 0 18px rgba(201, 187, 255, 0.75), 0 0 46px rgba(177, 161, 222, 0.4);
+    padding: 0.85rem 0;
+    min-height: 1.6em;
+  }
+
+  .stage-song-info {
+    margin-top: 2.8rem;
+  }
+
+  .stage-song-title {
+    font-size: 1.32rem;
+    letter-spacing: 0.18em;
+  }
+
+  .stage-song-artist {
+    margin-top: 0.55rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.32em;
+    color: rgba(244, 245, 249, 0.56);
+  }
+
+  .stage-controls {
+    flex: none;
+    margin: 0 2.2rem 2.2rem;
+    border: 1px solid rgba(244, 245, 249, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 1.05rem 1.85rem;
+    display: flex;
+    align-items: center;
+    gap: 1.55rem;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .c-btn {
+    width: 46px;
+    height: 46px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px solid rgba(244, 245, 249, 0.28);
+    background: transparent;
+    color: rgba(244, 245, 249, 0.85);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 200ms var(--ease-space);
+  }
+
+  .c-btn:hover {
+    background: rgba(244, 245, 249, 0.12);
+  }
+
+  .c-play {
+    width: 52px;
+    height: 52px;
+    background: #F4F5F9;
+    color: #0F0F14;
+    border: none;
+    font-size: 1rem;
+  }
+
+  .c-play:hover {
+    background: #ffffff;
+  }
+
+  .stage-progress {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.95rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: rgba(244, 245, 249, 0.5);
+  }
+
+  .stage-track {
+    flex: 1;
+    height: 3px;
+    background: rgba(244, 245, 249, 0.22);
+    border-radius: 99px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .stage-track-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    background: linear-gradient(90deg, #B1A1DE, #F7CDE1);
+    border-radius: 99px;
+    pointer-events: none;
+  }
+
+  .stage-track-fill::after {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #F4F5F9;
+  }
+
+  /* 演出内移动端：竖排收窄 */
+  @media (max-width: 959px) {
+    .stage-core {
+      flex-direction: column;
+      gap: 2.2rem;
+      justify-content: center;
+    }
+
+    .stage-disc-wrap {
+      width: 200px;
+      height: 200px;
+    }
+
+    .stage-l-now {
+      font-size: 1.35rem;
+    }
+
+    .stage-song-info {
+      margin-top: 1.6rem;
+    }
+
+    .stage-controls {
+      flex-wrap: wrap;
+      gap: 0.95rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spark {
+      animation: none;
+    }
+
+    .stage-disc {
+      animation: none;
+    }
   }
 
   .music-artist {
@@ -659,9 +1012,23 @@ const song = mediaNotes.find((note) => note.kind === '在听');
 </style>
 
 <script>
-  // v31：CD 机卡与 MiniPlayer 同源（jy:track 广播）+ 真歌词行
-  const songTitle = document.querySelector('[data-stage-song]');
-  const songArtist = document.querySelector('[data-stage-artist]');
+  import { FOLIA_BASE } from '../lib/config';
+
+  // v34：播放三方同步（同一 audio 唯一内核）——jy:track 曲目 / jy:player 播放态 / jy:player-tick 时间轴
+  interface TrackDetail {
+    id?: number;
+    title?: string;
+    artist?: string;
+    pic?: string;
+  }
+
+  interface LyricLine {
+    t: number;
+    text: string;
+  }
+
+  const songTitles = document.querySelectorAll('[data-stage-song]');
+  const songArtists = document.querySelectorAll('[data-stage-artist]');
   const songLyric = document.querySelector('[data-stage-lyric]');
   const cdDisc = document.querySelector('[data-cd-disc]');
   const cdMini = document.querySelector('[data-cd-mini]');
@@ -670,96 +1037,159 @@ const song = mediaNotes.find((note) => note.kind === '在听');
   const musicCard = document.querySelector('.music-card');
   const musicEyebrow = document.querySelector('.music-eyebrow');
 
-  // v32：小窗演出状态上卡片（跨域读不到 Folia 内部播放态——如实标注「小窗演出中」）
-  const setLive = (on: boolean): void => {
-    if (musicCard) musicCard.classList.toggle('is-live', on);
-    if (musicEyebrow) musicEyebrow.textContent = on ? '♪ 小窗演出中' : '♪ 正在播放';
+  // ── 歌词演出（主站自绘：深色沉浸 + 封面碟 + LRC 三层歌词；发光仅限演出内） ──
+  const overlay = document.querySelector('[data-stage-overlay]');
+  const stageDisc = document.querySelector('[data-stage-disc]');
+  const lPrev = document.querySelector('[data-l-prev]');
+  const lNow = document.querySelector('[data-l-now]');
+  const lNext = document.querySelector('[data-l-next]');
+  const stagePlay = document.querySelector('[data-stage-play]');
+  const stageCur = document.querySelector('[data-stage-cur]');
+  const stageDur = document.querySelector('[data-stage-dur]');
+  const stageFill = document.querySelector('[data-stage-fill]');
+  const stageTrack = document.querySelector('[data-stage-track]');
+
+  let lyricLines: LyricLine[] = [];
+
+  const parseLrc = (lrc: string): LyricLine[] => {
+    const out: LyricLine[] = [];
+    // 制作行黑名单（作词/作曲/编曲…LRC 头部信息不是歌词）
+    const creditRe = /^(作词|作曲|编曲|制作人|制作|监制|录音|混音|母带|和声|吉他|贝斯|鼓|键盘|弦乐|出品|原唱|翻唱|录音室|混音师|词：|曲：)/;
+    String(lrc || '')
+      .split('\n')
+      .forEach((line) => {
+        const m = line.match(/\[(\d+):(\d+)(?:\.(\d+))?\]/);
+        const text = line.replace(/\[[^\]]*\]/g, '').trim();
+        if (m && text && !creditRe.test(text)) {
+          const t = parseInt(m[1], 10) * 60 + parseInt(m[2], 10) + (m[3] ? parseInt(m[3], 10) / 100 : 0);
+          out.push({ t: t, text: text });
+        }
+      });
+    out.sort((a, b) => a.t - b.t);
+    return out;
   };
 
-  interface TrackDetail {
-    id?: number;
-    title?: string;
-    artist?: string;
-    pic?: string;
-  }
+  const fmtTime = (s: number): string => {
+    if (!isFinite(s) || s < 0) s = 0;
+    const m = Math.floor(s / 60);
+    const ss = Math.floor(s % 60);
+    return m + ':' + (ss < 10 ? '0' : '') + ss;
+  };
+
+  const setLive = (on: boolean): void => {
+    if (musicCard) musicCard.classList.toggle('is-live', on);
+  };
+
+  const openStage = (): void => {
+    if (!overlay) return;
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    setLive(true);
+  };
+
+  // 「收起」= 隐藏演出壳（同一 audio 继续放——统一内核天然满足）
+  const closeStage = (): void => {
+    if (!overlay) return;
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    setLive(false);
+  };
+
+  // 播放态上卡（眉标 + 碟转/停 = 真实播放状态）
+  const setPlayingUI = (playing: boolean): void => {
+    if (cdDisc) cdDisc.classList.toggle('is-playing', playing);
+    if (stageDisc) stageDisc.classList.toggle('is-playing', playing);
+    if (musicEyebrow) musicEyebrow.textContent = playing ? '♪ 正在播放' : '♪ 已暂停';
+    if (stagePlay) stagePlay.textContent = playing ? '❚❚' : '▶';
+  };
+
+  const updateLyricAt = (t: number): void => {
+    if (!lyricLines.length) return;
+    let i = 0;
+    for (let k = 0; k < lyricLines.length; k++) {
+      if (lyricLines[k].t <= t) i = k;
+      else break;
+    }
+    const line = lyricLines[i] ? lyricLines[i].text : '';
+    if (lNow) lNow.textContent = line ? '「' + line + '」' : '未在播放';
+    if (lPrev) lPrev.textContent = i > 0 ? '「' + lyricLines[i - 1].text + '」' : '';
+    if (lNext) lNext.textContent = i < lyricLines.length - 1 ? '「' + lyricLines[i + 1].text + '」' : '';
+    if (songLyric && line) songLyric.textContent = '「' + line + '」';
+  };
 
   const setLyric = (id: number): void => {
+    lyricLines = [];
+    if (!id || !FOLIA_BASE) return;
     fetch(FOLIA_BASE + '/api/lyric?id=' + id)
-      .then((r) => r.json())
-      .then((d) => {
-        const raw = (d && d.lrc && d.lrc.lyric) || '';
-        const line = raw
-          .split('\n')
-          .map((s: string) => s.replace(/^\[[^\]]*\]/, '').trim())
-          .find((s: string) => s && !/^(作词|作曲|编曲|制作|和声|监制|录音|混音|OP|SP)/.test(s));
-        if (songLyric) songLyric.textContent = line ? '「' + line + '」' : '';
+      .then((res) => res.json())
+      .then((data: { lrc?: { lyric?: string } }) => {
+        lyricLines = parseLrc(data && data.lrc && data.lrc.lyric ? data.lrc.lyric : '');
+        if (songLyric && lyricLines.length) songLyric.textContent = '「' + lyricLines[0].text + '」';
       })
       .catch(() => {
-        // 歌词拉不到就保持示例行
+        // 歌词拿不到就安静（不打扰播放）
       });
   };
 
   document.addEventListener('jy:track', (e) => {
     const d = ((e as CustomEvent<TrackDetail>).detail || {}) as TrackDetail;
-    if (songTitle) songTitle.textContent = d.title || '未在播放';
-    if (songArtist) songArtist.textContent = d.artist || '';
-    // 音乐位三卡小卡（只动 cd-note，书/游戏卡不受影响）
+    // v34：data-stage-song/artist 有两处（音乐卡 + 演出壳）——querySelector 只命中第一个，须全量更新
+    songTitles.forEach((el) => {
+      el.textContent = d.title || '未在播放';
+    });
+    songArtists.forEach((el) => {
+      el.textContent = d.artist || '';
+    });
     if (mediaSong) mediaSong.textContent = d.title || '未在播放';
     if (mediaMeta) mediaMeta.textContent = d.artist || '';
     if (d.pic) {
       const css = 'url("' + d.pic + '")';
       if (cdDisc) cdDisc.style.backgroundImage = css;
       if (cdMini) cdMini.style.backgroundImage = css;
+      if (stageDisc) (stageDisc as HTMLElement).style.backgroundImage = css;
     }
     if (d.id) setLyric(d.id);
   });
 
-  // 听歌舞台：点击才注入 Folia Stage iframe（演出引擎懒加载）；关闭即释放
-  import { FOLIA_BASE, FOLIA_STAGE_URL } from '../lib/config';
+  document.addEventListener('jy:player', (e) => {
+    const d = ((e as CustomEvent<{ playing?: boolean }>).detail || {}) as { playing?: boolean };
+    setPlayingUI(!!d.playing);
+  });
 
-  const stageEls = document.querySelectorAll<HTMLElement>('[data-song-stage]');
-  const overlay = document.querySelector<HTMLElement>('[data-stage-overlay]');
-  const closeBtn = document.querySelector<HTMLButtonElement>('[data-stage-close]');
+  document.addEventListener('jy:player-tick', (e) => {
+    const d = ((e as CustomEvent<{ t?: number; d?: number }>).detail || {}) as { t?: number; d?: number };
+    updateLyricAt(d.t || 0);
+    if (stageCur) stageCur.textContent = fmtTime(d.t || 0);
+    if (stageDur) stageDur.textContent = fmtTime(d.d || 0);
+    if (stageFill && d.d) (stageFill as HTMLElement).style.width = Math.min(100, ((d.t || 0) / d.d) * 100) + '%';
+  });
 
-  // 演出层必须在最上（§12B.1 禁止垫在任何内容层之下）：搬出 .page 的层叠上下文
-  if (overlay && overlay.parentElement !== document.body) {
-    document.body.appendChild(overlay);
+  // 控制条指令（同一 audio：MiniPlayer 监听执行）
+  document.querySelectorAll<HTMLElement>('[data-cmd]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const cmd = el.getAttribute('data-cmd') || '';
+      document.dispatchEvent(new CustomEvent('jy:player-cmd', { detail: { cmd: cmd } }));
+    });
+  });
+
+  // 进度条点击 seek
+  if (stageTrack) {
+    stageTrack.addEventListener('click', (e) => {
+      const rect = (stageTrack as HTMLElement).getBoundingClientRect();
+      const audio = document.querySelector<HTMLAudioElement>('[data-mini-audio]');
+      const d = audio ? audio.duration : 0;
+      if (rect.width > 0 && d && isFinite(d)) {
+        const t = Math.max(0, Math.min(1, ((e as MouseEvent).clientX - rect.left) / rect.width)) * d;
+        document.dispatchEvent(new CustomEvent('jy:player-cmd', { detail: { cmd: 'seek', t: t } }));
+      }
+    });
   }
 
-  const openStage = (): void => {
-    if (!overlay) return;
-    if (!overlay.querySelector('iframe')) {
-      const frame = document.createElement('iframe');
-      // v30：Folia 部署地址走单点配置（IP:81 → music.nijingzh.top 只改 env）
-      frame.src = FOLIA_STAGE_URL;
-      frame.title = '歌词演出';
-      frame.allow = 'autoplay';
-      // 拒嵌兜底（Folia 当前无 X-Frame-Options 可嵌；若日后加拒嵌头，退新窗口）
-      frame.addEventListener('error', () => {
-        closeStage();
-        window.open(FOLIA_STAGE_URL, '_blank', 'noopener');
-      });
-      overlay.appendChild(frame);
-    }
-    overlay.classList.add('is-open');
-    overlay.setAttribute('aria-hidden', 'false');
-    setLive(true);
-  };
-
-  // v32：「收起」≠「停止」——iframe 保留（visibility 隐藏不杀媒体），小窗音乐继续放
-  const closeStage = (): void => {
-    if (!overlay) return;
-    overlay.classList.remove('is-open');
-    overlay.setAttribute('aria-hidden', 'true');
-  };
-
-  // v31：CD 碟与 ▶ 图标钮都开演出（button 原生 Enter/Space 触发 click，无需手绑键盘）
+  // 开演出（CD 碟 + ▶ 图标钮都开）
+  const stageEls = document.querySelectorAll<HTMLElement>('[data-song-stage]');
   stageEls.forEach((el) => el.addEventListener('click', openStage));
+  const closeBtn = document.querySelector('[data-stage-close]');
   if (closeBtn) closeBtn.addEventListener('click', closeStage);
-  // 点演出外的背景也可退回（关闭按钮避让 fixed 导航，双保险）
-  if (overlay) overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeStage();
-  });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeStage();
   });

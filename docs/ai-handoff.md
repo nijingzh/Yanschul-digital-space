@@ -1,4 +1,13 @@
-江衍个人数字空间 ｜ AI 交接上下文 v33（v1 上线定稿 · 2026-09-30）
+江衍个人数字空间 ｜ AI 交接上下文 v34（v1 上线定稿 · 2026-10-02）
+v34 更新（2026-10-02，歌词演出主站自绘批；拍板 =「做缓缓漂浮动效，明显一点。在播放时界面还是这个样子的（小样）。在生活页要不你直接调用3000端口的网易api，不经过folia（保留folia主页进入入口）」）：
+【架构终态·统一播放内核】站内 `<audio>`（MiniPlayer）= 唯一音源；演出 overlay / CD 机卡 / 页脚播放器**三方同源**——曲目/进度/播放暂停实时一致，关闭演出音乐不断（「收起」= 隐藏壳，同一 audio 继续）。Folia 只留「↗ 在 Folia 打开」外链入口。
+【API 直连】浏览器直连网易 API（NeteaseCloudMusicApi）：歌单 `/api/playlist/track/all`、音源 `/api/song/url/v1`、歌词 `/api/lyric`。实测 **3000 端口公网不通（000）**，浏览器入口 = **81 端口 `/api/*` 同源反代**（同一服务）；CORS 全开（`access-control-allow-origin: *` + 预检 204）✓ 跨端口调用无障碍。地址单点 = `PUBLIC_FOLIA_BASE`（src/lib/config.ts FOLIA_BASE + '/api'）。
+【同步协议】MiniPlayer 广播 `jy:player` {playing,t,d}（play/pause）+ `jy:player-tick` {t,d}（timeupdate）；监听 `jy:player-cmd` {cmd: toggle/next/prev/seek, t}（演出控制条/进度点击）。`jy:track` {id,title,artist,pic} 曲目变更（已有）。
+【演出自绘（照小样 stage-redesign-mock.html）】深色沉浸（#0F0F14 + 粉紫光晕）+ 星芒 10 颗**缓缓飘浮明显**（spark-float 6/7.5/9s，±16px 漂移 + 明暗 0.35→1 呼吸，相位错落）+ 封面碟 Ø320（8s/圈、**播放才转**（animation-play-state 跟 jy:player）、reduce 静止）+ 三层歌词（LRC 时间轴 currentTime 驱动滚动、主句发光）+ 玻璃控制条（‹‹/❚❚/›› + 进度点击 seek）。CD 机卡同规则（眉标「♪ 待播放/正在播放/已暂停」+ 碟转/停跟播放）。
+【纪念日豁免登记】新增循环动画已登记 global.css（原值 ×3）：.stage-disc 24s、.spark 18s、.spark-2 23s、.spark-3 27s。
+【bug 修】① `[data-stage-song]/[data-stage-artist]` 两处元素（音乐卡 + 演出壳）querySelector 只命中第一个 → querySelectorAll 全量更新（演出壳曲名曾显示「未在播放」）；② LRC 制作行过滤（creditRe：作词/作曲/编曲/制作/监制/录音/混音…黑名单）；③ 假歌词「船向西飞，夜还长。」初始值清零（夜航西飞示例彻底退休）。
+【封面甄别教训】碟面「超市生鲜四格照」= 曹格《寂寞先生》**官方创意封面**（超市概念专辑视觉）——vision 报「与语境不符」是误判，封面字段 `al.picUrl` 一直是对的。陌生封面先验真伪再改字段。
+【验收】build 21 页；真播放 paused:false t=16.8s、三方状态同步（眉标/碟转/按钮）、歌词三层滚动（「世界难得那么美」主句 + 上下句）、演出壳曲名「寂寞先生/曹格」、进度 0:28 推进、vision 终检零「未在播放」残留零错位。
 v33 更新（2026-09-30，小窗演出播放 bug；触发 =「我点击按钮进入小窗后播放音乐，然后点击关闭 音乐就暂停了，卡片也没有出现播放状态」）：
 【根因】closeStage 里 `iframe.remove()` 把 Folia 连播放器一起销毁 = 音乐随关闭而断；且 Folia（iframe 内播放器）与 MiniPlayer（主站 audio）是**两套播放内核**，卡片状态走主站一套、小窗播放是另一套，天然不同步。
 【修复】①「关闭」→「收起」：closeStage 只移除 .is-open（overlay 本就用 opacity/visibility 显隐），**iframe 永不销毁**——收起后小窗音乐继续放，再点 ▶ 回小窗（openStage 复用已有 iframe）；②卡片补演出态：music-card.is-live（静态小圆点 + 眉标「♪ 小窗演出中」）——**如实标注小窗开着**，不假装知道 Folia 内部播放态（跨域隔离读不到）。

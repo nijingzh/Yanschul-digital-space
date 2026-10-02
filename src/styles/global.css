@@ -1381,49 +1381,7 @@ html.js .ambient-blob:not(.is-settled) {
   box-shadow: var(--shadow-contact-deep);
 }
 
-/* 全屏歌词演出壳（Folia Stage 嵌入层；发光仅限演出内） */
-.stage-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 120;
-  display: grid;
-  place-items: center;
-  background: var(--color-bg);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 400ms var(--ease-space), visibility 400ms;
-}
-
-.stage-overlay.is-open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.stage-overlay iframe {
-  width: calc(100% - 3rem);
-  max-width: 1120px;
-  height: min(72vh, 720px);
-  border: 1px solid var(--hair-frame);
-  background: var(--color-panel);
-}
-
-.stage-close {
-  position: absolute;
-  top: 4.5rem;
-  right: 1.6rem;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  color: var(--color-ink-2);
-  border: 1px solid var(--hair-frame);
-  border-radius: 999px;
-  padding: 0.42rem 0.95rem;
-  background: var(--color-panel);
-  cursor: pointer;
-}
+/* v34：歌词演出样式迁至 life.astro scoped（主站自绘，复用 cd-spin）；此段留空 */
 
 /* ────────────────────────────────────────────────
    纪念日灰色模式（body.memorial-day，运行时判断；token 收干为灰阶）
@@ -1474,6 +1432,10 @@ body.memorial-day .folia { animation-duration: 27s !important; }
 body.memorial-day .year-no { animation-duration: 24s !important; }
 body.memorial-day .cover-band { animation-duration: 33s !important; }
 body.memorial-day .cd-disc { animation-duration: 24s !important; }
+body.memorial-day .stage-disc { animation-duration: 24s !important; }
+body.memorial-day .spark { animation-duration: 18s !important; }
+body.memorial-day .spark-2 { animation-duration: 23s !important; }
+body.memorial-day .spark-3 { animation-duration: 27s !important; }
 
 body.memorial-day [data-enter],
 body.memorial-day [data-enter-char],
