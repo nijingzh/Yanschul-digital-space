@@ -751,7 +751,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
 <script>
   import { FOLIA_BASE } from '../lib/config';
 
-  // v35：卡片即播放器（弹窗已删）——jy:track 曲目 / jy:player 播放态 / jy:player-tick 时间轴
+  // v36：SPA 导航根治——事件委托到 document + 元素动态查询（View Transitions 换 DOM 后永久有效）
   interface TrackDetail {
     id?: number;
     title?: string;
@@ -763,19 +763,6 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     t: number;
     text: string;
   }
-
-  const songTitles = document.querySelectorAll('[data-stage-song]');
-  const songArtists = document.querySelectorAll('[data-stage-artist]');
-  const songLyric = document.querySelector('[data-stage-lyric]');
-  const cdDisc = document.querySelector('[data-cd-disc]');
-  const cdMini = document.querySelector('[data-cd-mini]');
-  const mediaSong = document.querySelector('.cd-note [data-media-song]');
-  const mediaMeta = document.querySelector('.cd-note [data-media-meta]');
-  const musicEyebrow = document.querySelector('.music-eyebrow');
-  const stageCur = document.querySelector('[data-stage-cur]');
-  const stageDur = document.querySelector('[data-stage-dur]');
-  const stageFill = document.querySelector('[data-stage-fill]');
-  const stageTrack = document.querySelector('[data-stage-track]');
 
   let lyricLines: LyricLine[] = [];
 
@@ -804,8 +791,12 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     return m + ':' + (ss < 10 ? '0' : '') + ss;
   };
 
-  // 播放态上卡（眉标 + 碟转/停 = 真实播放状态）
+  const q = (sel: string): Element | null => document.querySelector(sel);
+  const qa = (sel: string): Element[] => Array.prototype.slice.call(document.querySelectorAll(sel));
+
   const setPlayingUI = (playing: boolean): void => {
+    const cdDisc = q('[data-cd-disc]');
+    const musicEyebrow = q('.music-eyebrow');
     if (cdDisc) cdDisc.classList.toggle('is-playing', playing);
     if (musicEyebrow) musicEyebrow.textContent = playing ? '♪ 正在播放' : '♪ 已暂停';
   };
@@ -818,6 +809,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
       else break;
     }
     const line = lyricLines[i] ? lyricLines[i].text : '';
+    const songLyric = q('[data-stage-lyric]');
     if (songLyric && line) songLyric.textContent = '「' + line + '」';
   };
 
@@ -828,6 +820,7 @@ const song = mediaNotes.find((note) => note.kind === '在听');
       .then((res) => res.json())
       .then((data: { lrc?: { lyric?: string } }) => {
         lyricLines = parseLrc(data && data.lrc && data.lrc.lyric ? data.lrc.lyric : '');
+        const songLyric = q('[data-stage-lyric]');
         if (songLyric && lyricLines.length) songLyric.textContent = '「' + lyricLines[0].text + '」';
       })
       .catch(() => {
@@ -835,20 +828,25 @@ const song = mediaNotes.find((note) => note.kind === '在听');
       });
   };
 
+  // ── document 级事件：只挂一次（module 顶层），DOM 再怎么换都有效 ──
   document.addEventListener('jy:track', (e) => {
     const d = ((e as CustomEvent<TrackDetail>).detail || {}) as TrackDetail;
-    songTitles.forEach((el) => {
+    qa('[data-stage-song]').forEach((el) => {
       el.textContent = d.title || '未在播放';
     });
-    songArtists.forEach((el) => {
+    qa('[data-stage-artist]').forEach((el) => {
       el.textContent = d.artist || '';
     });
+    const mediaSong = q('.cd-note [data-media-song]');
+    const mediaMeta = q('.cd-note [data-media-meta]');
     if (mediaSong) mediaSong.textContent = d.title || '未在播放';
     if (mediaMeta) mediaMeta.textContent = d.artist || '';
     if (d.pic) {
       const css = 'url("' + d.pic + '")';
-      if (cdDisc) cdDisc.style.backgroundImage = css;
-      if (cdMini) cdMini.style.backgroundImage = css;
+      const cdDisc = q('[data-cd-disc]');
+      const cdMini = q('[data-cd-mini]');
+      if (cdDisc) (cdDisc as HTMLElement).style.backgroundImage = css;
+      if (cdMini) (cdMini as HTMLElement).style.backgroundImage = css;
     }
     if (d.id) setLyric(d.id);
   });
@@ -861,24 +859,30 @@ const song = mediaNotes.find((note) => note.kind === '在听');
   document.addEventListener('jy:player-tick', (e) => {
     const d = ((e as CustomEvent<{ t?: number; d?: number }>).detail || {}) as { t?: number; d?: number };
     updateLyricAt(d.t || 0);
+    const stageCur = q('[data-stage-cur]');
+    const stageDur = q('[data-stage-dur]');
+    const stageFill = q('[data-stage-fill]');
+    const stageTrack = q('[data-stage-track]');
     if (stageCur) stageCur.textContent = fmtTime(d.t || 0);
     if (stageDur) stageDur.textContent = fmtTime(d.d || 0);
     if (stageFill && d.d) (stageFill as HTMLElement).style.width = Math.min(100, ((d.t || 0) / d.d) * 100) + '%';
     if (stageTrack && d.d) stageTrack.setAttribute('aria-valuenow', String(Math.round(((d.t || 0) / d.d) * 100)));
   });
 
-  // 控制指令（同一 audio：MiniPlayer 监听执行）
-  document.querySelectorAll<HTMLElement>('[data-cmd]').forEach((el) => {
-    el.addEventListener('click', () => {
-      const cmd = el.getAttribute('data-cmd') || '';
-      document.dispatchEvent(new CustomEvent('jy:player-cmd', { detail: { cmd: cmd } }));
-    });
+  // 点击委托：[data-cmd] 按钮（播放/上一首/下一首）——元素重建后依然有效
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    const el = target && target.closest ? target.closest('[data-cmd]') : null;
+    if (!el) return;
+    const cmd = el.getAttribute('data-cmd') || '';
+    if (cmd) document.dispatchEvent(new CustomEvent('jy:player-cmd', { detail: { cmd: cmd } }));
   });
 
-  // v35：进度条拖动 seek（鼠标 + 触摸；拖动中实时跳，跟手）
+  // ── 进度条拖动 seek（事件委托 + 鼠标/触摸；拖动中实时跟手） ──
   const seekFromClientX = (clientX: number): void => {
-    if (!stageTrack) return;
-    const rect = (stageTrack as HTMLElement).getBoundingClientRect();
+    const track = q('[data-stage-track]');
+    if (!track) return;
+    const rect = (track as HTMLElement).getBoundingClientRect();
     const audio = document.querySelector<HTMLAudioElement>('[data-mini-audio]');
     const d = audio ? audio.duration : 0;
     if (rect.width > 0 && d && isFinite(d)) {
@@ -888,45 +892,52 @@ const song = mediaNotes.find((note) => note.kind === '在听');
   };
 
   let dragging = false;
-  if (stageTrack) {
-    stageTrack.addEventListener('mousedown', (e) => {
+  document.addEventListener('mousedown', (e) => {
+    const target = e.target as Element | null;
+    const el = target && target.closest ? target.closest('[data-stage-track]') : null;
+    if (!el) return;
+    dragging = true;
+    seekFromClientX((e as MouseEvent).clientX);
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (dragging) seekFromClientX((e as MouseEvent).clientX);
+  });
+  window.addEventListener('mouseup', () => {
+    dragging = false;
+  });
+  document.addEventListener(
+    'touchstart',
+    (e) => {
+      const target = e.target as Element | null;
+      const el = target && target.closest ? target.closest('[data-stage-track]') : null;
+      if (!el) return;
       dragging = true;
-      seekFromClientX((e as MouseEvent).clientX);
-    });
-    window.addEventListener('mousemove', (e) => {
-      if (dragging) seekFromClientX((e as MouseEvent).clientX);
-    });
-    window.addEventListener('mouseup', () => {
-      dragging = false;
-    });
-    stageTrack.addEventListener(
-      'touchstart',
-      (e) => {
-        dragging = true;
-        const t = (e as TouchEvent).touches[0];
-        if (t) seekFromClientX(t.clientX);
-      },
-      { passive: true }
-    );
-    stageTrack.addEventListener(
-      'touchmove',
-      (e) => {
-        if (!dragging) return;
-        const t = (e as TouchEvent).touches[0];
-        if (t) seekFromClientX(t.clientX);
-      },
-      { passive: true }
-    );
-    window.addEventListener('touchend', () => {
-      dragging = false;
-    });
-    // 键盘：方向键微调（accessibility）
-    stageTrack.addEventListener('keydown', (e) => {
-      const audio = document.querySelector<HTMLAudioElement>('[data-mini-audio]');
-      const d = audio ? audio.duration : 0;
-      if (!audio || !d || !isFinite(d)) return;
-      if ((e as KeyboardEvent).key === 'ArrowRight') audio.currentTime = Math.min(d, audio.currentTime + 5);
-      else if ((e as KeyboardEvent).key === 'ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime - 5);
-    });
-  }
+      const t = (e as TouchEvent).touches[0];
+      if (t) seekFromClientX(t.clientX);
+    },
+    { passive: true }
+  );
+  document.addEventListener(
+    'touchmove',
+    (e) => {
+      if (!dragging) return;
+      const t = (e as TouchEvent).touches[0];
+      if (t) seekFromClientX(t.clientX);
+    },
+    { passive: true }
+  );
+  window.addEventListener('touchend', () => {
+    dragging = false;
+  });
+
+  // 键盘：进度条聚焦时方向键微调
+  document.addEventListener('keydown', (e) => {
+    const target = e.target as Element | null;
+    if (!target || !target.closest || !target.closest('[data-stage-track]')) return;
+    const audio = document.querySelector<HTMLAudioElement>('[data-mini-audio]');
+    const d = audio ? audio.duration : 0;
+    if (!audio || !d || !isFinite(d)) return;
+    if (e.key === 'ArrowRight') audio.currentTime = Math.min(d, audio.currentTime + 5);
+    else if (e.key === 'ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime - 5);
+  });
 </script>

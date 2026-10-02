@@ -20,7 +20,7 @@ export const FOLIA_BASE: string = trimTrailing(
 
 export const FOLIA_STAGE_PATH: string = env.PUBLIC_FOLIA_STAGE_PATH || '/player/stage';
 
-export const FOLIA_PLAYLIST_ID: string = env.PUBLIC_FOLIA_PLAYLIST_ID || '';
+export const FOLIA_PLAYLIST_ID: string = env.PUBLIC_FOLIA_PLAYLIST_ID || '593219640';
 
 /** 演出 iframe 的完整地址（Folia 无 X-Frame-Options，可嵌；拒嵌时前端降级新窗口） */
 export const FOLIA_STAGE_URL: string = FOLIA_BASE + FOLIA_STAGE_PATH;

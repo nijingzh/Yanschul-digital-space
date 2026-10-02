@@ -19,7 +19,7 @@ const mediaNotes = await getMediaNotes();
 const fallbackTrack = '未在播放';
 ---
 
-<div class="mini-player" data-mini-player data-folia-base={FOLIA_BASE} data-playlist-id={FOLIA_PLAYLIST_ID}>
+<div class="mini-player" data-mini-player data-folia-base={FOLIA_BASE} data-playlist-id={FOLIA_PLAYLIST_ID} transition:persist="mini-player">
   <span class="mini-track" data-mini-track>♪ {fallbackTrack}</span>
   <button class="mini-toggle mono" type="button" data-mini-toggle aria-pressed="false">播放</button>
   <audio data-mini-audio preload="none"></audio>
@@ -181,6 +181,25 @@ const fallbackTrack = '未在播放';
       prev();
     } else if (detail.cmd === 'seek' && audio && typeof detail.t === 'number') {
       audio.currentTime = detail.t;
+    }
+  });
+
+  // v36：SPA 导航后向新页面重播状态（jy:track/jy:player——MiniPlayer persist 不重建，新 DOM 需要补状态）
+  document.addEventListener('astro:page-load', () => {
+    const t = tracks[index];
+    if (t) {
+      document.dispatchEvent(
+        new CustomEvent('jy:track', {
+          detail: { id: t.id, title: t.title, artist: t.artist, pic: t.pic },
+        })
+      );
+    }
+    if (audio) {
+      document.dispatchEvent(
+        new CustomEvent('jy:player', {
+          detail: { playing: !audio.paused, t: audio.currentTime || 0, d: audio.duration || 0 },
+        })
+      );
     }
   });
 
