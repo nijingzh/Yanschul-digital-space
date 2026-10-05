@@ -75,3 +75,4 @@ desktop.ini
 .idea/
 .vscode/
 dist-v35.zip
+deploy/like-server/like.json
