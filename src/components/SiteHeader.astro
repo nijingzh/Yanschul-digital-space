@@ -44,6 +44,10 @@ const isActive = (href: string): boolean =>
 
     <div class="header-side">
       <span class="status mono"><i class="status-dot"></i>空间在线</span>
+      <button class="like-btn mono" data-like-btn aria-label="给这个空间点赞" title="点一下加一下">
+        <span class="like-star" aria-hidden="true">✦</span>
+        <span data-like-count>—</span>
+      </button>
 <button class="theme-toggle mono" data-theme-toggle aria-label="切换夜航模式" title="夜航模式">☾</button>
 <button class="search-btn mono" data-search-open aria-label="搜索" title="搜索（⌘K / Ctrl+K）">搜索 ⌘K</button>
       <button class="menu-btn mono" type="button" aria-expanded="false" aria-controls="mobile-menu">
@@ -64,6 +68,43 @@ const isActive = (href: string): boolean =>
     </nav>
   </div>
 </header>
+
+<script>
+  // v36 访客点赞：同源 /api/like（nginx 反代 → like-server）；委托挂一次，SPA 导航永久有效
+  const likeEls = (): Element[] => Array.prototype.slice.call(document.querySelectorAll('[data-like-count]'));
+
+  const showCount = (n: number | null): void => {
+    likeEls().forEach((el) => {
+      el.textContent = n === null ? '—' : String(n);
+    });
+  };
+
+  const loadCount = (): void => {
+    fetch('/api/like')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { count?: number } | null) => {
+        showCount(data && typeof data.count === 'number' ? data.count : null);
+      })
+      .catch(() => showCount(null));
+  };
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    const btn = target && target.closest ? target.closest('[data-like-btn]') : null;
+    if (!btn) return;
+    fetch('/api/like', { method: 'POST' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { count?: number } | null) => {
+        if (data && typeof data.count === 'number') showCount(data.count);
+      })
+      .catch(() => {
+        // 服务没起就静默（按钮不报错）
+      });
+  });
+
+  loadCount();
+  document.addEventListener('astro:page-load', loadCount);
+</script>
 
 <style>
   /* 页眉区顶部 140px 冷纱渐变（v17 · C）：顶缘 rgba(232,230,246,0.4) → 140px 处透明 */
@@ -224,6 +265,46 @@ const isActive = (href: string): boolean =>
   .search-btn:hover {
     color: var(--color-ink);
     border-color: var(--color-edge);
+  }
+
+  .like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.24rem 0.72rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    color: var(--color-ink-soft);
+    background: transparent;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+    transition:
+      color 0.32s var(--ease-out-quart),
+      border-color 0.32s var(--ease-out-quart),
+      transform 0.16s var(--ease-out-quart);
+  }
+
+  .like-btn:hover {
+    color: var(--color-ink);
+    border-color: var(--color-edge);
+  }
+
+  .like-btn:active {
+    transform: scale(0.94);
+  }
+
+  .like-star {
+    font-size: 0.62rem;
+    color: var(--color-ink-soft);
+    transition: color 0.32s var(--ease-out-quart);
+  }
+
+  .like-btn:hover .like-star {
+    color: var(--color-ink);
   }
 
   .theme-toggle {
