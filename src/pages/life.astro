@@ -429,10 +429,16 @@ const song = mediaNotes.find((note) => note.kind === '在听');
     }
 
     .music-grid {
-      grid-template-columns: 1fr;
+      /* v37 移动溢出修复：minmax(0,1fr) 防内容撑开（此前 grid 被歌词/控件最小宽度顶到 449px） */
+      grid-template-columns: minmax(0, 1fr);
       gap: 24px;
       justify-items: center;
       text-align: center;
+    }
+
+    .music-grid > * {
+      min-width: 0;
+      max-width: 100%;
     }
 
     .music-actions {
@@ -441,6 +447,16 @@ const song = mediaNotes.find((note) => note.kind === '在听');
 
     .music-card {
       padding: 26px 22px 18px;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    /* 眉标「音乐空间 / MUSIC SPACE」此前不换行顶到 527px */
+    .stage-kind {
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      white-space: normal;
+      word-break: break-word;
     }
   }
 
