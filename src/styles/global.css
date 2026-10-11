@@ -9,14 +9,14 @@
 @theme {
   /* ── 色彩：冷白基底 + 低饱和粉紫环境光 ── */
   --color-space-0: #f7f5fc;
-  --color-space-1: #f7f8fc;
+  --color-space-1: #fafbfe;
   --color-space-2: #f3eef8;
-  --color-tint: #faf4f8;
+  --color-tint: #f6f2fa;
   --color-ink: #1d1d22;
-  --color-ink-2: #777780;
+  --color-ink-2: #5e5e6b;
   --color-ink-3: #a6a6b3;
   --color-panel: rgba(253, 253, 255, 0.72);
-  --color-panel-2: rgba(250, 244, 248, 0.55);
+  --color-panel-2: rgba(250, 244, 248, 0.35);
   --color-hair: rgba(29, 29, 34, 0.16);
   --hair-frame: rgba(29, 29, 34, 0.28);
   --color-glow-pink: rgba(240, 214, 232, 0.55);
@@ -115,7 +115,7 @@ body {
     linear-gradient(rgba(167, 152, 218, 0.09), rgba(167, 152, 218, 0.09)),
     radial-gradient(1250px 1250px at 88% -8%, rgba(214, 208, 242, 0.95) 0%, transparent 66%),
     radial-gradient(1050px 1050px at 2% 102%, rgba(252, 238, 242, 0.95) 0%, transparent 80%),
-    radial-gradient(1500px 700px at 50% 118%, rgba(232, 230, 246, 0.5) 0%, transparent 70%),
+    radial-gradient(1500px 700px at 50% 118%, rgba(232, 230, 246, 0.22) 0%, transparent 70%),
     var(--color-space-0);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
