@@ -33,24 +33,33 @@ import SparkIcon from '../components/SparkIcon.astro';
 
     <section class="notes-list" data-reveal-group aria-label="文章列表" id="notes-list">
       {
-        feedItems.map((item, i) => (
-          <a class="note magnetic pressable" data-reveal-item href={item.href} data-cat={item.category}>
-            <span class="mono note-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-            <h2 class="note-title">{item.title}</h2>
-            <p class="note-desc">{item.desc}</p>
-            <p class="note-meta mono">
-              <span class="note-kind">{item.kind}</span>
-              <span class="note-date">{item.date.replace(/-/g, '.')}</span>
-              {item.kind === '文章' && <span class="note-mins">约 {item.minutes} 分钟</span>}
-              {item.kind === '文章' && item.tags.map((t) => (
-                <span class="note-tag">#{t}</span>
-              ))}
-            </p>
-          </a>
-        ))
+        feedItems.length === 0 ? (
+          <div class="empty-state" data-reveal-item>
+            <span class="empty-star" aria-hidden="true">✦</span>
+            <p class="empty-text">架子还空着，等第一篇搬进来。</p>
+          </div>
+        ) : (
+          feedItems.map((item, i) => (
+            <a class="note magnetic pressable" data-reveal-item href={item.href} data-cat={item.category}>
+              <span class="mono note-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h2 class="note-title">{item.title}</h2>
+              <p class="note-desc">{item.desc}</p>
+              <p class="note-meta mono">
+                <span class="note-kind">{item.kind}</span>
+                <span class="note-date">{item.date.replace(/-/g, '.')}</span>
+                {item.kind === '文章' && <span class="note-mins">约 {item.minutes} 分钟</span>}
+                {item.kind === '文章' && item.tags.map((t) => (
+                  <span class="note-tag">#{t}</span>
+                ))}
+              </p>
+            </a>
+          ))
+        )
       }
-      {/* 分页编号（v17 · D）：终端拟态，英文小标签位、真实计数 */}
-      <p class="mono list-range">[1–{feedItems.length}/{feedItems.length}]</p>
+      {/* 分页编号（v17 · D）：终端拟态，英文小标签位、真实计数；空列表不出编号 */}
+      {feedItems.length > 0 && (
+        <p class="mono list-range">[1–{feedItems.length}/{feedItems.length}]</p>
+      )}
     </section>
   </div>
 </Base>
@@ -81,6 +90,27 @@ import SparkIcon from '../components/SparkIcon.astro';
     display: flex;
     gap: 8px;
     margin: 28px 0 8px;
+  }
+
+  /* 空状态（v37）：feed 清空时的体面显示 */
+  .empty-state {
+    display: grid;
+    justify-items: center;
+    gap: 0.8rem;
+    padding: 4.5rem 1rem;
+    border: 1px dashed var(--color-hair);
+    border-radius: 18px;
+    color: var(--color-ink-2);
+  }
+
+  .empty-star {
+    font-size: 1.2rem;
+    color: var(--color-ink-3);
+  }
+
+  .empty-text {
+    font-size: 0.88rem;
+    letter-spacing: 0.06em;
   }
 
   .chip {

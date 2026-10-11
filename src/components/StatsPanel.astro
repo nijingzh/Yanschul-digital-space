@@ -48,7 +48,7 @@ const tier = (i: number) => (i < top ? 't3' : i < mid ? 't2' : 't1');
       </div>
     ))}
     <div class="reading reading-live">
-      <span class="reading-value serif" data-tick-days data-value={`${days}`}>{days}</span>
+      <span class="reading-value serif" data-tick-days data-birth={SITE_BIRTH} data-value={`${days}`}>{days}</span>
       <span class="mono reading-label">已住 · 天</span>
     </div>
   </div>
@@ -161,3 +161,20 @@ const tier = (i: number) => (i < top ? 't3' : i < mid ? 't2' : 't1');
     transform: translateY(-2px);
   }
 </style>
+
+<script>
+  // v37：已住天数实时重算（SSR 值构建后过时；此前 data-tick-days 无脚本消费）
+  const renderDays = (): void => {
+    document.querySelectorAll<HTMLElement>('[data-tick-days]').forEach((el) => {
+      const birthVal = el.dataset.birth || '2026-09-23';
+      const birth = new Date(birthVal + 'T00:00:00');
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const days = Math.max(0, Math.round((today.getTime() - birth.getTime()) / 86400000));
+      if (el.textContent !== String(days)) el.textContent = String(days);
+    });
+  };
+  renderDays();
+  document.addEventListener('astro:page-load', renderDays);
+  setInterval(renderDays, 60000);
+</script>

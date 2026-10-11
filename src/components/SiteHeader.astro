@@ -550,7 +550,7 @@ const isActive = (href: string): boolean =>
     } else {
       menu.hidden = false;
       menu.classList.add('glass');
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.querySelector('.mobile-link')) {
         animate('.mobile-link', {
           opacity: [0, 1],
           y: [10, 0],

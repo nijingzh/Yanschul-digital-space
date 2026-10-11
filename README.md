@@ -41,7 +41,29 @@ docs/           交接文档、Phase 记录、schema 契约、v1 收尾
 
 ## 部署
 
-`deploy/` 里有 docker-compose（站点 + Folia 音乐播放器 + nginx 反代）和 nginx 配置。环境变量照着 `deploy/.env.example` 建一个 `.env` 填值，别提交进仓库。
+`deploy/` 里有 docker-compose（站点 + Folia 音乐播放器 + nginx 反代）和 nginx 配置。
+
+配置分两层，都走 `.env`，都被 `.gitignore` 挡着，不会进仓库：
+
+**构建时配置**（项目根目录建 `.env`）——`PUBLIC_` 开头的会打进前端产物，所以它们不是秘密，只是不想写死在代码里：
+
+```bash
+PUBLIC_FOLIA_BASE=https://nijingzh.top:81   # Folia 地址，改域名时只动这一行
+PUBLIC_FOLIA_STAGE_PATH=/player/stage
+PUBLIC_FOLIA_PLAYLIST_ID=593219640          # 网易云歌单 ID，空了播放器不工作
+```
+
+不建 `.env` 也能 build，代码里有默认值（之前踩过坑：默认值留空，拉下来构建出来的站播放器直接不响，查了半天）。想换歌单或换域名，改完重新 `npm run build` 就行。
+
+**服务端密钥**（`deploy/.env`）——这些才是真正敏感的，只给服务器上的容器读，前端碰不到：
+
+```bash
+NCL_COOKIE="MUSIC_U=xxx; __csrf=yyy"   # 网易云登录 Cookie，解全曲试听（见下）
+```
+
+`NCL_COOKIE` 说两句。不带登录态的时候网易接口只吐 30 来秒的试听片段，歌听一半就跳；带上你自己的登录 Cookie 就是全曲。拿法：浏览器登录 music.163.com，F12 → Network → 随便点个请求，把 Request Headers 里那行 Cookie 整条抄下来贴进去。
+
+这行 Cookie 等同你的网易账号密码，别发给任何人，包括别贴到聊天窗口里让 AI 帮你看——自己填就好。它只活在服务器的 `.env` 里，git 看不到它。哪天觉得不对劲，网页上退出登录或者改个密码，这条就作废了。
 
 ## 还没做完
 
