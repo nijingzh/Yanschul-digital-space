@@ -135,7 +135,10 @@ const worldItems = await getWorldItems();
     padding: 1.55rem 1.7rem 1.35rem;
     border: 1px solid var(--color-hair);
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.55);
+    /* v37 玻璃化（用户裁决 A）：透出底下紫调，与观测台/搜索面板同玻璃语言 */
+    background: rgba(255, 255, 255, 0.32);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     text-decoration: none;
     color: inherit;
     transition:
@@ -144,8 +147,15 @@ const worldItems = await getWorldItems();
       box-shadow 0.5s var(--ease-space);
   }
 
+  /* 降级：不支持 backdrop-filter 的浏览器回退实一点的底，保证文字可读 */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .place {
+      background: rgba(255, 255, 255, 0.72);
+    }
+  }
+
   :global([data-theme='night']) .place {
-    background: rgba(255, 255, 255, 0.045);
+    background: rgba(255, 255, 255, 0.055);
     box-shadow: none;
   }
 
