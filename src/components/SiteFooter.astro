@@ -41,6 +41,7 @@ const year = new Date().getFullYear();
     <div class="footer-bottom mono">
       <span>© {year} 江衍 YANSCHUL · 保留所有心情</span>
       <span>由 Astro 驱动 · 动效来自 Anime.js</span>
+      <a class="icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">津ICP备2026014578号</a>
       <span>空间仍在生长中</span>
     </div>
   </div>
@@ -136,6 +137,27 @@ const year = new Date().getFullYear();
     justify-content: space-between;
     margin-top: 2.4rem;
     font-size: 0.58rem;
+  }
+
+  /* ICP 备案（发丝线胶囊，hover 亮边） */
+  .icp {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.22rem 0.72rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.32s var(--ease-space), border-color 0.32s var(--ease-space);
+  }
+
+  .icp:hover {
+    color: var(--color-ink);
+    border-color: var(--color-edge);
   }
 
   @media (min-width: 860px) {

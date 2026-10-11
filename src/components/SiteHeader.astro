@@ -145,9 +145,11 @@ const isActive = (href: string): boolean =>
     top: 0;
     z-index: 50;
     padding-block: 0.9rem;
+    /* v37：遮罩常驻（此前靠 is-scrolled 滚动加类，SPA 切页后监听失效导致遮罩消失透字） */
+    background: var(--color-space-0);
+    border-bottom: 1px solid var(--color-hair);
     transition: background 0.5s var(--ease-space), box-shadow 0.5s var(--ease-space),
       border-color 0.5s var(--ease-space);
-    border-bottom: 1px solid transparent;
   }
 
   .site-header.is-scrolled {
