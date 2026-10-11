@@ -203,7 +203,7 @@ const isActive = (href: string): boolean =>
   .nav-code {
     position: absolute;
     top: 100%;
-    margin-top: 8px;
+    margin-top: 12px;
     left: 50%;
     transform: translate(-50%, 6px);
     opacity: 0;
@@ -213,6 +213,11 @@ const isActive = (href: string): boolean =>
     letter-spacing: 0.18em;
     color: var(--color-ink-2);
     white-space: nowrap;
+    /* v37：胶囊底——此前浮字直接压在导航底线上（用户报「小字在横线上」） */
+    background: var(--color-space-0);
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 3px 10px;
     pointer-events: none;
     transition:
       transform 240ms ease-out,
