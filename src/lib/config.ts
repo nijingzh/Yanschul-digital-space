@@ -15,7 +15,7 @@ const env = import.meta.env as Record<string, string | undefined>;
 const trimTrailing = (s: string): string => s.replace(/\/+$/, '');
 
 export const FOLIA_BASE: string = trimTrailing(
-  env.PUBLIC_FOLIA_BASE || 'http://124.223.162.190:81'
+  env.PUBLIC_FOLIA_BASE || 'http://nijingzh.top:81'
 );
 
 export const FOLIA_STAGE_PATH: string = env.PUBLIC_FOLIA_STAGE_PATH || '/player/stage';
