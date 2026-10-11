@@ -57,18 +57,20 @@ import SparkIcon from '../components/SparkIcon.astro';
 
 <script>
   // 分类筛选（v23.8 · 方案 #2）：aria-pressed + 显示过滤，reduced 不动效
-  const chips = document.querySelectorAll<HTMLButtonElement>('.filter-chips .chip');
-  const rows = document.querySelectorAll<HTMLElement>('#notes-list .note');
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const cat = chip.dataset.cat;
-      chips.forEach((c) => {
-        c.classList.toggle('is-on', c === chip);
-        c.setAttribute('aria-pressed', String(c === chip));
-      });
-      rows.forEach((row) => {
-        row.style.display = cat === '*' || row.dataset.cat === cat ? '' : 'none';
-      });
+  // v37：事件委托 + 动态查询（此前顶层绑定，SPA 切页后筛选失效）
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    const chip = target && target.closest ? target.closest('.filter-chips .chip') : null;
+    if (!chip) return;
+    const chips = document.querySelectorAll<HTMLButtonElement>('.filter-chips .chip');
+    const rows = document.querySelectorAll<HTMLElement>('#notes-list .note');
+    const cat = (chip as HTMLElement).dataset.cat;
+    chips.forEach((c) => {
+      c.classList.toggle('is-on', c === chip);
+      c.setAttribute('aria-pressed', String(c === chip));
+    });
+    rows.forEach((row) => {
+      row.style.display = cat === '*' || row.dataset.cat === cat ? '' : 'none';
     });
   });
 </script>

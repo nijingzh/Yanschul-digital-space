@@ -527,38 +527,38 @@ const isActive = (href: string): boolean =>
 <script>
   import { animate, stagger } from 'animejs';
 
-  const header = document.querySelector('.site-header');
-  const menuBtn = document.querySelector<HTMLButtonElement>('.menu-btn');
-  const menu = document.querySelector<HTMLElement>('#mobile-menu');
-
-  // 滚动后切换为玻璃导航
+  // v37：事件委托 + 动态查询（此前顶层绑定，SPA 切页后菜单按钮失效）
   const onScroll = (): void => {
+    const header = document.querySelector('.site-header');
     if (header) header.classList.toggle('is-scrolled', window.scrollY > 12);
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
   // 移动端菜单：分层进入
-  if (menuBtn && menu) {
-    menuBtn.addEventListener('click', () => {
-      const open = menuBtn.getAttribute('aria-expanded') === 'true';
-      menuBtn.setAttribute('aria-expanded', String(!open));
-      if (open) {
-        menu.hidden = true;
-        menu.classList.remove('glass');
-      } else {
-        menu.hidden = false;
-        menu.classList.add('glass');
-        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          animate('.mobile-link', {
-            opacity: [0, 1],
-            y: [10, 0],
-            duration: 420,
-            delay: stagger(50),
-            ease: 'out(3)',
-          });
-        }
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    const menuBtn = target && target.closest ? (target.closest('.menu-btn') as HTMLButtonElement | null) : null;
+    if (!menuBtn) return;
+    const menu = document.querySelector<HTMLElement>('#mobile-menu');
+    if (!menu) return;
+    const open = menuBtn.getAttribute('aria-expanded') === 'true';
+    menuBtn.setAttribute('aria-expanded', String(!open));
+    if (open) {
+      menu.hidden = true;
+      menu.classList.remove('glass');
+    } else {
+      menu.hidden = false;
+      menu.classList.add('glass');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        animate('.mobile-link', {
+          opacity: [0, 1],
+          y: [10, 0],
+          duration: 420,
+          delay: stagger(50),
+          ease: 'out(3)',
+        });
       }
-    });
-  }
+    }
+  });
 </script>

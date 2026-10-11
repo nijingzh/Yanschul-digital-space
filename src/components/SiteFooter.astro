@@ -51,8 +51,9 @@ const year = new Date().getFullYear();
   import { tickText } from '../lib/motion';
 
   // 建站计时（裁决 §11）：X 天为自然日差，X 时按本地时区滚动
-  const clock = document.querySelector<HTMLElement>('[data-site-clock]');
+  // v37：元素查询放进 render + astro:page-load 重跑（此前顶层查一次，SPA 切页后新页脚没人填）
   const render = (): void => {
+    const clock = document.querySelector<HTMLElement>('[data-site-clock]');
     if (!clock) return;
     const birthVal = clock.dataset.birth || '2026-09-23';
     const birth = new Date(birthVal + 'T00:00:00');
@@ -65,6 +66,7 @@ const year = new Date().getFullYear();
     if (clock.textContent !== text) tickText(clock, text);
   };
   render();
+  document.addEventListener('astro:page-load', render);
   setInterval(render, 60000);
 </script>
 
