@@ -1,6 +1,6 @@
 /**
  * Folia 集成配置（v30 · 2026-09-30）——地址单点可配，做好兼容：
- * 现在 http://124.223.162.190:81（VPS 81 端口），后续解析到 music.nijingzh.top 时
+ * Folia 部署地址。现在 https://nijingzh.top:81（域名 + https 已生效），
  * 只改 PUBLIC_FOLIA_BASE 重新构建，全站（演出 iframe / 歌单音源）一次切换。
  *
  * 环境变量（.env，勿提交仓库）：
@@ -15,7 +15,7 @@ const env = import.meta.env as Record<string, string | undefined>;
 const trimTrailing = (s: string): string => s.replace(/\/+$/, '');
 
 export const FOLIA_BASE: string = trimTrailing(
-  env.PUBLIC_FOLIA_BASE || 'http://nijingzh.top:81'
+  env.PUBLIC_FOLIA_BASE || 'https://nijingzh.top:81'
 );
 
 export const FOLIA_STAGE_PATH: string = env.PUBLIC_FOLIA_STAGE_PATH || '/player/stage';

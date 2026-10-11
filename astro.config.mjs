@@ -11,5 +11,11 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      // dev 下把 /api/like 指到本地计数服务（node deploy/like-server/server.cjs）
+      proxy: {
+        '/api/like': 'http://127.0.0.1:3001',
+      },
+    },
   },
 });
