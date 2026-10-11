@@ -991,6 +991,11 @@ html.js .ambient-blob:not(.is-settled) {
   color: var(--color-ink-3);
 }
 
+/* v37 夜航：这行小字在暗底上几乎不可读，提亮一档 */
+[data-theme='night'] .slogan-note {
+  color: #8f8fa4;
+}
+
 /* 旁注：正文关键词上方小字批注（Sidenote 组件共用） */
 .sidenote {
   position: relative;
