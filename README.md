@@ -55,15 +55,38 @@ PUBLIC_FOLIA_PLAYLIST_ID=593219640          # 网易云歌单 ID，空了播放�
 
 不建 `.env` 也能 build，代码里有默认值（之前踩过坑：默认值留空，拉下来构建出来的站播放器直接不响，查了半天）。想换歌单或换域名，改完重新 `npm run build` 就行。
 
-**服务端密钥**（`deploy/.env`）——这些才是真正敏感的，只给服务器上的容器读，前端碰不到：
+**服务端密钥**——只给服务器上的服务读，前端碰不到。这里之前写过一个 `NCL_COOKIE` 环境变量，是错的，Folia 和网易 API 都不认这个名字，已经删掉。真实情况是这样：
 
-```bash
-NCL_COOKIE="MUSIC_U=xxx; __csrf=yyy"   # 网易云登录 Cookie，解全曲试听（见下）
+歌曲只能听 30 来秒，是网易对**未登录**的限制，不是哪个配置没填。解法两条：
+
+1. **Folia 里扫码登录**（主路径）。打开你的 Folia 页面，找网易云扫码登录入口，用网易云 App 扫一下。登录态存在服务端，Folia 里听什么都是全曲。
+2. **nginx 注入 Cookie**（想让主站的生活页播放器也全曲时用）。在主站 nginx 的 `/api/` 反代里加一行：
+
+```nginx
+proxy_set_header Cookie "MUSIC_U=你的; __csrf=你的";
 ```
 
-`NCL_COOKIE` 说两句。不带登录态的时候网易接口只吐 30 来秒的试听片段，歌听一半就跳；带上你自己的登录 Cookie 就是全曲。拿法：浏览器登录 music.163.com，F12 → Network → 随便点个请求，把 Request Headers 里那行 Cookie 整条抄下来贴进去。
+Cookie 从哪拿：浏览器登录 music.163.com，F12 → Network → 随便一个请求，把 Request Headers 里的 Cookie 整行抄下来。这行东西等同你的网易账号密码，只放在服务器的 nginx 配置里——不进 git、不进前端、别发给任何人。哪天觉得不对劲，改个密码它就作废了。
 
-这行 Cookie 等同你的网易账号密码，别发给任何人，包括别贴到聊天窗口里让 AI 帮你看——自己填就好。它只活在服务器的 `.env` 里，git 看不到它。哪天觉得不对劲，网页上退出登录或者改个密码，这条就作废了。
+## 点赞计数服务
+
+页眉那个「✦ 计数」点赞按钮，数字存在一个小服务里，部署站点时要顺手把它跑起来，否则按钮一直显示「—」。
+
+```bash
+cd deploy/like-server
+nohup node server.cjs > /var/log/like-server.log 2>&1 &
+```
+
+然后主站 nginx 的 server 块里加三行，`nginx -t && nginx -s reload`：
+
+```nginx
+location /api/like {
+  proxy_pass http://127.0.0.1:3001;
+  proxy_set_header Host $host;
+}
+```
+
+自测 `curl https://nijingzh.top/api/like`，返回 `{"count":N}` 就通了。数据存在 `like-server/like.json`，想清零删掉它重启就行。
 
 ## 还没做完
 
