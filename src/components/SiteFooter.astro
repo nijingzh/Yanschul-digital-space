@@ -1,52 +1,85 @@
 ---
-import { siteNav, SITE_BIRTH, SLOGAN } from '../data/content';
+import { siteNav, SITE_BIRTH, SLOGAN, getFeedItems } from '../data/content';
 import MiniPlayer from './MiniPlayer.astro';
+
 const year = new Date().getFullYear();
+const feed = await getFeedItems();
+const lastUpdate = feed.length ? feed[0].date.replace(/-/g, '.') : '';
 ---
 
 <footer class="site-footer">
   <!-- v21 波浪发丝线（流动收尾） -->
   <div class="wave-hair shell" aria-hidden="true"></div>
   <div class="shell">
-    <div class="hairline footer-top">
+    <!-- 上层 · 身份（v38 三段秩序：品牌 + SITEMAP + CONTACT） -->
+    <div class="footer-top">
       <div class="footer-brand">
-        <p class="display footer-name">江衍 YANSCHUL · Digital Space</p>
+        <p class="display footer-name">江衍<span class="brand-en mono">YANSCHUL · DIGITAL SPACE</span></p>
         <p class="lead">一个持续生长的个人数字空间，技术、生活与正在发生的一切都住在这里。</p>
-        <p class="slogan footer-slogan">{SLOGAN}</p>
+        <p class="slogan footer-slogan"><span class="slogan-star" aria-hidden="true">✦</span>{SLOGAN}</p>
       </div>
 
-      <nav class="footer-nav" aria-label="页脚导航">
-        {
-          siteNav
-            .filter((item) => item.href !== '/')
-            .map((item) => (
-              <a href={item.href} class="u-link footer-link">
-                {item.label}
-              </a>
-            ))
-        }
-        <span class="footer-sep" aria-hidden="true">·</span>
-        <a href="/archive" class="u-link footer-link">归档</a>
-        <a href="/tags" class="u-link footer-link">标签</a>
-        <a href="/rss.xml" class="u-link footer-link">RSS</a>
-      </nav>
+      <div class="footer-nav-block">
+        <div>
+          <p class="mono nav-label">SITEMAP / 导航</p>
+          <nav class="footer-nav" aria-label="页脚导航">
+            {
+              siteNav
+                .filter((item) => item.href !== '/')
+                .map((item) => (
+                  <a href={item.href} class="u-link footer-link">
+                    {item.label}
+                  </a>
+                ))
+            }
+            <a href="/archive" class="u-link footer-link">归档</a>
+            <a href="/tags" class="u-link footer-link">标签</a>
+            <a href="/rss.xml" class="u-link footer-link">RSS</a>
+          </nav>
+        </div>
+
+        <div>
+          <p class="mono nav-label">CONTACT / 找到我</p>
+          <div class="footer-contact">
+            <span class="chip-link"><i class="dot" aria-hidden="true"></i>空间在线</span>
+            <a class="chip-link" href="https://github.com/nijingzh" target="_blank" rel="noopener noreferrer">GITHUB</a>
+            <a class="chip-link" href="https://space.bilibili.com/86719895" target="_blank" rel="noopener noreferrer">BILIBILI</a>
+            <a class="chip-link" href="mailto:nijingzh@gmail.com">EMAIL</a>
+            <a class="chip-link" href="https://www.travellings.cn/go" target="_blank" rel="noopener noreferrer">开往 · TRAVELLINGS</a>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- 页脚上方：建站计时（数字 tick）+ 迷你播放态（常驻控件，不参与入场编排） -->
+    <!-- 中层 · 生命感（玻璃条：真数据聚成一条） -->
     <div class="footer-live">
-      <span class="mono site-clock" data-site-clock data-birth={SITE_BIRTH}>这间屋子住了 — 天 — 时</span>
+      <span class="live-item"><span class="ic" aria-hidden="true">✦</span><span class="mono site-clock" data-site-clock data-birth={SITE_BIRTH}>这间屋子住了 — 天 — 时</span></span>
+      <span class="live-sep" aria-hidden="true"></span>
+      <span class="live-item"><span class="ic heart" aria-hidden="true">♥</span><span class="mono">已被喜欢 <strong data-like-echo>—</strong> 次</span></span>
+      <span class="live-sep" aria-hidden="true"></span>
       <MiniPlayer />
+      {lastUpdate && (
+        <>
+          <span class="live-sep" aria-hidden="true"></span>
+          <span class="live-item"><span class="ic" aria-hidden="true">◷</span><span class="mono">最近更新 <strong>{lastUpdate}</strong></span></span>
+        </>
+      )}
     </div>
 
+    <!-- 下层 · 法定信息（版权 / 备案 / 回顶） -->
     <div class="footer-bottom mono">
-      <span>© {year} 江衍 YANSCHUL · 保留所有心情</span>
-      <span>由 Astro 驱动 · 动效来自 Anime.js</span>
-      <a class="icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">津ICP备2026014578号</a>
-      <a class="icp mps" href="https://beian.mps.gov.cn/#/query/webSearch?code=32020502002610" target="_blank" rel="noreferrer">
-        <img class="mps-badge" src="/mps-badge.png" width="16" height="16" alt="公安备案图标" />
-        苏公网安备32020502002610号
-      </a>
-      <span>空间仍在生长中</span>
+      <div class="bottom-left">
+        <span>© {year} 江衍 YANSCHUL · 保留所有心情</span>
+        <span>由 Astro 驱动 · 动效来自 Anime.js</span>
+      </div>
+      <div class="bottom-right">
+        <a class="icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">津ICP备2026014578号</a>
+        <a class="icp mps" href="https://beian.mps.gov.cn/#/query/webSearch?code=32020502002610" target="_blank" rel="noreferrer">
+          <img class="mps-badge" src="/mps-badge.png" width="16" height="16" alt="公安备案图标" />
+          苏公网安备32020502002610号
+        </a>
+        <button class="to-top mono" type="button" data-to-top>↑ 回到顶部</button>
+      </div>
     </div>
   </div>
 </footer>
@@ -58,20 +91,39 @@ const year = new Date().getFullYear();
   // v37：元素查询放进 render + astro:page-load 重跑（此前顶层查一次，SPA 切页后新页脚没人填）
   const render = (): void => {
     const clock = document.querySelector<HTMLElement>('[data-site-clock]');
-    if (!clock) return;
-    const birthVal = clock.dataset.birth || '2026-09-23';
-    const birth = new Date(birthVal + 'T00:00:00');
-    const now = new Date();
-    const dayMs = 86400000;
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const start = new Date(birth.getFullYear(), birth.getMonth(), birth.getDate());
-    const days = Math.max(0, Math.round((today.getTime() - start.getTime()) / dayMs));
-    const text = `这间屋子住了 ${days} 天 ${now.getHours()} 时`;
-    if (clock.textContent !== text) tickText(clock, text);
+    if (clock) {
+      const birthVal = clock.dataset.birth || '2026-09-23';
+      const birth = new Date(birthVal + 'T00:00:00');
+      const now = new Date();
+      const dayMs = 86400000;
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const start = new Date(birth.getFullYear(), birth.getMonth(), birth.getDate());
+      const days = Math.max(0, Math.round((today.getTime() - start.getTime()) / dayMs));
+      const text = `这间屋子住了 ${days} 天 ${now.getHours()} 时`;
+      if (clock.textContent !== text) tickText(clock, text);
+    }
+    // v38 点赞数 echo（真数据；服务没起就留「—」）
+    const echo = document.querySelector<HTMLElement>('[data-like-echo]');
+    if (echo && echo.textContent === '—') {
+      fetch('/api/like')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data: { count?: number } | null) => {
+          if (data && typeof data.count === 'number') echo.textContent = String(data.count);
+        })
+        .catch(() => {});
+    }
   };
   render();
   document.addEventListener('astro:page-load', render);
   setInterval(render, 60000);
+
+  // v38 回到顶部（事件委托，SPA 切页永久有效）
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    const btn = target && target.closest ? target.closest('[data-to-top]') : null;
+    if (!btn) return;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 </script>
 
 <style>
@@ -81,71 +133,222 @@ const year = new Date().getFullYear();
     padding-block: 4rem 2.2rem;
   }
 
+  /* ── 上层 · 身份（两栏 1.4fr:1fr） ── */
   .footer-top {
     display: grid;
-    gap: 2.5rem;
+    gap: 2.6rem;
     padding-top: 2.5rem;
+    align-items: start;
   }
 
   .footer-name {
-    font-size: 1.05rem;
-    margin-bottom: 0.7rem;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.35rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.85rem;
+    line-height: 1.3;
+  }
+
+  .brand-en {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 300;
+    letter-spacing: 0.28em;
+    color: var(--color-ink-3);
+    margin-left: 0.85rem;
+    vertical-align: middle;
+    white-space: nowrap;
   }
 
   .footer-brand .lead {
     max-width: 34ch;
-    font-size: 0.88rem;
-    line-height: 1.9;
+    font-size: 0.86rem;
+    line-height: 2;
+    color: var(--color-ink-2);
+    margin-bottom: 1.1rem;
   }
 
   .footer-slogan {
-    margin-top: 0.9rem;
-    font-size: 0.85rem;
-    letter-spacing: 0.18em;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    color: var(--color-ink-3);
+  }
+
+  .slogan-star {
+    font-size: 0.82rem;
     color: var(--color-ink-2);
+  }
+
+  .footer-nav-block {
+    display: grid;
+    gap: 1.7rem;
+  }
+
+  .nav-label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    color: var(--color-ink-3);
+    margin-bottom: 0.95rem;
+    line-height: 1;
   }
 
   .footer-nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.4rem;
+    gap: 0.75rem 1.75rem;
     align-content: start;
   }
 
   .footer-link {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
     color: var(--color-ink-2);
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.3s var(--ease-space), border-color 0.3s var(--ease-space);
   }
 
   .footer-link:hover {
     color: var(--color-ink);
+    border-bottom-color: var(--color-edge);
   }
 
+  /* CONTACT 胶囊组 */
+  .footer-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .chip-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.32rem 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+    text-decoration: none;
+    transition: color 0.3s var(--ease-space), border-color 0.3s var(--ease-space), transform 0.3s var(--ease-space);
+  }
+
+  .chip-link:hover {
+    color: var(--color-ink);
+    border-color: var(--color-edge);
+    transform: translateY(-1px);
+  }
+
+  .chip-link .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #7ec9a2;
+  }
+
+  /* ── 中层 · 生命感（玻璃条，站内玻璃语法） ── */
   .footer-live {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1.2rem 2.6rem;
-    margin-top: 2.4rem;
+    gap: 1.2rem 2.2rem;
+    margin-top: 2.6rem;
+    padding: 1.15rem 1.5rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 14px;
+    background: var(--color-panel);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .footer-live {
+      background: rgba(253, 253, 255, 0.92);
+    }
+  }
+
+  .live-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--color-ink-2);
+    white-space: nowrap;
+  }
+
+  .live-item .ic {
+    color: var(--color-ink-3);
+    font-size: 0.85rem;
+  }
+
+  .live-item .heart {
+    color: #c9788f;
+    font-size: 0.8rem;
+  }
+
+  .live-item strong {
+    color: var(--color-ink);
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+  }
+
+  .live-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--color-hair);
   }
 
   .site-clock {
-    font-size: 0.62rem;
-    letter-spacing: 0.16em;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
     color: var(--color-ink-2);
   }
 
+  /* ── 下层 · 法定信息 ── */
   .footer-bottom {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem 2.6rem;
-    line-height: 2;
+    align-items: center;
     justify-content: space-between;
-    margin-top: 2.4rem;
+    gap: 1rem 2rem;
+    margin-top: 2.2rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--color-hair);
+    font-family: var(--font-mono);
     font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-2);
+    line-height: 2;
   }
 
-  /* ICP 备案（发丝线胶囊，hover 亮边） */
+  .bottom-left {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem 1.6rem;
+  }
+
+  .bottom-right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* ICP / 公安备案（发丝线胶囊，hover 亮边） */
   .icp {
     display: inline-flex;
     align-items: center;
@@ -156,7 +359,7 @@ const year = new Date().getFullYear();
     font-family: var(--font-mono);
     font-size: 0.62rem;
     letter-spacing: 0.12em;
-    color: var(--color-muted);
+    color: var(--color-ink-2);
     text-decoration: none;
     transition: color 0.32s var(--ease-space), border-color 0.32s var(--ease-space);
   }
@@ -177,10 +380,33 @@ const year = new Date().getFullYear();
     display: block;
   }
 
+  /* 回到顶部 */
+  .to-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    border: 1px solid var(--color-hair);
+    border-radius: 999px;
+    padding: 0.32rem 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-2);
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.3s var(--ease-space), border-color 0.3s var(--ease-space), transform 0.3s var(--ease-space);
+  }
+
+  .to-top:hover {
+    color: var(--color-ink);
+    border-color: var(--color-edge);
+    transform: translateY(-2px);
+  }
+
   @media (min-width: 860px) {
     .footer-top {
-      grid-template-columns: 1fr auto;
-      align-items: start;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 3rem;
     }
   }
 
@@ -191,6 +417,14 @@ const year = new Date().getFullYear();
     }
     .footer-bottom {
       font-size: 0.72rem;
+      justify-content: flex-start;
+    }
+    .footer-live {
+      padding: 1rem;
+      gap: 0.9rem 1.4rem;
+    }
+    .live-sep {
+      display: none;
     }
   }
 </style>
