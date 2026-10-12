@@ -88,6 +88,25 @@ location /api/like {
 
 自测 `curl https://nijingzh.top/api/like`，返回 `{"count":N}` 就通了。数据存在 `like-server/like.json`，想清零删掉它重启就行。
 
+**想让它一直活着（开机自启 + 崩了自动重启）**——别用 `nohup`，用 systemd，仓库里有模板 `deploy/like-server/like-server.service`：
+
+```bash
+# 0. 先杀掉 nohup 起的旧进程（否则端口被占）
+pkill -f "node server.cjs"
+
+# 1. 改模板里两个路径（WorkingDirectory 指到你放 like-server 的目录；
+#    ExecStart 的 node 用 which node 查出来的绝对路径），然后装上
+sudo cp deploy/like-server/like-server.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now like-server
+
+# 2. 确认
+sudo systemctl status like-server     # active (running) 就成了
+curl http://127.0.0.1:3001/api/like
+```
+
+机器重启它自己起来，进程挂了 3 秒内自动拉起。日志用 `journalctl -u like-server -f` 看。
+
 ## 还没做完
 
 - 留言和评论，等部署上线之后再弄

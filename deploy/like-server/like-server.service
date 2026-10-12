@@ -1,0 +1,16 @@
+[Unit]
+Description=Yanschul like counter (zero-dep node server)
+After=network.target
+
+[Service]
+# 把下面两行改成你服务器上的实际路径：
+#   WorkingDirectory = deploy/like-server 的绝对路径
+#   ExecStart 的 node = which node 查出来的绝对路径
+WorkingDirectory=/opt/Yanschul-digital-space/deploy/like-server
+ExecStart=/usr/bin/node server.cjs
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
