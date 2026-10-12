@@ -42,11 +42,8 @@ const year = new Date().getFullYear();
       <span>© {year} 江衍 YANSCHUL · 保留所有心情</span>
       <span>由 Astro 驱动 · 动效来自 Anime.js</span>
       <a class="icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">津ICP备2026014578号</a>
-      <a class="icp mps" href="https://beian.mps.gov.cn/#/query/webSearch?code=32020502002610" target="_blank" rel="noopener noreferrer">
-        <svg class="mps-badge" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 2.2 L20 5.4 V11 C20 16.2 16.6 20.2 12 21.8 7.4 20.2 4 16.2 4 11 V5.4 Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" />
-          <path d="M12 6.6 L13.2 10.2 16.9 10.2 13.9 12.4 15.1 16 12 13.8 8.9 16 10.1 12.4 7.1 10.2 10.8 10.2 Z" fill="currentColor" opacity="0.85" />
-        </svg>
+      <a class="icp mps" href="https://beian.mps.gov.cn/#/query/webSearch?code=32020502002610" target="_blank" rel="noreferrer">
+        <img class="mps-badge" src="/mps-badge.png" width="16" height="16" alt="公安备案图标" />
         苏公网安备32020502002610号
       </a>
       <span>空间仍在生长中</span>
@@ -169,15 +166,15 @@ const year = new Date().getFullYear();
     border-color: var(--color-edge);
   }
 
-  /* 公安备案：警徽盾牌（发丝线线条，贴站点母题语言） */
+  /* 公安备案：官方警徽图标（公安部备案规定用官方图标，不改色） */
   .icp.mps {
     gap: 0.42rem;
   }
 
   .mps-badge {
-    width: 13px;
-    height: 13px;
-    color: var(--color-ink-2);
+    width: 16px;
+    height: 16px;
+    display: block;
   }
 
   @media (min-width: 860px) {
