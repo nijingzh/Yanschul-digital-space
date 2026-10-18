@@ -168,7 +168,8 @@ const index = items.map((it) => ({
     overflow-y: auto;
   }
 
-  .palette-item a {
+  /* 结果行由 JS innerHTML 注入，拿不到 Astro 的 scoped 属性，必须用 :global 命中 */
+  :global(.palette-item a) {
     display: grid;
     grid-template-columns: 5.2em 1fr auto;
     align-items: baseline;
@@ -179,19 +180,19 @@ const index = items.map((it) => ({
     color: inherit;
   }
 
-  .palette-item.is-cursor a,
-  .palette-item a:hover {
+  :global(.palette-item.is-cursor a),
+  :global(.palette-item a:hover) {
     background: var(--color-panel-2);
   }
 
-  .palette-item time,
-  .palette-kind {
+  :global(.palette-item time),
+  :global(.palette-kind) {
     font-size: 0.72rem;
     letter-spacing: 0.1em;
     color: var(--color-ink-soft);
   }
 
-  .palette-title {
+  :global(.palette-title) {
     font-family: var(--font-serif);
     font-size: 0.98rem;
     color: var(--color-ink);

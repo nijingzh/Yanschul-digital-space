@@ -2,6 +2,17 @@
 
 这个项目的改动都记在这里，交接细节在 docs/ai-handoff.md。
 
+## 2026-10-18 — 工程化补齐：SEO / 404 / 部署可复现 / 加载层兜底
+
+- `astro.config.mjs` 补 `site`（RSS 不再输出 localhost）；CSS 默认改为外链哈希文件（`DSH_INLINE_CSS=1` 可回退内联，保留 file:// 离线预览）
+- Base.astro 统一标题后缀（修项目页三层重复），补 canonical / og / twitter / theme-color / preconnect；关于页与项目页 `desc` → `description`（之前 meta 描述一直回退默认值）
+- 新增 `sitemap.xml` 端点与 `robots.txt`
+- nginx 模板：未知 URL 返回真 404（不再 200 软 404）、静态资源 1y immutable、`/api/like` 传 `X-Real-IP`
+- like-server：原子写、按 IP 2s 冷却、去掉 CORS `*`、no-store；新增 `install.sh` 一键生成 systemd unit（修模板路径导致的 `200/CHDIR`）
+- SiteLoader：无 JS 时不再显示遮罩、同一会话只挡一次、5s 兜底放行
+- 新增根目录 `.env.example`；README 修正 Cookie 注入位置（81 端口 Folia，不是 443 主站）
+- 界面细节：搜索面板结果行样式修复（Astro scoped CSS 命中不到 innerHTML 注入的节点）、手机与 900px 宽度下头部不再逐字换行、文章/项目详情眉标不再被固定导航盖住、分类筛选与正文列对齐、夜航玻璃层改用主题 token（移动端菜单不再是浅底浅字）
+
 ## 2026-10-12 — 页脚重设计「三段秩序」（小样过目后落地）
 
 - 上层品牌+SITEMAP/CONTACT 两栏（社交胶囊组：GitHub/Bilibili/Email/开往/空间在线）

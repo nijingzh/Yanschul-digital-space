@@ -4,7 +4,7 @@ import { getFeedItems } from '../data/content';
 
 export const GET: APIRoute = async ({ site }) => {
   const items = await getFeedItems();
-  const base = site ? site.toString() : 'http://localhost:4321';
+  const base = (site ? site.toString() : 'http://localhost:4321').replace(/\/+$/, '');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>

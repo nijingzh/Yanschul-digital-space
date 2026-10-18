@@ -22,7 +22,7 @@ const idx = all.findIndex((e) => e.id === entry.id);
 const older = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 ---
 
-<Base title={`${data.title} — 江衍 · Digital Space`} desc={data.desc}>
+<Base title={data.title} description={data.desc}>
   <div class="work-page">
     <header class="work-head">
       <p class="mono work-eyebrow" data-enter>SPACE 02 / WORK DETAIL</p>
@@ -80,7 +80,8 @@ const older = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
 <style>
   .work-page {
-    padding-block: clamp(2.2rem, 5vh, 3.6rem);
+    /* 顶部留出固定导航高度 + 呼吸位，避免眉标被 header 盖住 */
+    padding-block: clamp(4.5rem, 9vh, 6rem) clamp(2.2rem, 5vh, 3.6rem);
   }
 
   .work-eyebrow {

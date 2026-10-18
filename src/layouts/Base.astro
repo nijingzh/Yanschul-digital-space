@@ -10,12 +10,23 @@ import { ClientRouter } from 'astro:transitions';
 interface Props {
   title: string;
   description?: string;
+  /** 分享卡片图（绝对路径或完整 URL）；目前站点没有统一封面，留空时不输出 og:image。 */
+  image?: string;
 }
 
 const {
   title,
   description = '江衍 YANSCHUL 的个人数字空间：技术、学习、生活，以及一切正在发生的事。0为过去，1即未来。',
+  image,
 } = Astro.props;
+
+const SITE_NAME = '江衍 Digital Space';
+// 页面标题统一在这里补站名；已经带站名的（如项目页的项目名）不再重复追加。
+const pageTitle = title.includes('Digital Space') ? title : `${title} — ${SITE_NAME}`;
+// 规范 URL：去尾斜杠（根路径除外），与站内链接、sitemap 保持一致。
+const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const canonical = new URL(canonicalPath, Astro.site ?? 'https://nijingzh.top').href;
+const ogImage = image ? new URL(image, Astro.site ?? 'https://nijingzh.top').href : undefined;
 ---
 
 <!doctype html>
@@ -25,8 +36,21 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light" />
-    <title>{title} — 江衍 Digital Space</title>
+    <meta name="theme-color" content="#f7f5fc" />
+    <title>{pageTitle}</title>
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" />
     <ClientRouter />
     <script is:inline>
@@ -37,6 +61,11 @@ const {
       window.scrollTo(0, 0);
       // 浏览器的滚动恢复发生在本脚本之前，load 完成后再归零一次兜底
       window.addEventListener('load', function () { window.scrollTo(0, 0); }, { once: true });
+      // 兜底：即使加载层脚本没执行（资源 404 / JS 报错），5s 后也要放行页面
+      setTimeout(function () {
+        var l = document.querySelector('[data-site-loader]');
+        if (l && !l.classList.contains('done')) l.classList.add('done');
+      }, 5000);
     </script>
   </head>
 

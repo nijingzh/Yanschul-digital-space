@@ -88,8 +88,11 @@ import SparkIcon from '../components/SparkIcon.astro';
   /* 分类 chip（v23.8） */
   .filter-chips {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
-    margin: 28px 0 8px;
+    width: calc(100% - 3rem);
+    max-width: 56rem;
+    margin: 28px auto 8px;
   }
 
   /* 空状态（v37）：feed 清空时的体面显示 */

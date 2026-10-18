@@ -60,11 +60,13 @@ PUBLIC_FOLIA_PLAYLIST_ID=593219640          # 网易云歌单 ID，空了播放�
 歌曲只能听 30 来秒，是网易对**未登录**的限制，不是哪个配置没填。解法两条：
 
 1. **Folia 里扫码登录**（主路径）。打开你的 Folia 页面，找网易云扫码登录入口，用网易云 App 扫一下。登录态存在服务端，Folia 里听什么都是全曲。
-2. **nginx 注入 Cookie**（想让主站的生活页播放器也全曲时用）。在主站 nginx 的 `/api/` 反代里加一行：
+2. **nginx 注入 Cookie**（想让主站的生活页播放器也全曲时用）。加在 **81 端口 Folia 的 `/api/` 反代**里（443 主站的 `/api/like` 不用动）：
 
 ```nginx
 proxy_set_header Cookie "MUSIC_U=你的; __csrf=你的";
 ```
+
+注意：如果 `/api/` 反代还没剥前缀，播放器会报 `Cannot GET /api/...`，需要在同一个 location 里加一行 `rewrite ^/api/(.*)$ /$1 break;`（网易 API 的路由是 `/song/url`，不是 `/api/song/url`）。
 
 Cookie 从哪拿：浏览器登录 music.163.com，F12 → Network → 随便一个请求，把 Request Headers 里的 Cookie 整行抄下来。这行东西等同你的网易账号密码，只放在服务器的 nginx 配置里——不进 git、不进前端、别发给任何人。哪天觉得不对劲，改个密码它就作废了。
 
@@ -83,12 +85,19 @@ nohup node server.cjs > /var/log/like-server.log 2>&1 &
 location /api/like {
   proxy_pass http://127.0.0.1:3001;
   proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr;   # 点赞按 IP 冷却要靠它
 }
 ```
 
 自测 `curl https://nijingzh.top/api/like`，返回 `{"count":N}` 就通了。数据存在 `like-server/like.json`，想清零删掉它重启就行。
 
-**想让它一直活着（开机自启 + 崩了自动重启）**——别用 `nohup`，用 systemd，仓库里有模板 `deploy/like-server/like-server.service`：
+**想让它一直活着（开机自启 + 崩了自动重启）**——别用 `nohup`，用 systemd。仓库里有一键脚本，它会自己把仓库路径和 node 路径写进 unit：
+
+```bash
+sudo bash deploy/like-server/install.sh
+```
+
+脚本会完成 `enable --now` 并打印状态和自测结果。手动装也可以（模板 `deploy/like-server/like-server.service`，装之前改 `WorkingDirectory` 和 `ExecStart` 两处路径）：
 
 ```bash
 # 0. 先杀掉 nohup 起的旧进程（否则端口被占）

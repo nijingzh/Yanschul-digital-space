@@ -522,6 +522,61 @@ const isActive = (href: string): boolean =>
       display: none;
     }
   }
+
+  /* 头部控件永不被挤到逐字换行（900px 左右曾出现「首/页」竖排） */
+  .brand,
+  .nav-link,
+  .like-btn,
+  .theme-toggle,
+  .search-btn,
+  .menu-btn {
+    white-space: nowrap;
+  }
+
+  .brand,
+  .header-side {
+    flex-shrink: 0;
+  }
+
+  /* 860–1080：导航已出现但横向余量不足，先收起「空间在线」并收紧间距 */
+  @media (min-width: 860px) and (max-width: 1080px) {
+    .status {
+      display: none;
+    }
+
+    .main-nav {
+      gap: 1.15rem;
+    }
+
+    .header-inner {
+      gap: 1rem;
+    }
+  }
+
+  /* 手机：隐藏英文副标、收紧按钮，保证四个控件单行且高度一致 */
+  @media (max-width: 700px) {
+    .brand-tag {
+      display: none;
+    }
+
+    .header-inner {
+      gap: 0.75rem;
+    }
+
+    .header-side {
+      gap: 0.5rem;
+    }
+
+    .search-btn {
+      padding: 0.4rem 0.55rem;
+      letter-spacing: 0.06em;
+    }
+
+    .menu-btn {
+      padding: 0.4rem 0.6rem;
+      letter-spacing: 0.1em;
+    }
+  }
 </style>
 
 <script>

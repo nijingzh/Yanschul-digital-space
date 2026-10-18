@@ -206,6 +206,11 @@ const slugOf = (id: string) => id.replace(/^\d+-/, '');
     margin-inline: auto;
   }
 
+  /* 固定导航之下留出呼吸位，眉标不再被 header 盖住（此前 y=45 < 57px 导航高） */
+  .post-head {
+    padding-top: clamp(4.5rem, 9vh, 6rem);
+  }
+
   .post-eyebrow {
     color: var(--color-ink-2);
     font-size: 0.68rem;
