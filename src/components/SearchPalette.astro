@@ -38,6 +38,10 @@ const index = items.map((it) => ({
     let cursor = -1;
     let hits = [];
 
+    // 内容标题进入 innerHTML 前先转义；将来接 CMS 也不会变成注入点
+    const esc = (value) =>
+      String(value).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
+
     const render = (q) => {
       const query = q.trim().toLowerCase();
       hits = query ? index.filter((it) => it.hay.includes(query)).slice(0, 8) : index.slice(0, 8);
@@ -45,9 +49,9 @@ const index = items.map((it) => ({
         .map(
           (it, i) =>
             '<li class="palette-item' + (i === cursor ? ' is-cursor' : '') + '">' +
-            '<a href="' + it.href + '"><time class="mono">' + it.date + '</time>' +
-            '<span class="palette-title">' + it.title + '</span>' +
-            '<span class="mono palette-kind">' + it.kind + '</span></a></li>'
+            '<a href="' + esc(it.href) + '"><time class="mono">' + esc(it.date) + '</time>' +
+            '<span class="palette-title">' + esc(it.title) + '</span>' +
+            '<span class="mono palette-kind">' + esc(it.kind) + '</span></a></li>'
         )
         .join('');
       empty.hidden = hits.length > 0;
@@ -84,7 +88,10 @@ const index = items.map((it) => ({
         render(input.value);
       }
       if (e.key === 'Enter' && hits[cursor]) {
-        window.location.href = hits[cursor].href;
+        // 走真实链接点击，交给 ClientRouter 做无刷新跳转（location.href 会整页重载）
+        // 注意：is:inline 脚本不做 TS 转译，不能写 querySelector<T>()
+        const link = list.querySelector('.palette-item.is-cursor a');
+        if (link) link.click();
       }
     });
 

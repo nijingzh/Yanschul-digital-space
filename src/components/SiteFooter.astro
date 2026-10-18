@@ -133,6 +133,13 @@ const lastUpdate = feed.length ? feed[0].date.replace(/-/g, '.') : '';
     padding-block: 4rem 2.2rem;
   }
 
+  /* 夜航：给页脚一层从透明过渡到暗底的“地面”，
+     否则右上呼吸光晕会透上来，把浅色文字洗到看不清。
+     注意：[data-theme] 在 Astro scoped style 里会被加 cid，必须 :global 包住。 */
+  :global([data-theme='night']) .site-footer {
+    background: linear-gradient(to bottom, transparent 0, rgba(20, 20, 27, 0.86) 96px);
+  }
+
   /* ── 上层 · 身份（两栏 1.4fr:1fr） ── */
   .footer-top {
     display: grid;
@@ -425,6 +432,19 @@ const lastUpdate = feed.length ? feed[0].date.replace(/-/g, '.') : '';
     }
     .live-sep {
       display: none;
+    }
+    /* 小屏：导航别用大列间距把 5 项撑满整行，改成紧凑换行 */
+    .footer-nav {
+      column-gap: 1.2rem;
+      row-gap: 0.2rem;
+    }
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+    }
+    .footer-contact .chip-link {
+      min-height: 32px;
     }
   }
 </style>

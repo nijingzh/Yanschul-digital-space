@@ -54,7 +54,7 @@ const isActive = (href: string): boolean =>
           <i style="--bx: -19px; --by: -1px; --d: 40ms">✧</i>
         </span>
         <span class="like-star" aria-hidden="true">✦</span>
-        <span data-like-count>—</span>
+        <span data-like-count aria-live="polite">—</span>
       </button>
 <button class="theme-toggle mono" data-theme-toggle aria-label="切换夜航模式" title="夜航模式">☾</button>
 <button class="search-btn mono" data-search-open aria-label="搜索" title="搜索（⌘K / Ctrl+K）">搜索 ⌘K</button>
@@ -255,10 +255,11 @@ const isActive = (href: string): boolean =>
     position: absolute;
     left: 50%;
     bottom: -0.45rem;
-    width: 8px;
-    height: 1px;
+    width: 14px;
+    height: 2px;
+    border-radius: 2px;
     background: var(--color-ink);
-    opacity: 0.55;
+    opacity: 0.72;
     transform: translateX(-50%);
   }
 
@@ -433,6 +434,19 @@ const isActive = (href: string): boolean =>
   .theme-toggle:hover {
     color: var(--color-ink);
     border-color: var(--color-edge);
+  }
+
+  /* 触控目标：小圆钮至少 28px，手机上不至于点不中 */
+  .like-btn,
+  .theme-toggle {
+    min-height: 28px;
+  }
+
+  .theme-toggle {
+    min-width: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .status-dot {

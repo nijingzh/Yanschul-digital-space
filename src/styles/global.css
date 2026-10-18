@@ -14,7 +14,7 @@
   --color-tint: #f6f2fa;
   --color-ink: #1d1d22;
   --color-ink-2: #5e5e6b;
-  --color-ink-3: #a6a6b3;
+  --color-ink-3: #6f6f7d;
   --color-panel: rgba(253, 253, 255, 0.72);
   --color-panel-2: rgba(250, 244, 248, 0.35);
   --color-hair: rgba(29, 29, 34, 0.16);
@@ -76,7 +76,7 @@ html {
   --color-ink: #ededf4;
   --color-ink-soft: #9c9cb0;
   --color-ink-2: #9c9cb0;
-  --color-ink-3: #7a7a8c;
+  --color-ink-3: #8a8a9c;
   --color-hair: rgba(237, 237, 244, 0.14);
   --hair-frame: rgba(237, 237, 244, 0.3);
   --color-panel: rgba(22, 22, 30, 0.72);
@@ -102,9 +102,24 @@ html {
   background-image: radial-gradient(circle, rgba(237, 237, 244, 0.07) 1px, transparent 1.3px);
 }
 
+/* 夜航：基础呼吸动画是 0.62–0.78，会把右上内容洗白；这里换一套低透明度节奏 */
+@keyframes starhalo-breathe-night {
+  from {
+    opacity: 0.26;
+  }
+
+  to {
+    opacity: 0.38;
+  }
+}
+
 [data-theme='night'] body::before {
-  background: radial-gradient(circle, rgba(146, 132, 226, 1) 0%, transparent 70%);
-  opacity: 0.4;
+  background: radial-gradient(circle, rgba(118, 102, 190, 1) 0%, transparent 70%);
+  animation-name: starhalo-breathe-night;
+}
+
+[data-theme='night'] .ambient-blob {
+  opacity: 0.3;
 }
 
 body {
@@ -956,6 +971,17 @@ html.js .ambient-blob:not(.is-settled) {
   padding: 0.06em 0.16em 0 0;
   font-weight: 700;
   color: var(--color-ink);
+}
+
+/* 首字是中文标点（（ “ 《 等）时不做下沉，避免放大成一个怪块 */
+.prose > p.no-dropcap::first-letter {
+  float: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  padding: 0;
+  font-weight: inherit;
+  color: inherit;
 }
 
 .prose blockquote {

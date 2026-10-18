@@ -179,6 +179,14 @@ const slugOf = (id: string) => id.replace(/^\d+-/, '');
   }, { passive: true });
 </script>
 
+<script>
+  // 中文标点开头不做首字下沉（否则「（」会被放大成一个巨大的括号块）
+  const firstProseParagraph = document.querySelector('.post-prose > p');
+  if (firstProseParagraph && /^[（(“‘《「『【]/.test(firstProseParagraph.textContent?.trim() ?? '')) {
+    firstProseParagraph.classList.add('no-dropcap');
+  }
+</script>
+
 <style>
   .post-room {
     position: relative;
