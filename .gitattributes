@@ -1,0 +1,5 @@
+* text=auto
+
+# 服务端脚本必须 LF：CRLF 会让 shebang 失效、systemd unit 解析出 Unknown key
+*.sh text eol=lf
+*.service text eol=lf
