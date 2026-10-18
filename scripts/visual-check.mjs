@@ -147,7 +147,12 @@ async function main() {
         });
         cdp.events.length = 0;
         await cdp.send('Page.reload', { ignoreCache: false });
-        await sleep(2600);
+        await sleep(3000);
+        // 无头后台标签的定时器会被节流，开场加载层可能多停留；截图前直接摘掉
+        await cdp.send('Runtime.evaluate', {
+          expression: "document.querySelector('.site-loader')?.remove()",
+        });
+        await sleep(250);
         const { data } = await cdp.send('Page.captureScreenshot', { format: 'png' });
         const file = path.join(OUT, `${page.name}-${vp.name}-${theme}.png`);
         fs.writeFileSync(file, Buffer.from(data, 'base64'));
