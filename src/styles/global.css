@@ -15,6 +15,7 @@
   --color-ink: #1d1d22;
   --color-ink-2: #5e5e6b;
   --color-ink-3: #6f6f7d;
+  --color-ink-soft: #6a6a76;
   --color-panel: rgba(253, 253, 255, 0.72);
   --color-panel-2: rgba(250, 244, 248, 0.35);
   --color-hair: rgba(29, 29, 34, 0.16);
@@ -982,6 +983,29 @@ html.js .ambient-blob:not(.is-settled) {
   padding: 0;
   font-weight: inherit;
   color: inherit;
+}
+
+/* 强调：正文是霞鹜文楷，同字族的「粗体」在 16px 下几乎看不出；
+   强调切到衬线粗体（和标题同一套语言），一眼能分辨 */
+.prose strong,
+.prose b {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+/* 正文内链接：预检把 a 重置成继承色，不补样式的话链接和正文完全一样 */
+.prose a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--hair-frame);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.28em;
+  transition: text-decoration-color 0.3s var(--ease-space);
+}
+
+.prose a:hover {
+  text-decoration-color: var(--color-ink-3);
 }
 
 .prose blockquote {
