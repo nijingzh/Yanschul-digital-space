@@ -137,7 +137,9 @@ export function revealOnScroll(): void {
         observer.unobserve(entry.target);
       }
     },
-    { rootMargin: '0px 0px -10% 0px', threshold: 0.12 },
+    // threshold 不能用百分比：文章正文这类比视口高数倍的元素永远凑不够 12%，
+    // 首屏会一直停在 opacity:0（表现为正文空白）。有 1% 进入即触发。
+    { rootMargin: '0px 0px -8% 0px', threshold: 0.01 },
   );
 
   targets.forEach((el) => observer.observe(el));

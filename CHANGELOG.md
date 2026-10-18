@@ -2,6 +2,16 @@
 
 这个项目的改动都记在这里，交接细节在 docs/ai-handoff.md。
 
+## 2026-10-18 — 自托管字体 / 分享封面 / 首屏正文修复
+
+- 字体自托管：霞鹜文楷子集（3924 字，868KB）进 `public/fonts`，移除 jsdelivr 依赖；`scripts/fonts/subset.py` 可重新生成
+- 新增 `public/og.png`（1200×630）作为默认 `og:image` / `twitter:image`
+- 修复文章正文首屏空白：reveal 的 `threshold: 0.12` 对超高元素永远凑不够，改成 0.01
+- load 时的回顶兜底只在本就在顶部时执行，不再把已滚动的读者拽回去
+- 「我的世界」底部留白收紧（13vh → 7vh），页脚上方不再一大片空场
+- `deploy/nginx.conf` 增加安全响应头；新增 `deploy/production/`（443 主站 + 81 Folia 的真实拓扑）
+- 新增 `npm run visual`（`scripts/visual-check.mjs`）：3 视口 × 明暗 × 首页/文章 截图 + 控制台错误检查
+
 ## 2026-10-18 — 文章排版：强调与链接
 
 - `.prose strong/b` 改用衬线粗体：正文的文楷同族粗体在 16px 下几乎看不出对比

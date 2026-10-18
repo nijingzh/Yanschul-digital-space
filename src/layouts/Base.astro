@@ -26,7 +26,8 @@ const pageTitle = title.includes('Digital Space') ? title : `${title} — ${SITE
 // 规范 URL：去尾斜杠（根路径除外），与站内链接、sitemap 保持一致。
 const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const canonical = new URL(canonicalPath, Astro.site ?? 'https://nijingzh.top').href;
-const ogImage = image ? new URL(image, Astro.site ?? 'https://nijingzh.top').href : undefined;
+// 默认分享封面 public/og.png（1200×630）；页面可传 image 覆盖
+const ogImage = new URL(image ?? '/og.png', Astro.site ?? 'https://nijingzh.top').href;
 ---
 
 <!doctype html>
@@ -46,12 +47,18 @@ const ogImage = image ? new URL(image, Astro.site ?? 'https://nijingzh.top').hre
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     {ogImage && <meta property="og:image" content={ogImage} />}
-    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/lxgw-wenkai-site-regular.woff2"
+      crossorigin
+    />
     <ClientRouter />
     <script is:inline>
       if (location.protocol !== 'file:') document.documentElement.classList.add('js');
@@ -59,8 +66,11 @@ const ogImage = image ? new URL(image, Astro.site ?? 'https://nijingzh.top').hre
       // SPA 导航不受影响（本 inline script 不随 ClientRouter 导航重跑）
       if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
       window.scrollTo(0, 0);
-      // 浏览器的滚动恢复发生在本脚本之前，load 完成后再归零一次兜底
-      window.addEventListener('load', function () { window.scrollTo(0, 0); }, { once: true });
+      // 浏览器滚动恢复发生在本脚本之前，load 后再归零一次兜底；
+      // 但如果用户已经主动滚动（大字体下 load 可能晚到），不要把人拽回顶部
+      window.addEventListener('load', function () {
+        if (window.scrollY < 2) window.scrollTo(0, 0);
+      }, { once: true });
       // 兜底：即使加载层脚本没执行（资源 404 / JS 报错），5s 后也要放行页面
       setTimeout(function () {
         var l = document.querySelector('[data-site-loader]');

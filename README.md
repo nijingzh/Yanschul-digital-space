@@ -19,7 +19,15 @@ Astro 7 + TypeScript（strict）+ Tailwind 4 + Anime.js v4。
 
 没引 React 或 Vue。这站大部分内容是静态的，再挂个 UI 框架感觉没必要，Astro 默认零 JS 刚好。动效归 Anime.js 管，只动 transform 和 opacity，开了 `prefers-reduced-motion` 就全部老实静止。
 
-正文和小字用霞鹜文楷（[LxgwWenkai](https://github.com/lxgw/LxgwWenkai)，OFL 协议），走 jsdelivr 的 unicode-range 分片加载，整包字库对中文站太重了。标题是衬线，代码等宽。
+正文和小字用霞鹜文楷（[LxgwWenkai](https://github.com/lxgw/LxgwWenkai)，OFL 协议）。字体自托管在 `public/fonts/`：一个约 868KB 的 woff2 子集（本站用字 + GB2312 一级字，共 3924 字），不再依赖 jsdelivr。标题是衬线，代码等宽。
+
+新增大量文章后如果发现个别字回退成系统字体，就是子集没覆盖到，重新生成一次：
+
+```bash
+pip install fonttools brotli
+# 字体文件从 https://github.com/lxgw/LxgwWenkai/releases 下载
+python scripts/fonts/subset.py --font path/to/LXGWWenKai-Regular.ttf
+```
 
 ## 结构
 
@@ -42,6 +50,8 @@ docs/           交接文档、Phase 记录、schema 契约、v1 收尾
 ## 部署
 
 `deploy/` 里有 docker-compose（站点 + Folia 音乐播放器 + nginx 反代）和 nginx 配置。
+
+**服务器实际跑的是裸机 443 + 81**，对应配置和步骤在 [`deploy/production/`](deploy/production/README.md)：443 静态站 + `/api/like`，81 Folia + 网易 API 反代，含自检命令。
 
 配置分两层，都走 `.env`，都被 `.gitignore` 挡着，不会进仓库：
 
@@ -115,6 +125,18 @@ curl http://127.0.0.1:3001/api/like
 ```
 
 机器重启它自己起来，进程挂了 3 秒内自动拉起。日志用 `journalctl -u like-server -f` 看。
+
+## 视觉快照
+
+改版前后想确认没崩，用这个：
+
+```bash
+npm run build
+npm run preview -- --port 4322   # 另开一个终端
+npm run visual                    # 输出到 visual/（已 gitignore）
+```
+
+会截 3 个视口（1440 / 900 / 390）× 明暗两套 × 首页/文章页，共 12 张，并把控制台错误写进 `visual/index.json`。脚本只负责拍图、不做像素 diff，改完自己对照一眼；需要连已有的 Chrome 时用 `CDP_URL=http://127.0.0.1:9222 npm run visual`。
 
 ## 还没做完
 

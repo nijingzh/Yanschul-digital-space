@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* 自托管字体：霞鹜文楷子集（本站用字 + GB2312 一级字，共 3924 字），
+   不再依赖 jsdelivr，单个 868KB 文件覆盖常规正文与强调。 */
+@font-face {
+  font-family: "LXGW WenKai";
+  src: url("/fonts/lxgw-wenkai-site-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ============================================================
    江衍 · Digital Space — Design System
    冷白数字空间：浅粉只是白色世界里的光，不是主题色。
@@ -702,6 +712,11 @@ html::after {
 .section {
   position: relative;
   padding-block: clamp(5rem, 13vh, 9.5rem);
+}
+
+/* 世界区之后紧接页脚：底部收一档，避免页脚上方一大片空场 */
+.section.world {
+  padding-bottom: clamp(3rem, 7vh, 5rem);
 }
 
 /* ────────────────────────────────────────────────
