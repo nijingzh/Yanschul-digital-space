@@ -2,6 +2,15 @@
 
 这个项目的改动都记在这里，交接细节在 docs/ai-handoff.md。
 
+## 2026-10-19 — 线上 nginx 配置收敛
+
+- 443：补安全响应头（HSTS / nosniff / Referrer-Policy / X-Frame-Options / Permissions-Policy），关掉版本号
+- 443：`error_page 404 /404.html` + `try_files ... =404`，未知 URL 返回站点自己的 404 页
+- 443：字体/图片/CSS/JS 一年 immutable 缓存；HTML/RSS 保持 no-cache
+- 443/81：开启 HTTP/2
+- www 与 http 统一 301 到 `https://nijingzh.top`，和 canonical 一致
+- `try_files` 顺序改为 `$uri $uri/index.html $uri/`，文章等深层链接不再先 301 到带斜杠地址
+
 ## 2026-10-18 — 自托管字体 / 分享封面 / 首屏正文修复
 
 - 字体自托管：霞鹜文楷子集（3924 字，868KB）进 `public/fonts`，移除 jsdelivr 依赖；`scripts/fonts/subset.py` 可重新生成
