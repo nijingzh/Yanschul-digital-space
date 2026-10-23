@@ -288,6 +288,16 @@ const slugOf = (id: string) => id.replace(/^\d+-/, '');
     max-width: 44rem;
   }
 
+  /* 文章配图：截图原图 1900+ px，必须限宽 */
+  .post-prose :global(img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.6rem 0;
+    border-radius: 10px;
+    border: 1px solid var(--color-hair);
+  }
+
   /* TOC 悬浮目录（桌面右侧 sticky） */
   .post-comments {
     max-width: 67rem;

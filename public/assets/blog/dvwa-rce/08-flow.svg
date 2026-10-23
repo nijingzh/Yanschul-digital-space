@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="742" viewBox="0 0 760 742" role="img" aria-label="DVWA 完整渗透链路：弱口令到 GetShell">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7A5CC0"/>
+    </marker>
+    <style>
+      .bg { fill: #FBFBF9; }
+      .box { fill: #FFFFFF; stroke: #E4E4DE; stroke-width: 1; }
+      .num { fill: #7A5CC0; }
+      .num-t { fill: #FFFFFF; font: 600 13px "Segoe UI", system-ui, sans-serif; }
+      .t { fill: #1D1D22; font: 600 15.5px "Segoe UI", system-ui, sans-serif; }
+      .p { fill: #74747B; font: 12.5px Consolas, "Cascadia Mono", monospace; }
+      .tag { fill: #7A5CC0; font: 11px "Segoe UI", system-ui, sans-serif; letter-spacing: .06em; }
+      .h1 { fill: #1D1D22; font: 700 22px "Segoe UI", system-ui, sans-serif; }
+      .sub { fill: #8A8A91; font: 12.5px "Segoe UI", system-ui, sans-serif; letter-spacing: .04em; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="760" height="742" rx="18"/>
+
+  <text class="h1" x="52" y="52">DVWA 完整链路：从弱口令到 GetShell</text>
+  <text class="sub" x="52" y="76">2026-10-23 · 192.168.137.128 · DVWA 1.10 / Win2003</text>
+
+  <!-- 1 -->
+  <rect class="box" x="52" y="104" width="656" height="84" rx="12"/>
+  <circle class="num" cx="88" cy="146" r="13"/>
+  <text class="num-t" x="88" y="151" text-anchor="middle">1</text>
+  <text class="t" x="118" y="140">登录页爆破</text>
+  <text class="p" x="118" y="163">Burp Intruder · Cluster bomb · 24 条字典</text>
+  <text class="tag" x="688" y="140" text-anchor="end">弱口令</text>
+  <text class="p" x="688" y="163" text-anchor="end">命中 admin / password</text>
+
+  <line x1="380" y1="188" x2="380" y2="222" stroke="#7A5CC0" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 2 -->
+  <rect class="box" x="52" y="226" width="656" height="84" rx="12"/>
+  <circle class="num" cx="88" cy="268" r="13"/>
+  <text class="num-t" x="88" y="273" text-anchor="middle">2</text>
+  <text class="t" x="118" y="262">进入后台</text>
+  <text class="p" x="118" y="285">Location: index.php → Welcome, admin</text>
+  <text class="tag" x="688" y="262" text-anchor="end">认证失守</text>
+  <text class="p" x="688" y="285" text-anchor="end">获得管理权限</text>
+
+  <line x1="380" y1="310" x2="380" y2="344" stroke="#7A5CC0" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 3 -->
+  <rect class="box" x="52" y="348" width="656" height="84" rx="12"/>
+  <circle class="num" cx="88" cy="390" r="13"/>
+  <text class="num-t" x="88" y="395" text-anchor="middle">3</text>
+  <text class="t" x="118" y="384">命令注入</text>
+  <text class="p" x="118" y="407">127.0.0.1 &amp; whoami</text>
+  <text class="tag" x="688" y="384" text-anchor="end">OS 命令注入</text>
+  <text class="p" x="688" y="407" text-anchor="end">nijing-win2003\administrator</text>
+
+  <line x1="380" y1="432" x2="380" y2="466" stroke="#7A5CC0" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 4 -->
+  <rect class="box" x="52" y="470" width="656" height="84" rx="12"/>
+  <circle class="num" cx="88" cy="512" r="13"/>
+  <text class="num-t" x="88" y="517" text-anchor="middle">4</text>
+  <text class="t" x="118" y="506">写马落盘</text>
+  <text class="p" x="118" y="529">echo base64 &gt; s.b64 &amp;&amp; certutil -decode → shell.php</text>
+  <text class="tag" x="688" y="506" text-anchor="end">任意文件写入</text>
+  <text class="p" x="688" y="529" text-anchor="end">WWW 目录可写</text>
+
+  <line x1="380" y1="554" x2="380" y2="588" stroke="#7A5CC0" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- 5 -->
+  <rect class="box" x="52" y="592" width="656" height="84" rx="12"/>
+  <circle class="num" cx="88" cy="634" r="13"/>
+  <text class="num-t" x="88" y="639" text-anchor="middle">5</text>
+  <text class="t" x="118" y="628">GetShell</text>
+  <text class="p" x="118" y="651">POST c=phpinfo(); → PHP 5.4.45 页面</text>
+  <text class="tag" x="688" y="628" text-anchor="end">代码执行</text>
+  <text class="p" x="688" y="651" text-anchor="end">RCE · 收尾删马</text>
+
+  <text class="sub" x="52" y="712">危害链：入口（弱口令）→ 执行权（命令注入）→ 持久化（目录可写）。少一环，危害降一个量级。</text>
+</svg>
