@@ -3,7 +3,6 @@ label: 生活
 desc: 日常、影像，与走过的路。
 href: /life
 latest:
-  title: 九月的桌面与日常
-  date: 2026-09-18
+  title: 夜航西飞 · 睡前循环
+  date: 2026-10-19
 ---
-（示例数据：正文留空。）
